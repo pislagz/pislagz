@@ -1,0 +1,35 @@
+.page {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 68px var(--pad-x-inner) 80px;
+}
+
+.title {
+  font-size: 30px;
+  font-weight: 600;
+}
+
+.lead {
+  margin-top: 28px;
+  max-width: 425px;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  line-height: 1.35;
+}
+
+.cta {
+  margin-top: 36px;
+  min-width: 222px;
+}
+
+.cta img {
+  width: 18px;
+  height: 24px;
+}
+
+@media (max-width: 900px) {
+  .page {
+    padding: 48px var(--pad-x) 64px;
+  }
+}

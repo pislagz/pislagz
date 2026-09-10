@@ -1,0 +1,135 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--radius-pill);
+  background-image: var(--gradient-button);
+  color: var(--color-white);
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.sm {
+  height: 31px;
+  padding: 0 14px;
+  font-size: 14px;
+  min-width: 171px;
+}
+
+.md {
+  height: 40px;
+  padding: 0 16px 0 24px;
+  font-size: 18px;
+}
+
+.lg {
+  height: 49px;
+  padding: 0 18px 0 26px;
+  font-size: 21px;
+  min-width: 164px;
+}
+
+.overlay {
+  background-image: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    color-mix(in srgb, var(--color-magenta) 22%, transparent) 45%,
+    color-mix(in srgb, var(--color-blue) 14%, transparent) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .overlay {
+    background-image: var(--gradient-button);
+    border-color: transparent;
+    box-shadow: none;
+  }
+}
+
+.glow {
+  box-shadow: 0 0 32px rgba(206, 3, 255, 0.45);
+}
+
+.icon {
+  flex: none;
+  object-fit: contain;
+}
+
+.glassWrap {
+  display: inline-flex;
+  align-items: stretch;
+  color: var(--color-white);
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1;
+  flex-shrink: 0;
+  cursor: pointer;
+  border-radius: var(--radius-pill);
+}
+
+.glassWrap > * {
+  width: 100%;
+}
+
+.glassWrap span {
+  font-family: var(--font);
+  font-weight: 600;
+}
+
+.glass_sm {
+  height: 31px;
+  min-width: 171px;
+  font-size: 14px;
+}
+
+.glass_sm span {
+  font-size: 14px;
+}
+
+.glass_md {
+  height: 40px;
+  font-size: 18px;
+}
+
+.glass_md span {
+  font-size: 18px;
+}
+
+.glass_lg {
+  height: 49px;
+  min-width: 164px;
+  font-size: 21px;
+}
+
+.glass_lg span {
+  font-size: 21px;
+}
+
+.glassGlow {
+  border-radius: var(--radius-pill);
+  box-shadow: 0 0 22px rgba(206, 3, 255, 0.45);
+}
+
+@media (max-width: 900px) {
+  .md {
+    height: 35px;
+    font-size: 16px;
+    padding: 0 14px 0 21px;
+  }
+
+  .glass_md {
+    height: 35px;
+    font-size: 16px;
+  }
+
+  .glass_md span {
+    font-size: 16px;
+  }
+}

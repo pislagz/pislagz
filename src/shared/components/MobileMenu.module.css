@@ -1,0 +1,195 @@
+.drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.present {
+  visibility: visible;
+}
+
+.present.expanded {
+  pointer-events: auto;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.28);
+  border: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.expanded .backdrop {
+  opacity: 1;
+}
+
+.sheet {
+  position: absolute;
+  top: var(--sheet-top, 12px);
+  right: var(--sheet-right, 12px);
+  z-index: 1;
+  width: min(250px, calc(100vw - 24px));
+  height: auto;
+  overflow: hidden;
+  isolation: isolate;
+  border: 0;
+  border-radius: 18px;
+  background: rgba(18, 18, 18, 0.8);
+  box-shadow:
+    0 0 0 1px rgb(40, 40, 40),
+    0 8px 32px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  opacity: 0;
+  clip-path: inset(
+    var(--clip-top, 0px)
+    var(--clip-right, 0px)
+    var(--clip-bottom, 100%)
+    var(--clip-left, 100%)
+    round 18px
+  );
+  transition:
+    clip-path 0.4s cubic-bezier(0.4, 0, 1, 1),
+    opacity 0.2s linear;
+}
+
+.expanded .sheet {
+  opacity: 1;
+  clip-path: inset(0 0 0 0 round 18px);
+  transition:
+    clip-path 0.64s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.18s linear;
+}
+
+.panel {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 56px 20px 28px;
+}
+
+.nav,
+.hire,
+.social {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition:
+    opacity 0.18s linear,
+    transform 0.18s ease;
+}
+
+.expanded .nav,
+.expanded .hire,
+.expanded .social {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.expanded .nav {
+  transition-delay: 0.14s;
+}
+
+.expanded .hire {
+  transition-delay: 0.2s;
+}
+
+.expanded .social {
+  transition-delay: 0.26s;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.link {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-white);
+  transition:
+    color 0.55s ease,
+    text-shadow 0.55s ease;
+}
+
+.active {
+  color: var(--color-accent);
+  text-shadow: var(--shadow-nav);
+}
+
+.hire {
+  margin-top: 16px;
+}
+
+.hireButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 120px;
+  background: rgba(18, 18, 18, 0.8);
+  box-shadow: 0 0 0 1px rgb(110, 110, 115);
+  color: #f5f5f7;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.hireButton img {
+  width: 12px;
+  height: 12px;
+}
+
+.social {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.social img {
+  width: 18px;
+  height: 18px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .sheet,
+  .nav,
+  .hire,
+  .social,
+  .expanded .sheet,
+  .expanded .nav,
+  .expanded .hire,
+  .expanded .social {
+    transform: none;
+    clip-path: none;
+    transition: opacity 0.2s linear;
+    transition-delay: 0s;
+  }
+
+  .sheet {
+    opacity: 0;
+  }
+
+  .expanded .sheet,
+  .expanded .nav,
+  .expanded .hire,
+  .expanded .social {
+    opacity: 1;
+  }
+}

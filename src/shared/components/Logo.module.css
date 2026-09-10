@@ -1,0 +1,81 @@
+.logo {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-white);
+}
+
+.header {
+  gap: 19px;
+}
+
+.header .mark {
+  width: 46px;
+  height: 46px;
+}
+
+.header .name {
+  font-size: 24px;
+}
+
+.footer {
+  gap: 15px;
+}
+
+.footer .mark {
+  width: 32px;
+  height: 32px;
+}
+
+.footer .name {
+  font-size: 14px;
+}
+
+.inverted {
+  color: var(--color-black);
+}
+
+.mark {
+  border-radius: 8px;
+  object-fit: cover;
+  flex: none;
+  overflow: hidden;
+}
+
+.gradFrom {
+  stop-color: var(--logo-from, #cc18cf);
+  transition: stop-color 0.55s ease;
+}
+
+.gradTo {
+  stop-color: var(--logo-to, #4e0ca2);
+  transition: stop-color 0.55s ease;
+}
+
+.name {
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.regular {
+  font-weight: 400;
+}
+
+.bold {
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .header {
+    gap: 14px;
+  }
+
+  .header .mark {
+    width: 34px;
+    height: 34px;
+  }
+
+  .header .name {
+    font-size: 18px;
+  }
+}

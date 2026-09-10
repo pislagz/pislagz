@@ -1,0 +1,50 @@
+:root {
+  --color-bg: #151922;
+  --color-white: #ffffff;
+  --color-black: #1a1a1a;
+  --color-text: #ffffff;
+  --color-text-muted: rgba(255, 255, 255, 0.7);
+  --color-text-faint: #d0d0d0;
+  --color-accent: #af06ff;
+  --color-accent-deep: #4503ff;
+  --logo-from: #cc18cf;
+  --logo-to: #4e0ca2;
+  --skill-icon-filter: none;
+  --color-magenta: #ce03ff;
+  --color-blue: #3612ff;
+  --color-underline: #700dff;
+  --color-tag: #af05ff;
+  --color-overlay: rgba(0, 0, 0, 0.5);
+  --color-menu-overlay: rgba(0, 0, 0, 0.6);
+  --color-skill-hover: rgba(196, 196, 196, 0.1);
+  --color-dashed: rgba(255, 255, 255, 0.1);
+  --color-footer-copy: rgba(0, 0, 0, 0.3);
+  --color-nav-dark: #292929;
+  --gradient-button: linear-gradient(180deg, #ce03ff 0%, #3612ff 160%);
+  --gradient-hero-word: linear-gradient(180deg, #ce03ff 0%, #4503ff 100%);
+  --gradient-glow-a: linear-gradient(213deg, #ce03ff 23%, rgba(54, 18, 255, 0.61) 45%);
+  --gradient-glow-b: linear-gradient(233deg, #ce03ff 23%, rgba(54, 18, 255, 0.61) 45%);
+  --gradient-card: linear-gradient(14deg, #100453 7%, #8f13d2 114%);
+  --gradient-badge: linear-gradient(180deg, #7010b3 0%, #550fff 100%);
+  --shadow-nav: 0 10px 30px #af06ff;
+  --shadow-button: 0 10px 50px rgba(206, 3, 255, 0.15);
+  --shadow-hero-word: 0 4px 4px rgba(0, 0, 0, 0.25);
+  --shadow-hero-next: 0 4px 50px rgba(54, 18, 255, 0.4);
+  --shadow-card: 0 4px 4px rgba(0, 0, 0, 0.25);
+  --font: "Inter", system-ui, sans-serif;
+  --page-max: 1280px;
+  --pad-x: 94px;
+  --pad-x-inner: 175px;
+  --header-top: 66px;
+  --footer-h: 72px;
+  --radius-pill: 1000px;
+  --radius-card: 10px;
+}
+
+@media (max-width: 900px) {
+  :root {
+    --pad-x: 21px;
+    --pad-x-inner: 21px;
+    --header-top: 27px;
+  }
+}

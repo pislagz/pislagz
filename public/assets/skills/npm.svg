@@ -1,0 +1,16 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="43" height="43" viewBox="0 0 43 43" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="sass-original 1" clip-path="url(#clip0_0_35)">
+<g id="npm-original-wordmark 1">
+</g>
+<path id="Vector" d="M9.12122 17H35.6297V26.3443H22.3755V27.9027H16.4837V26.3443H9.12122V17ZM10.5941 24.7879H13.54V20.1148H15.0129V24.7879H16.4859V18.5584H10.5941V24.7879ZM17.9567 18.5584V26.3443H20.9025V24.7879H23.8484V18.5584H17.9567ZM20.9025 20.1169H22.3755V23.2295H20.9025V20.1169ZM25.3213 18.5584V24.7879H28.2672V20.1148H29.7401V24.7879H31.2131V20.1148H32.686V24.7879H34.1589V18.5584H25.3213Z" fill="url(#paint0_linear_0_35)"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_35" x1="22.3755" y1="17" x2="22.3755" y2="27.9027" gradientUnits="userSpaceOnUse">
+<stop stop-color="#AF05FF"/>
+<stop offset="1" stop-color="#3612FF"/>
+</linearGradient>
+<clipPath id="clip0_0_35">
+<rect width="43" height="43" fill="white"/>
+</clipPath>
+</defs>
+</svg>
