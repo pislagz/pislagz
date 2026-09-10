@@ -13,6 +13,7 @@ type Props = {
   variant?: Variant;
   className?: string;
   active?: boolean;
+  effectsEnabled?: boolean;
 };
 
 const PRESETS: Record<
@@ -61,6 +62,7 @@ export function GlassSurface({
   variant = "dock",
   className,
   active = false,
+  effectsEnabled = true,
 }: Props) {
   const [ready, setReady] = useState(false);
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
@@ -72,8 +74,8 @@ export function GlassSurface({
   const elasticity = active ? Math.min(preset.elasticity, 0.12) : preset.elasticity;
 
   useEffect(() => {
-    setReady(true);
-  }, []);
+    setReady(effectsEnabled);
+  }, [effectsEnabled]);
 
   return (
     <div
@@ -82,6 +84,7 @@ export function GlassSurface({
         .join(" ")}
       data-ready={ready ? "true" : "false"}
       data-active={active ? "true" : "false"}
+      data-effects-enabled={effectsEnabled ? "true" : "false"}
     >
       <div className={styles.sizer} aria-hidden={ready} inert={ready}>
         {children}
