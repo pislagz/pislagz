@@ -77,7 +77,7 @@ void main() {
   color += fresnel * 0.65;
 
   float hole = mix(0.12, 1.0, smoothstep(0.06, 0.24, length(vUv - 0.5)));
-  gl_FragColor = vec4(color * 0.85 * uGain, hole * (0.12 + fresnel * 0.35) * uGain);
+  gl_FragColor = vec4(color * 0.85 * uGain, hole * (0.12 + fresnel * 0.35));
 }
 `;
 
@@ -167,7 +167,7 @@ function makeMaterial(
 }
 
 function gainForWidth(width: number) {
-  return width < 900 ? 1 : 0.4;
+  return width < 900 ? 0.45 : 0.16;
 }
 
 export function createCrystalField(canvas: HTMLCanvasElement, options: Options): FieldHandle {
