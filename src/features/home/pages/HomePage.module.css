@@ -97,10 +97,15 @@
 @media (max-width: 900px) {
   .hero {
     flex-direction: column;
+    justify-content: center;
     text-align: center;
     padding: 37px var(--pad-x) 48px;
-    flex: none;
+    flex: 1;
     gap: 24px;
+  }
+
+  .copy {
+    flex: none;
   }
 
   .headline {

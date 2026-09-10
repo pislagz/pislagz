@@ -37,7 +37,7 @@ export function MobileMenu({ open, onClose, originRef }: Props) {
     const originBox = origin.getBoundingClientRect();
     const parent = sheet.offsetParent;
     const parentBox = parent?.getBoundingClientRect() ?? { left: 0, top: 0 };
-    const screenInset = 12;
+    const screenInset = 8;
     const iconSize = 22;
     const iconTop = originBox.top + (originBox.height - iconSize) / 2;
     const iconRight = originBox.right - (originBox.width - iconSize) / 2;
@@ -138,8 +138,8 @@ export function MobileMenu({ open, onClose, originRef }: Props) {
               "--clip-right": "0px",
               "--clip-bottom": "100%",
               "--clip-left": "100%",
-              "--sheet-top": "12px",
-              "--sheet-right": "12px",
+              "--sheet-top": "8px",
+              "--sheet-right": "8px",
             } as CSSProperties
           }
         >
