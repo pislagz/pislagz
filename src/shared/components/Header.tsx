@@ -26,7 +26,9 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`${styles.link} ${active ? styles.active : ""}`}
+                className={`${styles.link} ${active ? styles.active : ""} ${
+                  active && item.href === "/play" ? styles.playActive : ""
+                }`}
               >
                 {item.label}
               </Link>

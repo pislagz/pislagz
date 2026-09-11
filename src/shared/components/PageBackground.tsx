@@ -13,7 +13,8 @@ type FieldHandle = {
 };
 
 function paletteForPath(pathname: string): CrystalPalette {
-  if (pathname.startsWith("/skills")) return CRYSTAL_PALETTES.skills;
+  if (pathname.startsWith("/arsenal")) return CRYSTAL_PALETTES.arsenal;
+  if (pathname.startsWith("/play")) return CRYSTAL_PALETTES.play;
   if (pathname.startsWith("/resume")) return CRYSTAL_PALETTES.resume;
   if (pathname.startsWith("/hire-me")) return CRYSTAL_PALETTES.hire;
   return CRYSTAL_PALETTES.home;

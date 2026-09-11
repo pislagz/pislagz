@@ -3,8 +3,8 @@
 import type { AnimationEvent, CSSProperties } from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { GlassSurface } from "@shared/ui/GlassSurface";
-import type { Skill } from "../api";
-import styles from "./SkillsBentoGrid.module.css";
+import type { ArsenalItem } from "../api";
+import styles from "./ArsenalBentoGrid.module.css";
 
 type TileSize = "square" | "wide" | "feature";
 
@@ -100,7 +100,7 @@ function AnimatedValue({
  * away from the grid center, then converges into place. Offsets, scale and
  * stagger are computed from each tile's real position after layout.
  */
-export function SkillsBentoGrid({ skills }: { skills: Skill[] }) {
+export function ArsenalBentoGrid({ items }: { items: ArsenalItem[] }) {
   const gridRef = useRef<HTMLDivElement>(null);
   const [armed, setArmed] = useState(false);
   const settledTiles = useRef(0);
@@ -159,7 +159,11 @@ export function SkillsBentoGrid({ skills }: { skills: Skill[] }) {
 
     finalized.current = false;
     settledTiles.current = 0;
-    document.documentElement.style.setProperty("overflow", "clip");
+    // Keep mobile pages scrollable throughout the staggered fly-in. Desktop
+    // still clips transient overflow so distant tiles cannot flash scrollbars.
+    if (!window.matchMedia("(max-width: 900px)").matches) {
+      document.documentElement.style.setProperty("overflow", "clip");
+    }
     setArmed(true);
 
     const safety = window.setTimeout(finalize, FLY_SAFETY_TIMEOUT_MS);
@@ -176,7 +180,7 @@ export function SkillsBentoGrid({ skills }: { skills: Skill[] }) {
       event.target.parentElement === gridRef.current
     ) {
       settledTiles.current += 1;
-      if (settledTiles.current >= skills.length) finalize();
+      if (settledTiles.current >= items.length) finalize();
     }
   };
 
@@ -187,18 +191,18 @@ export function SkillsBentoGrid({ skills }: { skills: Skill[] }) {
       data-armed={armed ? "true" : "false"}
       onAnimationEnd={handleAnimationEnd}
     >
-      {skills.map((skill) => {
-        const size = TILE_SIZES[skill.id] ?? "square";
+      {items.map((item) => {
+        const size = TILE_SIZES[item.id] ?? "square";
         return (
           <div
-            key={skill.id}
+            key={item.id}
             className={`${styles.tile} ${styles[size]}`}
-            data-skill-id={skill.id}
+            data-arsenal-id={item.id}
           >
             <GlassSurface
               variant="panel"
-              className={styles.skillGlass}
-              active={skill.highlighted}
+              className={styles.arsenalGlass}
+              active={item.highlighted}
               effectsEnabled={false}
             >
               <div
@@ -206,30 +210,30 @@ export function SkillsBentoGrid({ skills }: { skills: Skill[] }) {
                   .filter(Boolean)
                   .join(" ")}
               >
-                {skill.iconSrc ? (
+                {item.iconSrc ? (
                   <>
                     <span
                       aria-hidden="true"
                       className={styles.icon}
                       style={
                         {
-                          "--skill-icon": `url("${skill.iconSrc}")`,
+                          "--arsenal-icon": `url("${item.iconSrc}")`,
                         } as CSSProperties
                       }
                     />
-                    <span className={styles.label}>{skill.label}</span>
+                    <span className={styles.label}>{item.label}</span>
                   </>
                 ) : (
                   <div className={styles.metric}>
                     <span className={styles.value}>
                       <AnimatedValue
-                        value={skill.value ?? ""}
+                        value={item.value ?? ""}
                         armed={armed}
-                        enabled={skill.id === "experience" || skill.id === "hours"}
+                        enabled={item.id === "experience" || item.id === "hours"}
                       />
                     </span>
-                    {skill.subtitle ? (
-                      <span className={styles.subtitle}>{skill.subtitle}</span>
+                    {item.subtitle ? (
+                      <span className={styles.subtitle}>{item.subtitle}</span>
                     ) : null}
                   </div>
                 )}

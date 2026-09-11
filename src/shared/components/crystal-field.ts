@@ -232,6 +232,9 @@ export function createCrystalField(canvas: HTMLCanvasElement, options: Options):
   const targetA = colorA.clone();
   const targetB = colorB.clone();
   const targetC = colorC.clone();
+  let renderWidth = 0;
+  let renderHeight = 0;
+  let renderPixelRatio = 0;
 
   const applyColors = () => {
     const matA = layerA.material as THREE.ShaderMaterial;
@@ -248,7 +251,23 @@ export function createCrystalField(canvas: HTMLCanvasElement, options: Options):
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
     if (width < 1 || height < 1) return;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, dprCap));
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, dprCap);
+
+    // Safari emits a final resize when its collapsing toolbar settles. Avoid
+    // reallocating the WebGL drawing buffer when our lvh-sized canvas did not
+    // actually change.
+    if (
+      width === renderWidth &&
+      height === renderHeight &&
+      pixelRatio === renderPixelRatio
+    ) {
+      return;
+    }
+
+    renderWidth = width;
+    renderHeight = height;
+    renderPixelRatio = pixelRatio;
+    renderer.setPixelRatio(pixelRatio);
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();

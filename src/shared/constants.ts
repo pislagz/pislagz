@@ -10,7 +10,8 @@ export const SOCIAL = {
 
 export const NAV_ITEMS = [
   { href: "/", label: "home" },
-  { href: "/skills", label: "skills" },
+  { href: "/arsenal", label: "arsenal" },
+  { href: "/play", label: "play" },
   { href: "/resume", label: "résumé" },
 ] as const;
 

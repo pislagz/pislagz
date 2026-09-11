@@ -1,0 +1,304 @@
+.game {
+  width: min(720px, 100%);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.hud {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.energyBars {
+  display: flex;
+  min-height: 18px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin: -5px 0 7px;
+}
+
+.energyRow {
+  position: relative;
+  display: flex;
+  min-height: 18px;
+  align-items: center;
+  gap: 8px;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.enemyEnergyRow {
+  justify-content: flex-end;
+}
+
+.energyLabel {
+  color: rgba(255, 255, 255, 0.62);
+  white-space: nowrap;
+}
+
+.energyTrack {
+  width: 90px;
+  height: 8px;
+  padding: 1px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.energyTrack > span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: #00ff41;
+  box-shadow: 0 0 7px rgba(0, 255, 65, 0.8);
+  transition: width 90ms linear;
+}
+
+.enemyEnergyTrack > span {
+  background: #ff3131;
+  box-shadow: 0 0 7px rgba(255, 49, 49, 0.8);
+}
+
+.deniedEnergyTrack > span {
+  animation: denied-meter 620ms steps(2, jump-none);
+}
+
+.noPower {
+  color: #ff3131;
+  white-space: nowrap;
+  text-shadow: 0 0 6px rgba(255, 49, 49, 0.85);
+  animation: no-power 620ms steps(2, jump-none) forwards;
+}
+
+@keyframes denied-meter {
+  25%,
+  70% {
+    background: #ffd400;
+    box-shadow: 0 0 8px rgba(255, 212, 0, 0.95);
+  }
+}
+
+@keyframes no-power {
+  0%,
+  45% {
+    opacity: 1;
+  }
+
+  20%,
+  65%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.powerHint {
+  white-space: nowrap;
+  color: #00ff41;
+  text-shadow: 0 0 6px rgba(0, 255, 65, 0.75);
+  animation: power-hint-blink 800ms steps(2, jump-none) infinite;
+}
+
+.invaderEnergyRow {
+  display: flex;
+  min-height: 18px;
+  align-items: center;
+  gap: 9px;
+  margin: -5px 0 7px;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.invaderEnergyTrack {
+  width: 150px;
+}
+
+.burstReady {
+  color: #ffd400;
+  text-shadow: 0 0 6px rgba(255, 212, 0, 0.8);
+  animation: power-hint-blink 500ms steps(2, jump-none) infinite;
+}
+
+@keyframes power-hint-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.scoreFlash,
+.bestFlash {
+  animation: score-flash 480ms steps(2, jump-none);
+}
+
+@keyframes score-flash {
+  0%,
+  45%,
+  100% {
+    color: #fff;
+    text-shadow: none;
+  }
+
+  20%,
+  70% {
+    color: #00ff41;
+    text-shadow:
+      0 0 6px rgba(0, 255, 65, 0.95),
+      0 0 18px rgba(0, 255, 65, 0.6);
+  }
+}
+
+.frame {
+  position: relative;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.75);
+  background: rgba(0, 0, 0, 0.72);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.8),
+    0 18px 60px rgba(0, 0, 0, 0.5);
+  touch-action: none;
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  cursor: crosshair;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 22px;
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.pixelMessage {
+  display: flex;
+  height: clamp(42px, 7vw, 68px);
+  align-items: stretch;
+  gap: clamp(5px, 0.8vw, 9px);
+}
+
+.pixelGlyph {
+  display: grid;
+  width: calc(
+    (clamp(42px, 7vw, 68px) / 7) * var(--glyph-columns)
+  );
+  grid-template-columns: repeat(var(--glyph-columns), 1fr);
+  grid-template-rows: repeat(7, 1fr);
+  gap: 1px;
+}
+
+.pixelCell[data-on="true"] {
+  background: #fff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.18);
+}
+
+.pixelSpace {
+  width: clamp(8px, 1.4vw, 16px);
+}
+
+.overlayActions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.overlayActions button,
+.overlayActions a {
+  border: 2px solid #fff;
+  padding: 10px 22px;
+  background: #fff;
+  color: #050505;
+  font: 700 14px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.overlayActions button:hover,
+.overlayActions button:focus-visible,
+.overlayActions a:hover,
+.overlayActions a:focus-visible {
+  background: transparent;
+  color: #fff;
+}
+
+.instructions {
+  margin-top: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .game {
+    width: 100%;
+    margin-top: 14px;
+    margin-inline: auto;
+  }
+
+  .hud {
+    gap: 10px;
+    font-size: 10px;
+  }
+
+  .frame {
+    width: 100%;
+    margin-inline: auto;
+  }
+
+  .canvas {
+    width: 100%;
+    height: min(560px, calc(100dvh - 285px));
+  }
+}
+
+@media (max-width: 600px) {
+  .energyTrack {
+    width: 70px;
+  }
+
+  .powerHint {
+    letter-spacing: 0.03em;
+  }
+}
+
+@media (max-width: 430px) {
+  .energyTrack {
+    width: 45px;
+  }
+
+  .energyRow {
+    gap: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scoreFlash,
+  .bestFlash,
+  .powerHint,
+  .burstReady,
+  .deniedEnergyTrack > span,
+  .noPower {
+    animation: none;
+  }
+
+  .noPower {
+    opacity: 0;
+  }
+}

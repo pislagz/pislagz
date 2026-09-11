@@ -37,6 +37,13 @@
   text-shadow: var(--shadow-nav);
 }
 
+.playActive {
+  color: #b967ff;
+  text-shadow:
+    0 0 6px rgba(185, 103, 255, 0.95),
+    0 0 18px rgba(185, 103, 255, 0.6);
+}
+
 .social {
   display: flex;
   align-items: center;

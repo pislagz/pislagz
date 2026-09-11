@@ -1,4 +1,3 @@
-import { SOCIAL } from "@shared/constants";
 import { Button } from "@shared/ui/Button";
 import { HeroHeadline } from "../components/HeroHeadline";
 import styles from "./HomePage.module.css";
@@ -10,13 +9,13 @@ export function HomePage() {
         <HeroHeadline />
         <p className={styles.role}>Frontend Developer</p>
         <Button
-          href={SOCIAL.github}
+          href="/arsenal"
           variant="glass"
           iconSrc="/assets/icons/arrow-circle.svg"
           iconSize={24}
           className={styles.cta}
         >
-          check my projects
+          see my arsenal
         </Button>
       </div>
     </section>

@@ -1,6 +1,6 @@
 # pawelpisulski.pl
 
-Personal portfolio for Paweł Pisulski, a front-end developer. Built with **Next.js 15** (App Router) and CSS modules. No Tailwind.
+Personal demo page. Built with **Next.js 15** (App Router) and CSS modules.
 
 ## Run
 
@@ -19,7 +19,7 @@ src/
 ├── features/
 │   ├── home/                    # Hero landing
 │   ├── projects/                # Project grid + feature API
-│   ├── skills/                  # Skill icons + feature API
+│   ├── arsenal/                 # Tool icons + feature API
 │   ├── resume/                  # PDF download
 │   └── contact/                 # Hire-me form + feature API
 └── shared/
@@ -48,7 +48,7 @@ src/
 |---------|-------------|
 | `home` | Hero with headline, project CTA, and isometric illustration. |
 | `projects` | Lists personal/work projects as cards with tech tags and links. |
-| `skills` | Grid of daily tools and technologies. |
+| `arsenal` | Grid of daily tools and technologies. |
 | `resume` | Short intro and PDF download. |
 | `contact` | Email plus a hire-me form that posts to `/api/contact`. |
 

@@ -7,7 +7,7 @@
   flex-direction: column;
   /* "clip" instead of "hidden": hidden forces overflow-y from visible to
      auto, turning the shell into a scroll container whose scrollbar flashes
-     during the skills fly-in animation. */
+     during the arsenal fly-in animation. */
   overflow-x: clip;
 }
 

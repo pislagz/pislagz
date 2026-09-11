@@ -1,6 +1,16 @@
 .root {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  /*
+   * Keep the WebGL surface at the largest viewport height. On mobile Safari,
+   * the visible viewport changes while its toolbar collapses; sizing against
+   * that viewport would force an expensive drawing-buffer reallocation when
+   * the toolbar animation settles.
+   */
+  height: 100vh;
+  height: 100lvh;
   z-index: 0;
   pointer-events: none;
   overflow: hidden;

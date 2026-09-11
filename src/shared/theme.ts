@@ -5,7 +5,7 @@ export type PageTheme = {
   logoTo: string;
   shadowNav: string;
   underline: string;
-  skillFilter: string;
+  arsenalIconFilter: string;
 };
 
 export const PAGE_THEMES = {
@@ -16,16 +16,25 @@ export const PAGE_THEMES = {
     logoTo: "#4E0CA2",
     shadowNav: "0 10px 30px #af06ff",
     underline: "#700dff",
-    skillFilter: "none",
+    arsenalIconFilter: "none",
   },
-  skills: {
+  arsenal: {
     accent: "#ff6b00",
     accentDeep: "#ff2a00",
     logoFrom: "#FF8A1A",
     logoTo: "#D91F00",
     shadowNav: "0 10px 30px #ff6b00",
     underline: "#ff4d00",
-    skillFilter: "hue-rotate(118deg) saturate(1.25)",
+    arsenalIconFilter: "hue-rotate(118deg) saturate(1.25)",
+  },
+  play: {
+    accent: "#ffffff",
+    accentDeep: "#777777",
+    logoFrom: "#050505",
+    logoTo: "#171717",
+    shadowNav: "0 10px 30px rgba(255, 255, 255, 0.28)",
+    underline: "#ffffff",
+    arsenalIconFilter: "none",
   },
   resume: {
     accent: "#2dff4e",
@@ -34,7 +43,7 @@ export const PAGE_THEMES = {
     logoTo: "#009E32",
     shadowNav: "0 10px 30px #2dff4e",
     underline: "#1ad94a",
-    skillFilter: "none",
+    arsenalIconFilter: "none",
   },
   hire: {
     accent: "#3ecbff",
@@ -43,12 +52,13 @@ export const PAGE_THEMES = {
     logoTo: "#0077FF",
     shadowNav: "0 10px 30px #3ecbff",
     underline: "#2bb4ff",
-    skillFilter: "none",
+    arsenalIconFilter: "none",
   },
 } as const satisfies Record<string, PageTheme>;
 
 export function themeForPath(pathname: string): PageTheme {
-  if (pathname.startsWith("/skills")) return PAGE_THEMES.skills;
+  if (pathname.startsWith("/arsenal")) return PAGE_THEMES.arsenal;
+  if (pathname.startsWith("/play")) return PAGE_THEMES.play;
   if (pathname.startsWith("/resume")) return PAGE_THEMES.resume;
   if (pathname.startsWith("/hire-me")) return PAGE_THEMES.hire;
   return PAGE_THEMES.home;

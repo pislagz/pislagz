@@ -18,7 +18,7 @@ export function ThemeShell({ children }: Props) {
     "--logo-from": theme.logoFrom,
     "--logo-to": theme.logoTo,
     "--color-underline": theme.underline,
-    "--skill-icon-filter": theme.skillFilter,
+    "--arsenal-icon-filter": theme.arsenalIconFilter,
   } as CSSProperties;
 
   return (
