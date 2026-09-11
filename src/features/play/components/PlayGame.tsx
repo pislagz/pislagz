@@ -418,6 +418,8 @@ function VerticalPong({
     let lastTap = 0;
     let powerShotArmed = false;
     let powerDeniedUntil = 0;
+    let activeTouchPointer: number | null = null;
+    let lastTouchClientX = 0;
     let rallyBounces = 0;
     const sparks: Array<{
       x: number;
@@ -429,7 +431,14 @@ function VerticalPong({
     }> = [];
 
     const movePlayer = (event: PointerEvent) => {
+      if (event.pointerType === "touch" && event.pointerId !== activeTouchPointer) return;
       const rect = canvas.getBoundingClientRect();
+      if (event.pointerType === "touch") {
+        const deltaX = event.clientX - lastTouchClientX;
+        player.x += (deltaX / rect.width) * width;
+        lastTouchClientX = event.clientX;
+        return;
+      }
       player.x = ((event.clientX - rect.left) / rect.width) * width;
     };
     const onKeyDown = (event: KeyboardEvent) => {
@@ -438,10 +447,7 @@ function VerticalPong({
       keys.add(event.code);
     };
     const onKeyUp = (event: KeyboardEvent) => keys.delete(event.code);
-    const onPointerDown = (event: PointerEvent) => {
-      unlockArcadeAudio();
-      movePlayer(event);
-      const now = performance.now();
+    const registerPowerTap = (now: number) => {
       const ballIsNearPaddle = ball.vy > 0 && ball.y > height * 0.62;
       if (now - lastTap <= 280) {
         if (charge >= 5 && ballIsNearPaddle) {
@@ -453,11 +459,60 @@ function VerticalPong({
       }
       lastTap = now;
     };
+    const onPointerDown = (event: PointerEvent) => {
+      unlockArcadeAudio();
+      if (event.pointerType === "touch") {
+        activeTouchPointer = event.pointerId;
+        lastTouchClientX = event.clientX;
+        canvas.setPointerCapture(event.pointerId);
+      } else {
+        movePlayer(event);
+      }
+      registerPowerTap(performance.now());
+    };
+    const onPointerUp = (event: PointerEvent) => {
+      if (event.pointerId === activeTouchPointer) activeTouchPointer = null;
+    };
+    const onExternalPointer = (event: Event) => {
+      const { phase, clientX, pointerId, pointerType } = (
+        event as CustomEvent<{
+          phase: "down" | "move" | "up";
+          clientX: number;
+          pointerId: number;
+          pointerType: string;
+        }>
+      ).detail;
+      if (phase === "down") {
+        unlockArcadeAudio();
+        if (pointerType === "touch") {
+          activeTouchPointer = pointerId;
+          lastTouchClientX = clientX;
+        }
+        registerPowerTap(performance.now());
+        return;
+      }
+      if (phase === "up") {
+        if (pointerId === activeTouchPointer) activeTouchPointer = null;
+        return;
+      }
+      if (pointerType === "touch" && pointerId !== activeTouchPointer) return;
+      const rect = canvas.getBoundingClientRect();
+      if (pointerType === "touch") {
+        const deltaX = clientX - lastTouchClientX;
+        player.x += (deltaX / rect.width) * width;
+        lastTouchClientX = clientX;
+        return;
+      }
+      player.x = ((clientX - rect.left) / rect.width) * width;
+    };
 
     canvas.addEventListener("pointerdown", onPointerDown);
     canvas.addEventListener("pointermove", movePlayer);
+    canvas.addEventListener("pointerup", onPointerUp);
+    canvas.addEventListener("pointercancel", onPointerUp);
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
+    window.addEventListener("pong-external-pointer", onExternalPointer);
 
     const resetBall = () => {
       const speedIncrease = score * 14;
@@ -656,8 +711,11 @@ function VerticalPong({
       cancelAnimationFrame(frame);
       canvas.removeEventListener("pointerdown", onPointerDown);
       canvas.removeEventListener("pointermove", movePlayer);
+      canvas.removeEventListener("pointerup", onPointerUp);
+      canvas.removeEventListener("pointercancel", onPointerUp);
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
+      window.removeEventListener("pong-external-pointer", onExternalPointer);
     };
   }, [
     onChargeChange,
