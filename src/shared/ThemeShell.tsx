@@ -1,7 +1,8 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, MouseEvent, ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import { playArcadeSound } from "./arcade-audio";
 import { themeForPath } from "./theme";
 import styles from "./App.module.css";
 
@@ -21,8 +22,18 @@ export function ThemeShell({ children }: Props) {
     "--arsenal-icon-filter": theme.arsenalIconFilter,
   } as CSSProperties;
 
+  const playNavigationSound = (event: MouseEvent<HTMLDivElement>) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const link = target.closest("a[href]");
+    if (!link) return;
+    const destination = new URL(link.getAttribute("href") ?? "", window.location.href);
+    if (destination.origin !== window.location.origin) return;
+    playArcadeSound("navigate");
+  };
+
   return (
-    <div className={styles.shell} style={style}>
+    <div className={styles.shell} style={style} onClickCapture={playNavigationSound}>
       {children}
     </div>
   );

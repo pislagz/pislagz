@@ -3,6 +3,7 @@
 import type { CSSProperties } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { playArcadeSound, unlockArcadeAudio } from "@shared/arcade-audio";
 import { useMediaQuery } from "@shared/hooks/use-media-query";
 import styles from "./PlayGame.module.css";
 
@@ -10,69 +11,6 @@ const HIGH_SCORE_KEYS = {
   invaders: "space-invaders-high-score",
   pong: "pong-high-score",
 } as const;
-
-type ArcadeSound =
-  | "arrival"
-  | "shoot"
-  | "blaster"
-  | "hit"
-  | "bounce"
-  | "power"
-  | "deny"
-  | "score"
-  | "wave-clear"
-  | "game-over"
-  | "select";
-
-let arcadeAudioContext: AudioContext | null = null;
-
-function unlockArcadeAudio() {
-  if (!arcadeAudioContext) arcadeAudioContext = new AudioContext();
-  if (arcadeAudioContext.state === "suspended") void arcadeAudioContext.resume();
-}
-
-function playArcadeSound(sound: ArcadeSound, allowCreate = true) {
-  if (!arcadeAudioContext && allowCreate) {
-    arcadeAudioContext = new AudioContext();
-  }
-  const audio = arcadeAudioContext;
-  if (!audio || audio.state !== "running") {
-    if (allowCreate && audio?.state === "suspended") void audio.resume();
-    return;
-  }
-
-  const notes: Record<ArcadeSound, Array<[number, number, number]>> = {
-    arrival: [[110, 0, 0.055], [165, 0.045, 0.055]],
-    shoot: [[620, 0, 0.055], [310, 0.035, 0.06]],
-    blaster: [[980, 0, 0.045], [720, 0.025, 0.055], [420, 0.055, 0.07]],
-    hit: [[180, 0, 0.07], [90, 0.045, 0.09]],
-    bounce: [[260, 0, 0.045]],
-    power: [[180, 0, 0.06], [420, 0.045, 0.08], [920, 0.1, 0.14]],
-    deny: [[190, 0, 0.08], [130, 0.09, 0.14]],
-    score: [[440, 0, 0.08], [660, 0.075, 0.08], [880, 0.15, 0.12]],
-    "wave-clear": [
-      [330, 0, 0.09],
-      [440, 0.08, 0.09],
-      [550, 0.16, 0.09],
-      [880, 0.24, 0.16],
-    ],
-    "game-over": [[220, 0, 0.12], [165, 0.12, 0.12], [110, 0.24, 0.2]],
-    select: [[330, 0, 0.045], [520, 0.045, 0.06]],
-  };
-  const start = audio.currentTime;
-  notes[sound].forEach(([frequency, delay, duration]) => {
-    const oscillator = audio.createOscillator();
-    const gain = audio.createGain();
-    oscillator.type = "square";
-    oscillator.frequency.setValueAtTime(frequency, start + delay);
-    gain.gain.setValueAtTime(0.035, start + delay);
-    gain.gain.exponentialRampToValueAtTime(0.001, start + delay + duration);
-    oscillator.connect(gain);
-    gain.connect(audio.destination);
-    oscillator.start(start + delay);
-    oscillator.stop(start + delay + duration);
-  });
-}
 
 type GameStatus = "playing" | "game-over";
 

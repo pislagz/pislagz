@@ -1,0 +1,108 @@
+export type ArcadeSound =
+  | "arrival"
+  | "shoot"
+  | "blaster"
+  | "hit"
+  | "bounce"
+  | "power"
+  | "deny"
+  | "score"
+  | "wave-clear"
+  | "game-over"
+  | "select"
+  | "navigate";
+
+let arcadeAudioContext: AudioContext | null = null;
+
+export function unlockArcadeAudio() {
+  if (!arcadeAudioContext) arcadeAudioContext = new AudioContext();
+  if (arcadeAudioContext.state === "suspended") void arcadeAudioContext.resume();
+}
+
+export function playArcadeSound(sound: ArcadeSound, allowCreate = true) {
+  if (!arcadeAudioContext && allowCreate) {
+    arcadeAudioContext = new AudioContext();
+  }
+  const audio = arcadeAudioContext;
+  if (!audio || audio.state !== "running") {
+    if (allowCreate && audio?.state === "suspended") {
+      void audio.resume().then(() => playArcadeSound(sound, false));
+    }
+    return;
+  }
+
+  if (sound === "navigate") {
+    const start = audio.currentTime;
+    const duration = 0.026;
+    const buffer = audio.createBuffer(
+      1,
+      Math.ceil(audio.sampleRate * duration),
+      audio.sampleRate,
+    );
+    const samples = buffer.getChannelData(0);
+    for (let index = 0; index < samples.length; index += 1) {
+      const decay = Math.pow(1 - index / samples.length, 6);
+      samples[index] = (Math.random() * 2 - 1) * decay;
+    }
+    const source = audio.createBufferSource();
+    const filter = audio.createBiquadFilter();
+    const snapGain = audio.createGain();
+    filter.type = "lowpass";
+    filter.frequency.value = 2400;
+    filter.Q.value = 0.65;
+    snapGain.gain.setValueAtTime(0.055, start);
+    snapGain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+    source.buffer = buffer;
+    source.connect(filter);
+    filter.connect(snapGain);
+    snapGain.connect(audio.destination);
+
+    const body = audio.createOscillator();
+    const bodyGain = audio.createGain();
+    body.type = "triangle";
+    body.frequency.setValueAtTime(180, start);
+    body.frequency.exponentialRampToValueAtTime(105, start + 0.038);
+    bodyGain.gain.setValueAtTime(0.06, start);
+    bodyGain.gain.exponentialRampToValueAtTime(0.001, start + 0.042);
+    body.connect(bodyGain);
+    bodyGain.connect(audio.destination);
+
+    source.start(start);
+    body.start(start);
+    body.stop(start + 0.045);
+    return;
+  }
+
+  const notes: Record<ArcadeSound, Array<[number, number, number]>> = {
+    arrival: [[110, 0, 0.055], [165, 0.045, 0.055]],
+    shoot: [[620, 0, 0.055], [310, 0.035, 0.06]],
+    blaster: [[980, 0, 0.045], [720, 0.025, 0.055], [420, 0.055, 0.07]],
+    hit: [[180, 0, 0.07], [90, 0.045, 0.09]],
+    bounce: [[260, 0, 0.045]],
+    power: [[180, 0, 0.06], [420, 0.045, 0.08], [920, 0.1, 0.14]],
+    deny: [[190, 0, 0.08], [130, 0.09, 0.14]],
+    score: [[440, 0, 0.08], [660, 0.075, 0.08], [880, 0.15, 0.12]],
+    "wave-clear": [
+      [330, 0, 0.09],
+      [440, 0.08, 0.09],
+      [550, 0.16, 0.09],
+      [880, 0.24, 0.16],
+    ],
+    "game-over": [[220, 0, 0.12], [165, 0.12, 0.12], [110, 0.24, 0.2]],
+    select: [[330, 0, 0.045], [520, 0.045, 0.06]],
+    navigate: [],
+  };
+  const start = audio.currentTime;
+  notes[sound].forEach(([frequency, delay, duration]) => {
+    const oscillator = audio.createOscillator();
+    const gain = audio.createGain();
+    oscillator.type = "square";
+    oscillator.frequency.setValueAtTime(frequency, start + delay);
+    gain.gain.setValueAtTime(0.035, start + delay);
+    gain.gain.exponentialRampToValueAtTime(0.001, start + delay + duration);
+    oscillator.connect(gain);
+    gain.connect(audio.destination);
+    oscillator.start(start + delay);
+    oscillator.stop(start + delay + duration);
+  });
+}

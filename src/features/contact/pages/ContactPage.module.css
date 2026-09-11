@@ -19,7 +19,15 @@
 }
 
 .direct {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 14px 30px;
   margin-top: 16px;
+}
+
+.method {
+  min-width: max-content;
 }
 
 .via {
@@ -27,13 +35,18 @@
   color: var(--color-text-muted);
 }
 
-.email {
+.contactLink {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   margin-top: 4px;
   font-size: 14px;
   font-weight: 600;
+}
+
+.contactLink:hover,
+.contactLink:focus-visible {
+  color: var(--color-accent);
 }
 
 .or {
@@ -54,5 +67,9 @@
 @media (max-width: 900px) {
   .page {
     padding: 32px var(--pad-x) 24px;
+  }
+
+  .direct {
+    flex-direction: column;
   }
 }
