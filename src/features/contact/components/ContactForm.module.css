@@ -9,6 +9,7 @@
     0 8px 32px rgba(0, 0, 0, 0.28);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  color-scheme: dark;
 }
 
 .row {
@@ -42,6 +43,21 @@
   font-size: 14px;
   padding: 0 7px 8px;
   width: 100%;
+  color-scheme: dark;
+}
+
+.form .input::-webkit-credentials-auto-fill-button,
+.form .input::-webkit-contacts-auto-fill-button {
+  background-color: #fff;
+}
+
+.form .input:-webkit-autofill,
+.form .input:-webkit-autofill:hover,
+.form .input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-white);
+  caret-color: var(--color-white);
+  box-shadow: 0 0 0 1000px rgba(18, 18, 18, 0.95) inset;
+  transition: background-color 99999s ease-out;
 }
 
 .message {
@@ -60,13 +76,22 @@
   width: 189px;
 }
 
+.actionRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  height: 28px;
+  margin-top: 18px;
+}
+
 .submit {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   height: 28px;
-  margin: 18px 0 0 auto;
   padding: 0 12px;
   border-radius: 120px;
   background: rgba(18, 18, 18, 0.8);
@@ -76,6 +101,8 @@
   font-weight: 400;
   line-height: 1;
   white-space: nowrap;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .submit img {
@@ -87,11 +114,97 @@
   opacity: 0.6;
 }
 
+.submitSending {
+  opacity: 1;
+  box-shadow:
+    0 0 0 1px rgba(62, 203, 255, 0.55),
+    0 0 18px rgba(0, 136, 255, 0.28);
+}
+
+.submitSending img {
+  animation: send-fly 780ms ease-in-out infinite;
+}
+
+.submitOut {
+  animation: submit-out 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  pointer-events: none;
+}
+
 .success {
-  margin-top: 12px;
-  font-size: 13px;
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.2;
   color: var(--color-text-muted);
   text-align: right;
+}
+
+.successIn {
+  animation: success-in 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.error {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.2;
+  color: #ff8f8f;
+  text-align: right;
+  animation: success-in 320ms ease both;
+}
+
+.formSent .input {
+  opacity: 0.72;
+}
+
+.input:disabled {
+  cursor: default;
+}
+
+@keyframes send-fly {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  55% {
+    transform: translateX(7px);
+    opacity: 0.35;
+  }
+}
+
+@keyframes submit-out {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(0.86) translateY(4px);
+  }
+}
+
+@keyframes success-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .submitSending img,
+  .submitOut,
+  .successIn,
+  .error {
+    animation: none;
+  }
 }
 
 @media (max-width: 900px) {

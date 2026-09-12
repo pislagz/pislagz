@@ -1,14 +1,28 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useContactForm } from "../hooks/use-contact-form";
 import styles from "./ContactForm.module.css";
 
 const FOOTER_GAP = 28;
+const BUTTON_OUT_MS = 520;
 
 export function ContactForm() {
   const form = useContactForm();
   const messageRef = useRef<HTMLTextAreaElement>(null);
+  const [buttonGone, setButtonGone] = useState(false);
+  const locked = form.status === "sent";
+  const busy = form.status === "sending";
+
+  useLayoutEffect(() => {
+    if (form.lockedOnLoad) setButtonGone(true);
+  }, [form.lockedOnLoad]);
+
+  useEffect(() => {
+    if (form.status !== "sent" || form.lockedOnLoad) return;
+    const timer = window.setTimeout(() => setButtonGone(true), BUTTON_OUT_MS);
+    return () => window.clearTimeout(timer);
+  }, [form.status, form.lockedOnLoad]);
 
   const fitMessage = useCallback(() => {
     const field = messageRef.current;
@@ -30,7 +44,7 @@ export function ContactForm() {
 
   useLayoutEffect(() => {
     fitMessage();
-  }, [form.message, fitMessage]);
+  }, [form.message, form.status, buttonGone, fitMessage]);
 
   useEffect(() => {
     window.addEventListener("resize", fitMessage);
@@ -38,7 +52,11 @@ export function ContactForm() {
   }, [fitMessage]);
 
   return (
-    <form className={styles.form} onSubmit={form.onSubmit}>
+    <form
+      className={`${styles.form} ${form.status === "sent" ? styles.formSent : ""}`}
+      data-status={form.status}
+      onSubmit={form.onSubmit}
+    >
       <div className={styles.row}>
         <label className={`${styles.field} ${styles.name}`}>
           <span className={styles.label}>Full name / Company</span>
@@ -47,6 +65,7 @@ export function ContactForm() {
             value={form.name}
             onChange={(event) => form.setName(event.target.value)}
             autoComplete="name"
+            disabled={busy || locked}
           />
         </label>
         <label className={`${styles.field} ${styles.contact}`}>
@@ -56,6 +75,7 @@ export function ContactForm() {
             value={form.contact}
             onChange={(event) => form.setContact(event.target.value)}
             autoComplete="email"
+            disabled={busy || locked}
           />
         </label>
       </div>
@@ -67,17 +87,27 @@ export function ContactForm() {
           rows={2}
           value={form.message}
           onChange={(event) => form.setMessage(event.target.value)}
+          disabled={busy || locked}
         />
       </label>
-      <button
-        type="submit"
-        className={styles.submit}
-        disabled={form.status === "sending"}
-      >
-        Send message
-        <img src="/assets/icons/send.svg" alt="" width={12} height={12} />
-      </button>
-      {form.status === "sent" ? <p className={styles.success}>Message sent. Thank you.</p> : null}
+      <div className={styles.actionRow}>
+        {!buttonGone ? (
+          <button
+            type="submit"
+            className={`${styles.submit} ${busy ? styles.submitSending : ""} ${
+              form.status === "sent" ? styles.submitOut : ""
+            }`}
+            disabled={busy || locked}
+          >
+            <span>{busy ? "Sending" : "Send message"}</span>
+            <img src="/assets/icons/send.svg" alt="" width={12} height={12} />
+          </button>
+        ) : null}
+        {form.error ? <p className={styles.error}>{form.error}</p> : null}
+        {buttonGone ? (
+          <p className={`${styles.success} ${styles.successIn}`}>Message sent. Thank you.</p>
+        ) : null}
+      </div>
     </form>
   );
 }
