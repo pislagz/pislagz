@@ -9,20 +9,16 @@ export function PlayPage() {
 
   useEffect(() => {
     if (!window.matchMedia("(max-width: 900px)").matches) return;
-    const previousHtmlOverflow = document.documentElement.style.overflow;
-    const previousHtmlOverscroll = document.documentElement.style.overscrollBehavior;
-    const previousBodyOverflow = document.body.style.overflow;
-    const previousBodyOverscroll = document.body.style.overscrollBehavior;
     document.documentElement.style.overflow = "hidden";
     document.documentElement.style.overscrollBehavior = "none";
     document.body.style.overflow = "hidden";
     document.body.style.overscrollBehavior = "none";
 
     return () => {
-      document.documentElement.style.overflow = previousHtmlOverflow;
-      document.documentElement.style.overscrollBehavior = previousHtmlOverscroll;
-      document.body.style.overflow = previousBodyOverflow;
-      document.body.style.overscrollBehavior = previousBodyOverscroll;
+      document.documentElement.style.removeProperty("overflow");
+      document.documentElement.style.removeProperty("overscroll-behavior");
+      document.body.style.removeProperty("overflow");
+      document.body.style.removeProperty("overscroll-behavior");
     };
   }, []);
 

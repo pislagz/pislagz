@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from "react";
 import { useMediaQuery } from "@shared/hooks/use-media-query";
+import { SOCIAL } from "@shared/constants";
 import { Logo } from "./Logo";
 import styles from "./Footer.module.css";
 
@@ -16,6 +17,7 @@ export function Footer() {
   const onHirePage = pathname === "/hire-me";
   const onArsenalPage = pathname === "/arsenal";
   const onPlayPage = pathname === "/play";
+  const onResumePage = pathname === "/resume";
   const mobile = useMediaQuery("(max-width: 900px)");
   const playActionDelayPending =
     pathname === "/play" && delayPlayFooterAction;
@@ -35,6 +37,9 @@ export function Footer() {
   const writeDock = (value: number) => {
     dockRef.current = value;
     footerRef.current?.style.setProperty("--dock", String(value));
+    window.dispatchEvent(
+      new CustomEvent("pong-footer-progress", { detail: { dock: value } }),
+    );
   };
 
   const HANDLE_SLOT = 22;
@@ -54,14 +59,18 @@ export function Footer() {
     el.style.setProperty("--dock-travel", `${measureTravel()}px`);
   };
   const showArsenalContinue =
-    onArsenalPage && (arsenalReady || arsenalHasSettled);
+    onArsenalPage && (mobile || arsenalReady || arsenalHasSettled);
   const showPlayResume =
     onPlayPage && showPrimaryAction && !playActionDelayPending;
   const showResumeAction = showPlayResume || onHirePage;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!onArsenalPage) {
       setArsenalReady(false);
+      return;
+    }
+    if (window.matchMedia("(max-width: 900px)").matches) {
+      setArsenalReady(true);
       return;
     }
     const revealContinue = () => {
@@ -222,10 +231,35 @@ export function Footer() {
           {showPrimaryAction && !playActionDelayPending ? (
             <div
               className={`${styles.actions} ${
-                !showArsenalContinue && !showResumeAction ? styles.singleAction : ""
+                !showArsenalContinue && !showResumeAction && !onResumePage
+                  ? styles.singleAction
+                  : ""
+              } ${
+                onPlayPage || onArsenalPage || onHirePage
+                  ? styles.actionsMobileFlip
+                  : ""
+              } ${
+                onPlayPage || onArsenalPage ? styles.actionsArsenalFlip : ""
               }`}
             >
-              <Link href={onHirePage ? "/" : "/hire-me"} className={styles.message}>
+              {onResumePage ? (
+                <a
+                  href={SOCIAL.linkedin}
+                  className={styles.message}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  LinkedIn
+                </a>
+              ) : null}
+              <Link
+                href={onHirePage ? "/" : "/hire-me"}
+                className={
+                  onResumePage
+                    ? `${styles.continue} ${styles.contactContinue}`
+                    : styles.message
+                }
+              >
                 {onHirePage ? "Homepage" : "Send message"}
                 <img
                   src={onHirePage ? "/assets/icons/home.svg" : "/assets/icons/send.svg"}
@@ -237,7 +271,7 @@ export function Footer() {
               {showArsenalContinue ? (
                 <Link
                   href="/play"
-                  className={styles.continue}
+                  className={`${styles.continue} ${styles.continuePulse}`}
                   onClick={() => {
                     delayPlayFooterAction = true;
                   }}
@@ -248,7 +282,9 @@ export function Footer() {
               {showResumeAction ? (
                 <Link
                   href="/resume"
-                  className={`${styles.continue} ${styles.resumeContinue}`}
+                  className={`${styles.continue} ${
+                    onHirePage ? styles.hireContinue : styles.resumeContinue
+                  }`}
                 >
                   See résumé
                 </Link>

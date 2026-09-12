@@ -1,8 +1,8 @@
 .form {
-  width: 448px;
+  width: 520px;
   max-width: 100%;
   border-radius: 28px;
-  padding: 32px 24px 24px;
+  padding: 24px 24px 20px;
   background: rgba(18, 18, 18, 0.8);
   box-shadow:
     0 0 0 1px rgb(40, 40, 40),
@@ -24,7 +24,7 @@
 }
 
 .full {
-  margin-top: 28px;
+  margin-top: 20px;
 }
 
 .label {
@@ -66,7 +66,7 @@
   justify-content: center;
   gap: 8px;
   height: 28px;
-  margin: 24px 0 0 auto;
+  margin: 18px 0 0 auto;
   padding: 0 12px;
   border-radius: 120px;
   background: rgba(18, 18, 18, 0.8);
@@ -112,5 +112,13 @@
 
   .full {
     margin-top: 28px;
+  }
+}
+
+@media (max-width: 740px) {
+  .form {
+    width: calc(100% + 2 * (var(--pad-x) - 16px));
+    max-width: none;
+    margin-inline: calc(16px - var(--pad-x));
   }
 }

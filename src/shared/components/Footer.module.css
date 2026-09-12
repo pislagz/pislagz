@@ -58,6 +58,10 @@
   flex-shrink: 0;
 }
 
+.actionsArsenalFlip {
+  flex-direction: row-reverse;
+}
+
 .continue {
   display: inline-flex;
   align-items: center;
@@ -77,7 +81,29 @@
   will-change: opacity;
 }
 
+.continuePulse {
+  transform-origin: center;
+  animation:
+    continue-fade 520ms ease-out both,
+    continue-attention 2.8s ease-in-out 900ms infinite;
+}
+
 .resumeContinue {
+  background: #18b957;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 0 18px rgba(24, 185, 87, 0.3);
+}
+
+.hireContinue {
+  background: #0088ff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 0 18px rgba(62, 203, 255, 0.35);
+}
+
+.contactContinue {
+  gap: 8px;
   background: #18b957;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.28),
@@ -91,6 +117,18 @@
 
   to {
     opacity: 1;
+  }
+}
+
+@keyframes continue-attention {
+  0%,
+  78%,
+  100% {
+    transform: scale(1);
+  }
+
+  86% {
+    transform: scale(1.07);
   }
 }
 
@@ -148,13 +186,20 @@
     align-items: stretch;
   }
 
+  .actionsMobileFlip,
+  .actionsArsenalFlip {
+    flex-direction: column-reverse;
+  }
+
   .singleAction {
     align-self: start;
     margin-top: 10px;
   }
 
-  .continue {
+  .continue,
+  .actions .message {
     width: 100%;
+    justify-content: center;
   }
 
   .copy {
@@ -233,7 +278,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .continue {
+  .continue,
+  .continuePulse {
     animation: none;
   }
 

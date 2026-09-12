@@ -47,10 +47,44 @@ const PIXEL_GLYPHS: Record<string, readonly string[]> = {
   O: ["011110", "100001", "100001", "100001", "100001", "100001", "011110"],
   V: ["1000001", "1000001", "0100010", "0100010", "0010100", "0010100", "0001000"],
   R: ["111110", "100001", "100001", "111110", "100100", "100010", "100001"],
-  "1": ["001100", "011100", "001100", "001100", "001100", "001100", "111111"],
+  "1": ["001000", "011000", "001000", "001000", "001000", "001000", "011100"],
   "2": ["011110", "100001", "000001", "000110", "011000", "100000", "111111"],
   "3": ["011110", "100001", "000001", "001110", "000001", "100001", "011110"],
 };
+
+const POINTER_SPRITE = [
+  "            ###              ",
+  "           #...#             ",
+  "           #...#             ",
+  "           #...#  ##  ##     ",
+  "           #...# #..##..#    ",
+  "           #...##......##    ",
+  "        ## #............#    ",
+  "       #..##............#    ",
+  "      #.................#    ",
+  "      #......#.#.#......#    ",
+  "      #......#.#.#......#    ",
+  "       #.....#.#.#.....#     ",
+  "        #.............#      ",
+  "         #...........#       ",
+  "          ###########        ",
+];
+
+function PixelPointer() {
+  return (
+    <span className={styles.pixelPointer} aria-hidden="true">
+      {POINTER_SPRITE.flatMap((row, rowIndex) =>
+        Array.from(row).map((cell, columnIndex) => (
+          <span
+            key={`${rowIndex}-${columnIndex}`}
+            className={styles.pixelPointerCell}
+            data-tone={cell === "#" ? "outline" : cell === "." ? "fill" : "off"}
+          />
+        )),
+      )}
+    </span>
+  );
+}
 
 function PixelMessage({ text }: { text: string }) {
   return (
@@ -485,8 +519,8 @@ function VerticalPong({
     const ball = {
       x: width / 2,
       y: height / 2,
-      vx: 105,
-      vy: 175,
+      vx: 0,
+      vy: 0,
       size: 10,
       color: PONG_BALL_COLORS[0] as string,
     };
@@ -616,15 +650,18 @@ function VerticalPong({
     window.addEventListener("keyup", onKeyUp);
     window.addEventListener("pong-external-pointer", onExternalPointer);
 
-    const resetBall = () => {
-      const speedIncrease = score * 14;
+    const serveBall = () => {
+      const speed = 204 + score * 14;
+      const tilt = 0.32 + Math.random() * 0.42;
+      const horizontal = Math.random() < 0.5 ? -1 : 1;
       ball.x = width / 2;
       ball.y = height / 2;
-      ball.vx = (Math.random() > 0.5 ? 1 : -1) * (105 + speedIncrease * 0.55);
-      ball.vy = 175 + speedIncrease;
+      ball.vx = Math.sin(tilt) * speed * horizontal;
+      ball.vy = Math.cos(tilt) * speed;
       rallyBounces = 0;
       ball.color = PONG_BALL_COLORS[0];
     };
+    serveBall();
 
     const registerBounce = () => {
       rallyBounces += 1;
@@ -774,7 +811,7 @@ function VerticalPong({
         score += 1;
         playArcadeSound("score", false);
         onScore(score);
-        resetBall();
+        serveBall();
       } else if (ball.y > height + 20) {
         stopped = true;
         playArcadeSound("game-over", false);
@@ -926,7 +963,10 @@ export function PlayGame() {
   const [powerWindowOpen, setPowerWindowOpen] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [skipCountdown, setSkipCountdown] = useState(false);
+  const [footerDocked, setFooterDocked] = useState(false);
   const powerTimingTimeoutRef = useRef<number | null>(null);
+  const instructionsRef = useRef<HTMLParagraphElement>(null);
+  const touchCursorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!mobile) {
@@ -1010,6 +1050,36 @@ export function PlayGame() {
     setStatus("playing");
     setRestartToken((current) => current + 1);
   };
+
+  useEffect(() => {
+    if (!mobile) return;
+    const onFooterProgress = (event: Event) => {
+      const { dock } = (event as CustomEvent<{ dock: number }>).detail;
+      setFooterDocked(dock > 0.9);
+    };
+    setFooterDocked(document.documentElement.dataset.pongFooterDocked === "true");
+    window.addEventListener("pong-footer-progress", onFooterProgress);
+    return () => window.removeEventListener("pong-footer-progress", onFooterProgress);
+  }, [mobile]);
+
+  useEffect(() => {
+    if (!mobile || !footerDocked) return;
+    const placeCursor = () => {
+      const cursor = touchCursorRef.current;
+      const instructions = instructionsRef.current;
+      if (!cursor || !instructions) return;
+      const top = instructions.getBoundingClientRect().bottom;
+      const bottom = window.innerHeight - 36;
+      cursor.style.top = `${(top + bottom) / 2}px`;
+    };
+    placeCursor();
+    const timeout = window.setTimeout(placeCursor, 640);
+    window.addEventListener("resize", placeCursor);
+    return () => {
+      window.clearTimeout(timeout);
+      window.removeEventListener("resize", placeCursor);
+    };
+  }, [footerDocked, mobile]);
 
   return (
     <div className={styles.game}>
@@ -1112,19 +1182,43 @@ export function PlayGame() {
           </div>
         ) : null}
       </div>
-      <p className={styles.instructions}>
+      <div className={styles.touchpad}>
+        <p
+          ref={instructionsRef}
+          className={`${styles.instructions} ${
+            mobile && footerDocked ? styles.hintPlaying : ""
+          }`}
+        >
+          {mobile ? (
+            <>
+              <span className={styles.instructionDrag}>
+                drag left or right to move the paddle
+              </span>
+              <br />
+              <span
+                className={`${styles.instructionTap} ${
+                  powerWindowOpen ? styles.instructionPowerReady : ""
+                }`}
+              >
+                double tap to use power shot
+              </span>
+            </>
+          ) : (
+            "arrow keys or mouse to move · space or click to fire"
+          )}
+        </p>
         {mobile ? (
-          <>
-            drag left or right to move the paddle
-            <br />
-            <span className={powerWindowOpen ? styles.instructionPowerReady : undefined}>
-              double tap to use power shot
-            </span>
-          </>
-        ) : (
-          "arrow keys or mouse to move · space or click to fire"
-        )}
-      </p>
+          <div
+            ref={touchCursorRef}
+            className={`${styles.touchCursor} ${
+              footerDocked ? styles.touchCursorVisible : ""
+            }`}
+            aria-hidden="true"
+          >
+            <PixelPointer />
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }

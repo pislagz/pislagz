@@ -11,6 +11,7 @@
 
 @media (max-width: 900px) {
   .page {
+    justify-content: flex-start;
     padding: 24px var(--pad-x) 32px;
   }
 }

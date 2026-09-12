@@ -168,6 +168,11 @@ export function ArsenalBentoGrid({ items }: { items: ArsenalItem[] }) {
     // still clips transient overflow so distant tiles cannot flash scrollbars.
     if (!window.matchMedia("(max-width: 900px)").matches) {
       document.documentElement.style.setProperty("overflow", "clip");
+    } else {
+      document.documentElement.style.removeProperty("overflow");
+      document.body.style.removeProperty("overflow");
+      document.documentElement.style.removeProperty("overscroll-behavior");
+      document.body.style.removeProperty("overscroll-behavior");
     }
     setArmed(true);
 
