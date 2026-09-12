@@ -104,6 +104,10 @@
   min-width: 100%;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 0 16px 0 22px;
+  gap: var(--glass-pill-gap, 8px);
+  padding:
+    0
+    var(--glass-pill-padding-right, 16px)
+    0
+    var(--glass-pill-padding-left, 22px);
 }

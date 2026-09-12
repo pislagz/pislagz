@@ -1,7 +1,6 @@
 export const SITE_NAME = "pawelpisulski.pl";
 export const SITE_TITLE = "Pawel Pisulski — Frontend Developer";
 export const CONTACT_EMAIL = "contact@pawelpisulski.pl";
-export const COPYRIGHT = "All rights reserved | Pawel Pisulski | 2026";
 
 export const SOCIAL = {
   github: "https://github.com/pislagz",

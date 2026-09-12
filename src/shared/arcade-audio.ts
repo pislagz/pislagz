@@ -6,10 +6,16 @@ export type ArcadeSound =
   | "bounce"
   | "power"
   | "deny"
+  | "timing-early"
+  | "timing-late"
   | "score"
   | "wave-clear"
   | "game-over"
   | "select"
+  | "countdown-3"
+  | "countdown-2"
+  | "countdown-1"
+  | "countdown-go"
   | "navigate";
 
 let arcadeAudioContext: AudioContext | null = null;
@@ -81,6 +87,8 @@ export function playArcadeSound(sound: ArcadeSound, allowCreate = true) {
     bounce: [[260, 0, 0.045]],
     power: [[180, 0, 0.06], [420, 0.045, 0.08], [920, 0.1, 0.14]],
     deny: [[190, 0, 0.08], [130, 0.09, 0.14]],
+    "timing-early": [[300, 0, 0.07], [260, 0.075, 0.09]],
+    "timing-late": [[210, 0, 0.08], [150, 0.08, 0.12]],
     score: [[440, 0, 0.08], [660, 0.075, 0.08], [880, 0.15, 0.12]],
     "wave-clear": [
       [330, 0, 0.09],
@@ -90,15 +98,21 @@ export function playArcadeSound(sound: ArcadeSound, allowCreate = true) {
     ],
     "game-over": [[220, 0, 0.12], [165, 0.12, 0.12], [110, 0.24, 0.2]],
     select: [[330, 0, 0.045], [520, 0.045, 0.06]],
+    "countdown-3": [[330, 0, 0.1]],
+    "countdown-2": [[440, 0, 0.11]],
+    "countdown-1": [[554, 0, 0.11]],
+    "countdown-go": [[880, 0, 0.08], [1175, 0.07, 0.22]],
     navigate: [],
   };
   const start = audio.currentTime;
+  const volume = sound === "countdown-go" ? 0.07 : sound === "countdown-3" ? 0.022 : 0.035;
+  const wave: OscillatorType = sound === "countdown-3" ? "triangle" : "square";
   notes[sound].forEach(([frequency, delay, duration]) => {
     const oscillator = audio.createOscillator();
     const gain = audio.createGain();
-    oscillator.type = "square";
+    oscillator.type = wave;
     oscillator.frequency.setValueAtTime(frequency, start + delay);
-    gain.gain.setValueAtTime(0.035, start + delay);
+    gain.gain.setValueAtTime(volume, start + delay);
     gain.gain.exponentialRampToValueAtTime(0.001, start + delay + duration);
     oscillator.connect(gain);
     gain.connect(audio.destination);

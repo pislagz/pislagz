@@ -16,7 +16,7 @@ export function Header() {
   const hireActive = pathname === "/hire-me";
 
   return (
-    <header className={styles.header}>
+    <header className={styles.header} onContextMenu={(event) => event.preventDefault()}>
       <Logo />
       <nav className={styles.desktopNav} aria-label="Primary">
         <div className={styles.links}>

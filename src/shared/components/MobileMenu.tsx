@@ -38,14 +38,18 @@ export function MobileMenu({ open, onClose, originRef }: Props) {
     const parent = sheet.offsetParent;
     const parentBox = parent?.getBoundingClientRect() ?? { left: 0, top: 0 };
     const screenInset = 8;
-    const iconSize = 22;
-    const iconTop = originBox.top + (originBox.height - iconSize) / 2;
-    const iconRight = originBox.right - (originBox.width - iconSize) / 2;
-    const panelRight = window.innerWidth - screenInset;
-    const edgeGap = Math.max(0, panelRight - iconRight);
+    const buttonInset = 12;
+    const panelRight = Math.min(
+      window.innerWidth - screenInset,
+      originBox.right + buttonInset,
+    );
+    const panelTop = Math.max(screenInset, originBox.top - buttonInset);
 
-    sheet.style.setProperty("--sheet-right", `${screenInset}px`);
-    sheet.style.setProperty("--sheet-top", `${Math.max(screenInset, iconTop - edgeGap)}px`);
+    sheet.style.setProperty(
+      "--sheet-right",
+      `${window.innerWidth - panelRight}px`,
+    );
+    sheet.style.setProperty("--sheet-top", `${panelTop}px`);
 
     const x = originBox.left + originBox.width / 2 - (parentBox.left + sheet.offsetLeft);
     const y = originBox.top + originBox.height / 2 - (parentBox.top + sheet.offsetTop);

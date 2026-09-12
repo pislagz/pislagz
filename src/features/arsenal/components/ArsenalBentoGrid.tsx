@@ -118,13 +118,18 @@ export function ArsenalBentoGrid({ items }: { items: ArsenalItem[] }) {
     if (finalized.current) return;
     finalized.current = true;
     document.documentElement.style.removeProperty("overflow");
+    document.documentElement.dataset.arsenalSettled = "true";
+    window.dispatchEvent(new Event("arsenal-grid-settled"));
   };
 
   useLayoutEffect(() => {
     const grid = gridRef.current;
     if (!grid) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      return;
+      finalize();
+      return () => {
+        delete document.documentElement.dataset.arsenalSettled;
+      };
     }
 
     const gridRect = grid.getBoundingClientRect();
@@ -170,6 +175,7 @@ export function ArsenalBentoGrid({ items }: { items: ArsenalItem[] }) {
     return () => {
       window.clearTimeout(safety);
       document.documentElement.style.removeProperty("overflow");
+      delete document.documentElement.dataset.arsenalSettled;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

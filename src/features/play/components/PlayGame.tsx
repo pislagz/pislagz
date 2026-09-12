@@ -40,13 +40,16 @@ const PONG_BALL_COLORS = [
 ] as const;
 
 const PIXEL_GLYPHS: Record<string, readonly string[]> = {
-  G: ["1111", "1000", "1000", "1011", "1001", "1001", "1111"],
-  A: ["0110", "1001", "1001", "1111", "1001", "1001", "1001"],
-  M: ["10001", "11011", "10101", "10101", "10001", "10001", "10001"],
-  E: ["1111", "1000", "1000", "1110", "1000", "1000", "1111"],
-  O: ["0110", "1001", "1001", "1001", "1001", "1001", "0110"],
-  V: ["10001", "10001", "10001", "10001", "01010", "01010", "00100"],
-  R: ["1110", "1001", "1001", "1110", "1010", "1001", "1001"],
+  G: ["011110", "100001", "100000", "100111", "100001", "100001", "011110"],
+  A: ["001100", "010010", "100001", "111111", "100001", "100001", "100001"],
+  M: ["1000001", "1100011", "1010101", "1001001", "1000001", "1000001", "1000001"],
+  E: ["111111", "100000", "100000", "111110", "100000", "100000", "111111"],
+  O: ["011110", "100001", "100001", "100001", "100001", "100001", "011110"],
+  V: ["1000001", "1000001", "0100010", "0100010", "0010100", "0010100", "0001000"],
+  R: ["111110", "100001", "100001", "111110", "100100", "100010", "100001"],
+  "1": ["001100", "011100", "001100", "001100", "001100", "001100", "111111"],
+  "2": ["011110", "100001", "000001", "000110", "011000", "100000", "111111"],
+  "3": ["011110", "100001", "000001", "001110", "000001", "100001", "011110"],
 };
 
 function PixelMessage({ text }: { text: string }) {
@@ -87,6 +90,10 @@ type Props = {
   onChargeChange?: (charge: number) => void;
   onEnemyChargeChange?: (charge: number) => void;
   onPowerDenied?: () => void;
+  onPowerTimingMiss?: (timing: "early" | "late") => void;
+  onPowerWindowChange?: (open: boolean) => void;
+  onCountdownChange?: (value: number | null) => void;
+  skipCountdown?: boolean;
   restartToken: number;
 };
 
@@ -113,6 +120,11 @@ function SpaceInvaders({ onScore, onGameOver, onChargeChange, restartToken }: Pr
       row: number;
       color: string;
       bobOffset: number;
+      diving: boolean;
+      diveDelay: number;
+      diveStarted: boolean;
+      diveVx: number;
+      diveVy: number;
       alive: boolean;
       sprite: number;
     };
@@ -135,7 +147,7 @@ function SpaceInvaders({ onScore, onGameOver, onChargeChange, restartToken }: Pr
       const waveIndex = wave;
       const sprite = waveIndex % INVADER_SPRITES.length;
       const accent = INVADER_COLORS[waveIndex % INVADER_COLORS.length];
-      invaders = Array.from({ length: 32 }, (_, index) => {
+      const formation = Array.from({ length: 32 }, (_, index) => {
         const column = index % 8;
         const row = Math.floor(index / 8);
         const targetX = 114 + column * 64;
@@ -158,10 +170,34 @@ function SpaceInvaders({ onScore, onGameOver, onChargeChange, restartToken }: Pr
           row,
           color: isWhite ? "#fff" : accent,
           bobOffset: 0,
+          diving: false,
+          diveDelay: 0,
+          diveStarted: false,
+          diveVx: 0,
+          diveVy: 0,
           alive: true,
           sprite: (sprite + row) % INVADER_SPRITES.length,
         };
       });
+      const diverCount = Math.min(10, waveIndex * 2);
+      const divers: Invader[] = Array.from({ length: diverCount }, (_, index) => ({
+        x: 70 + ((index * 137 + waveIndex * 83) % (width - 140)),
+        y: -45,
+        targetX: 0,
+        targetY: 0,
+        entryDelay: 0,
+        row: -1,
+        color: index % 2 === 0 ? accent : "#fff",
+        bobOffset: 0,
+        diving: true,
+        diveDelay: 1450 + index * 680,
+        diveStarted: false,
+        diveVx: 0,
+        diveVy: 0,
+        alive: true,
+        sprite: (sprite + index) % INVADER_SPRITES.length,
+      }));
+      invaders = [...formation, ...divers];
       direction = waveIndex % 2 === 0 ? 1 : -1;
       rowDirections = Array.from(
         { length: 4 },
@@ -211,7 +247,7 @@ function SpaceInvaders({ onScore, onGameOver, onChargeChange, restartToken }: Pr
     canvas.addEventListener("pointermove", pointerX);
     canvas.addEventListener("pointerdown", onPointerDown);
 
-    const drawInvader = (invader: Invader, shake: number) => {
+    const drawInvader = (invader: Invader, shake: number, handsRaised: boolean) => {
       const sprite = INVADER_SPRITES[invader.sprite];
       const pixel = 6;
       const shakeX = shake ? (Math.random() - 0.5) * shake : 0;
@@ -220,9 +256,15 @@ function SpaceInvaders({ onScore, onGameOver, onChargeChange, restartToken }: Pr
       sprite.forEach((row, rowIndex) => {
         Array.from(row).forEach((cell, columnIndex) => {
           if (cell === "1") {
+            const isHand = (columnIndex === 0 || columnIndex === 6) &&
+              rowIndex >= 3 &&
+              rowIndex <= 5;
             context.fillRect(
               invader.x + shakeX + (columnIndex - 3.5) * pixel,
-              invader.y + shakeY + (rowIndex - 3.5) * pixel,
+              invader.y +
+                shakeY +
+                (rowIndex - 3.5) * pixel -
+                (isHand && handsRaised ? 3 : 0),
               pixel,
               pixel,
             );
@@ -240,8 +282,9 @@ function SpaceInvaders({ onScore, onGameOver, onChargeChange, restartToken }: Pr
       context.fillRect(player.x - 11, player.y - 7, 22, 7);
       context.fillRect(player.x - 3, player.y - 13, 6, 6);
       const shake = power >= 70 ? 2 + ((power - 70) / 30) * 3 : 0;
+      const handsRaised = Math.floor(performance.now() / 260) % 2 === 0;
       invaders.forEach((invader) => {
-        if (invader.alive) drawInvader(invader, shake);
+        if (invader.alive) drawInvader(invader, shake, handsRaised);
       });
       context.fillStyle = "#fff";
       bullets.forEach((bullet) => context.fillRect(bullet.x - 2, bullet.y, 4, 12));
@@ -263,8 +306,10 @@ function SpaceInvaders({ onScore, onGameOver, onChargeChange, restartToken }: Pr
       player.x = Math.max(24, Math.min(width - 24, player.x));
 
       const living = invaders.filter((invader) => invader.alive);
+      const formationLiving = living.filter((invader) => !invader.diving);
+      const divingLiving = living.filter((invader) => invader.diving);
       const powerSpeedMultiplier = power >= 70 ? 1 + ((power - 70) / 30) * 0.55 : 1;
-      const speed = (22 + wave * 10 + (32 - living.length) * 2.4) *
+      const speed = (22 + wave * 10 + (32 - formationLiving.length) * 2.4) *
         powerSpeedMultiplier;
       const entryElapsed = now - waveStartedAt;
       const isEntering = entryElapsed < 1320;
@@ -273,7 +318,7 @@ function SpaceInvaders({ onScore, onGameOver, onChargeChange, restartToken }: Pr
           playArcadeSound("arrival", false);
           nextArrivalSound += 165;
         }
-        living.forEach((invader) => {
+        formationLiving.forEach((invader) => {
           const progress = Math.max(
             0,
             Math.min(1, (entryElapsed - invader.entryDelay) / 620),
@@ -287,7 +332,7 @@ function SpaceInvaders({ onScore, onGameOver, onChargeChange, restartToken }: Pr
         });
       } else if (wave > 1) {
         const rowsAtEdge = new Set<number>();
-        living.forEach((invader) => {
+        formationLiving.forEach((invader) => {
           invader.y -= invader.bobOffset;
           const rowSpeed = speed * (0.78 + invader.row * 0.14);
           invader.x += rowDirections[invader.row] * rowSpeed * dt;
@@ -295,30 +340,45 @@ function SpaceInvaders({ onScore, onGameOver, onChargeChange, restartToken }: Pr
         });
         rowsAtEdge.forEach((row) => {
           rowDirections[row] *= -1;
-          living.forEach((invader) => {
+          formationLiving.forEach((invader) => {
             if (invader.row !== row) return;
             invader.x = Math.max(28, Math.min(width - 28, invader.x));
             invader.y += 11;
           });
         });
-        living.forEach((invader) => {
+        formationLiving.forEach((invader) => {
           invader.bobOffset = Math.sin(now / 310 + invader.row * 1.35) * 5;
           invader.y += invader.bobOffset;
         });
       } else {
         let hitEdge = false;
-        living.forEach((invader) => {
+        formationLiving.forEach((invader) => {
           invader.x += direction * speed * dt;
           if (invader.x < 28 || invader.x > width - 28) hitEdge = true;
         });
         if (hitEdge) {
           direction *= -1;
-          living.forEach((invader) => {
+          formationLiving.forEach((invader) => {
             invader.x = Math.max(28, Math.min(width - 28, invader.x));
             invader.y += 15;
           });
         }
       }
+      divingLiving.forEach((invader) => {
+        if (entryElapsed < invader.diveDelay) return;
+        if (!invader.diveStarted) {
+          invader.diveStarted = true;
+          const dx = player.x - invader.x;
+          const dy = player.y - invader.y;
+          const distance = Math.hypot(dx, dy) || 1;
+          const diveSpeed = (wave === 2 ? 155 : 191) * powerSpeedMultiplier;
+          invader.diveVx = (dx / distance) * diveSpeed;
+          invader.diveVy = (dy / distance) * diveSpeed;
+          playArcadeSound("arrival", false);
+        }
+        invader.x += invader.diveVx * dt;
+        invader.y += invader.diveVy * dt;
+      });
 
       bullets.forEach((bullet) => {
         bullet.y -= 390 * dt;
@@ -347,8 +407,28 @@ function SpaceInvaders({ onScore, onGameOver, onChargeChange, restartToken }: Pr
         playArcadeSound("wave-clear", false);
         spawnWave();
       }
+      let diverHitPlayer = false;
+      divingLiving.forEach((invader) => {
+        if (!invader.diveStarted) return;
+        const touchesPlayer =
+          Math.abs(invader.x - player.x) < 30 &&
+          Math.abs(invader.y - player.y) < 24;
+        if (touchesPlayer) {
+          diverHitPlayer = true;
+          return;
+        }
+        if (invader.y > height + 30) {
+          invader.x = 70 + Math.random() * (width - 140);
+          invader.y = -45;
+          invader.diveStarted = false;
+          invader.diveDelay = entryElapsed + 650;
+        }
+      });
       draw();
-      if (living.some((invader) => invader.alive && invader.y > player.y - 28)) {
+      const formationReachedPlayer = formationLiving.some(
+        (invader) => invader.alive && invader.y > player.y - 28,
+      );
+      if (diverHitPlayer || formationReachedPlayer) {
         stopped = true;
         playArcadeSound("game-over", false);
         onGameOver();
@@ -384,6 +464,10 @@ function VerticalPong({
   onChargeChange,
   onEnemyChargeChange,
   onPowerDenied,
+  onPowerTimingMiss,
+  onPowerWindowChange,
+  onCountdownChange,
+  skipCountdown = false,
   restartToken,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -420,7 +504,9 @@ function VerticalPong({
     let powerDeniedUntil = 0;
     let activeTouchPointer: number | null = null;
     let lastTouchClientX = 0;
+    let lastTouchAt = 0;
     let rallyBounces = 0;
+    let reportedPowerWindow = false;
     const sparks: Array<{
       x: number;
       y: number;
@@ -430,6 +516,8 @@ function VerticalPong({
       color: string;
     }> = [];
 
+    const isGhostMouse = (pointerType?: string) =>
+      pointerType !== "touch" && performance.now() - lastTouchAt < 800;
     const movePlayer = (event: PointerEvent) => {
       if (event.pointerType === "touch" && event.pointerId !== activeTouchPointer) return;
       const rect = canvas.getBoundingClientRect();
@@ -439,6 +527,12 @@ function VerticalPong({
         lastTouchClientX = event.clientX;
         return;
       }
+      if (isGhostMouse(event.pointerType)) return;
+      player.x = ((event.clientX - rect.left) / rect.width) * width;
+    };
+    const movePlayerWithMouse = (event: MouseEvent) => {
+      if (isGhostMouse("mouse")) return;
+      const rect = canvas.getBoundingClientRect();
       player.x = ((event.clientX - rect.left) / rect.width) * width;
     };
     const onKeyDown = (event: KeyboardEvent) => {
@@ -452,6 +546,10 @@ function VerticalPong({
       if (now - lastTap <= 280) {
         if (charge >= 5 && ballIsNearPaddle) {
           powerShotArmed = true;
+        } else if (charge >= 5) {
+          const timing = ball.vy > 0 ? "early" : "late";
+          playArcadeSound(timing === "early" ? "timing-early" : "timing-late");
+          onPowerTimingMiss?.(timing);
         } else if (charge < 5 && now >= powerDeniedUntil) {
           playArcadeSound("deny");
           onPowerDenied?.();
@@ -464,8 +562,9 @@ function VerticalPong({
       if (event.pointerType === "touch") {
         activeTouchPointer = event.pointerId;
         lastTouchClientX = event.clientX;
+        lastTouchAt = performance.now();
         canvas.setPointerCapture(event.pointerId);
-      } else {
+      } else if (!isGhostMouse(event.pointerType)) {
         movePlayer(event);
       }
       registerPowerTap(performance.now());
@@ -487,6 +586,7 @@ function VerticalPong({
         if (pointerType === "touch") {
           activeTouchPointer = pointerId;
           lastTouchClientX = clientX;
+          lastTouchAt = performance.now();
         }
         registerPowerTap(performance.now());
         return;
@@ -503,11 +603,13 @@ function VerticalPong({
         lastTouchClientX = clientX;
         return;
       }
+      if (isGhostMouse(pointerType)) return;
       player.x = ((clientX - rect.left) / rect.width) * width;
     };
 
     canvas.addEventListener("pointerdown", onPointerDown);
     canvas.addEventListener("pointermove", movePlayer);
+    canvas.addEventListener("mousemove", movePlayerWithMouse);
     canvas.addEventListener("pointerup", onPointerUp);
     canvas.addEventListener("pointercancel", onPointerUp);
     window.addEventListener("keydown", onKeyDown);
@@ -679,11 +781,19 @@ function VerticalPong({
         onGameOver();
       }
 
+      const powerWindowOpen =
+        charge >= 5 && ball.vy > 0 && ball.y > height * 0.62;
+      if (powerWindowOpen !== reportedPowerWindow) {
+        reportedPowerWindow = powerWindowOpen;
+        onPowerWindowChange?.(powerWindowOpen);
+      }
+
       context.clearRect(0, 0, width, height);
       context.fillStyle = "rgba(255,255,255,.3)";
       for (let y = 18; y < height; y += 28) context.fillRect(width / 2 - 2, y, 4, 14);
       context.fillStyle = "#fff";
       context.fillRect(player.x - player.width / 2, player.y - 6, player.width, 12);
+      context.fillStyle = "#fff";
       context.fillRect(
         opponent.x - opponent.width / 2,
         opponent.y - 6,
@@ -705,12 +815,70 @@ function VerticalPong({
 
       if (!stopped) frame = requestAnimationFrame(loop);
     };
-    frame = requestAnimationFrame(loop);
+    const startMatch = () => {
+      lastTime = performance.now();
+      frame = requestAnimationFrame(loop);
+    };
+
+    if (skipCountdown) {
+      startMatch();
+    } else {
+      const waitingBounds = canvas.getBoundingClientRect();
+      const waitingBallWidth = ball.size *
+        (waitingBounds.height / height) /
+        (waitingBounds.width / width);
+      context.clearRect(0, 0, width, height);
+      context.fillStyle = "rgba(255,255,255,.3)";
+      for (let y = 18; y < height; y += 28) {
+        context.fillRect(width / 2 - 2, y, 4, 14);
+      }
+      context.fillStyle = "#fff";
+      context.fillRect(player.x - player.width / 2, player.y - 6, player.width, 12);
+      context.fillRect(
+        opponent.x - opponent.width / 2,
+        opponent.y - 6,
+        opponent.width,
+        12,
+      );
+      context.fillRect(
+        ball.x - waitingBallWidth / 2,
+        ball.y - ball.size / 2,
+        waitingBallWidth,
+        ball.size,
+      );
+
+      const countdownStartedAt = performance.now();
+      let reportedCountdown = 3;
+      onCountdownChange?.(reportedCountdown);
+      playArcadeSound("countdown-3");
+      const countdownLoop = (now: number) => {
+        const elapsed = now - countdownStartedAt;
+        const nextCountdown = Math.max(1, 3 - Math.floor(elapsed / 600));
+        if (nextCountdown !== reportedCountdown) {
+          reportedCountdown = nextCountdown;
+          onCountdownChange?.(nextCountdown);
+          playArcadeSound(
+            nextCountdown === 2 ? "countdown-2" : "countdown-1",
+            false,
+          );
+        }
+        if (elapsed >= 1800) {
+          onCountdownChange?.(null);
+          playArcadeSound("countdown-go", false);
+          startMatch();
+          return;
+        }
+        frame = requestAnimationFrame(countdownLoop);
+      };
+      frame = requestAnimationFrame(countdownLoop);
+    }
 
     return () => {
       cancelAnimationFrame(frame);
+      onCountdownChange?.(null);
       canvas.removeEventListener("pointerdown", onPointerDown);
       canvas.removeEventListener("pointermove", movePlayer);
+      canvas.removeEventListener("mousemove", movePlayerWithMouse);
       canvas.removeEventListener("pointerup", onPointerUp);
       canvas.removeEventListener("pointercancel", onPointerUp);
       window.removeEventListener("keydown", onKeyDown);
@@ -719,11 +887,15 @@ function VerticalPong({
     };
   }, [
     onChargeChange,
+    onCountdownChange,
     onEnemyChargeChange,
     onGameOver,
     onPowerDenied,
+    onPowerTimingMiss,
+    onPowerWindowChange,
     onScore,
     restartToken,
+    skipCountdown,
   ]);
 
   return (
@@ -732,7 +904,7 @@ function VerticalPong({
       className={styles.canvas}
       width={360}
       height={560}
-      aria-label="Vertical Pong game. Drag or tap to move your bottom paddle."
+      aria-label="Vertical Pong game. Drag left or right to move your bottom paddle."
     />
   );
 }
@@ -748,6 +920,25 @@ export function PlayGame() {
   const [powerCharge, setPowerCharge] = useState(0);
   const [enemyPowerCharge, setEnemyPowerCharge] = useState(0);
   const [powerDeniedToken, setPowerDeniedToken] = useState(0);
+  const [powerTimingFeedback, setPowerTimingFeedback] = useState<
+    "too early" | "too late" | null
+  >(null);
+  const [powerWindowOpen, setPowerWindowOpen] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [skipCountdown, setSkipCountdown] = useState(false);
+  const powerTimingTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!mobile) {
+      delete document.documentElement.dataset.pongFooterDocked;
+      return;
+    }
+    const docked = status === "playing";
+    document.documentElement.dataset.pongFooterDocked = docked ? "true" : "false";
+    window.dispatchEvent(
+      new CustomEvent("pong-footer-dock", { detail: { docked } }),
+    );
+  }, [mobile, status]);
 
   useEffect(() => {
     const key = mobile ? HIGH_SCORE_KEYS.pong : HIGH_SCORE_KEYS.invaders;
@@ -755,12 +946,25 @@ export function PlayGame() {
     setPowerCharge(0);
     setEnemyPowerCharge(0);
     setPowerDeniedToken(0);
+    setPowerTimingFeedback(null);
+    setPowerWindowOpen(false);
+    setCountdown(null);
+    setSkipCountdown(false);
     setStatus("playing");
     setRestartToken((current) => current + 1);
     const savedHighScore = Number.parseInt(localStorage.getItem(key) ?? "0", 10) || 0;
     highScoreRef.current = savedHighScore;
     setHighScore(savedHighScore);
   }, [mobile]);
+
+  useEffect(
+    () => () => {
+      if (powerTimingTimeoutRef.current !== null) {
+        window.clearTimeout(powerTimingTimeoutRef.current);
+      }
+    },
+    [],
+  );
 
   const handleScore = useCallback((nextScore: number) => {
     setScore(nextScore);
@@ -778,7 +982,20 @@ export function PlayGame() {
   );
   const handlePowerCharge = useCallback((charge: number) => {
     setPowerCharge(charge);
-    if (charge === 0) setPowerDeniedToken(0);
+    if (charge === 0) {
+      setPowerDeniedToken(0);
+      setPowerTimingFeedback(null);
+    }
+  }, []);
+  const handlePowerTimingMiss = useCallback((timing: "early" | "late") => {
+    if (powerTimingTimeoutRef.current !== null) {
+      window.clearTimeout(powerTimingTimeoutRef.current);
+    }
+    setPowerTimingFeedback(timing === "early" ? "too early" : "too late");
+    powerTimingTimeoutRef.current = window.setTimeout(
+      () => setPowerTimingFeedback(null),
+      720,
+    );
   }, []);
   const restart = () => {
     playArcadeSound("select");
@@ -786,13 +1003,17 @@ export function PlayGame() {
     setPowerCharge(0);
     setEnemyPowerCharge(0);
     setPowerDeniedToken(0);
+    setPowerTimingFeedback(null);
+    setPowerWindowOpen(false);
+    setCountdown(null);
+    setSkipCountdown(true);
     setStatus("playing");
     setRestartToken((current) => current + 1);
   };
 
   return (
     <div className={styles.game}>
-      <div className={styles.hud}>
+      <div className={styles.hud} onContextMenu={(event) => event.preventDefault()}>
         <span key={`score-${score}`} className={styles.scoreFlash}>
           score {String(score).padStart(4, "0")}
         </span>
@@ -804,7 +1025,7 @@ export function PlayGame() {
         </span>
       </div>
       {mobile ? (
-        <div className={styles.energyBars}>
+        <div className={styles.energyBars} onContextMenu={(event) => event.preventDefault()}>
           <div className={styles.energyRow}>
             <span className={styles.energyLabel}>power</span>
             <span
@@ -816,7 +1037,9 @@ export function PlayGame() {
             >
               <span style={{ width: `${powerCharge * 20}%` }} />
             </span>
-            {powerCharge >= 5 ? (
+            {powerTimingFeedback ? (
+              <span className={styles.timingFeedback}>{powerTimingFeedback}</span>
+            ) : powerCharge >= 5 ? (
               <span className={styles.powerHint}>double tap</span>
             ) : powerDeniedToken ? (
               <span key={powerDeniedToken} className={styles.noPower}>no power</span>
@@ -855,6 +1078,10 @@ export function PlayGame() {
             onChargeChange={handlePowerCharge}
             onEnemyChargeChange={setEnemyPowerCharge}
             onPowerDenied={handlePowerDenied}
+            onPowerTimingMiss={handlePowerTimingMiss}
+            onPowerWindowChange={setPowerWindowOpen}
+            onCountdownChange={setCountdown}
+            skipCountdown={skipCountdown}
             restartToken={restartToken}
           />
         ) : (
@@ -866,6 +1093,13 @@ export function PlayGame() {
             restartToken={restartToken}
           />
         )}
+        {mobile && countdown !== null && status === "playing" ? (
+          <div className={styles.countdownOverlay}>
+            <div key={countdown} className={styles.countdownNumber}>
+              <PixelMessage text={String(countdown)} />
+            </div>
+          </div>
+        ) : null}
         {status === "game-over" ? (
           <div className={styles.overlay}>
             <PixelMessage text="GAME OVER" />
@@ -881,9 +1115,11 @@ export function PlayGame() {
       <p className={styles.instructions}>
         {mobile ? (
           <>
-            drag or tap to move the paddle
+            drag left or right to move the paddle
             <br />
-            double tap to use power shot
+            <span className={powerWindowOpen ? styles.instructionPowerReady : undefined}>
+              double tap to use power shot
+            </span>
           </>
         ) : (
           "arrow keys or mouse to move · space or click to fire"

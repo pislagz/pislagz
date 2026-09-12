@@ -62,6 +62,74 @@
   object-fit: contain;
 }
 
+.decryptIcon {
+  animation: decrypt-icon 1.6s steps(1, end) both;
+}
+
+@keyframes decrypt-icon {
+  0% {
+    clip-path: inset(0 0 100% 0);
+    opacity: 0;
+    filter: drop-shadow(0 0 5px #00ff41);
+  }
+
+  24% {
+    clip-path: polygon(0 0, 100% 0, 100% 16%, 0 16%);
+    opacity: 0.75;
+    transform: translateX(-2px);
+  }
+
+  38% {
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% 20%,
+      0 20%,
+      0 42%,
+      100% 42%,
+      100% 57%,
+      0 57%
+    );
+    opacity: 0.82;
+    transform: translateX(2px);
+  }
+
+  54% {
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% 22%,
+      0 22%,
+      0 38%,
+      100% 38%,
+      100% 62%,
+      0 62%,
+      0 78%,
+      100% 78%,
+      100% 100%,
+      0 100%
+    );
+    opacity: 0.9;
+    transform: translateX(-1px);
+  }
+
+  76% {
+    clip-path: inset(0);
+    opacity: 1;
+    filter:
+      drop-shadow(-1px 0 rgba(0, 255, 213, 0.8))
+      drop-shadow(1px 0 rgba(0, 255, 65, 0.9));
+    transform: none;
+  }
+
+  100% {
+    clip-path: inset(0);
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+
 .glassWrap {
   display: inline-flex;
   align-items: stretch;
@@ -131,5 +199,11 @@
 
   .glass_md span {
     font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .decryptIcon {
+    animation: none;
   }
 }

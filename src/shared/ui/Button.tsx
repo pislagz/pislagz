@@ -18,6 +18,7 @@ type Common = {
   active?: boolean;
   variant?: Variant;
   className?: string;
+  decryptIcon?: boolean;
 };
 
 type ButtonAsButton = Common &
@@ -41,6 +42,7 @@ export function Button({
   active = false,
   variant = "solid",
   className,
+  decryptIcon = false,
   ...rest
 }: ButtonAsButton | ButtonAsLink) {
   const iconPx = iconSize ?? (size === "sm" ? 18 : size === "lg" ? 27 : 18);
@@ -54,7 +56,7 @@ export function Button({
           alt={iconAlt}
           width={iconPx}
           height={iconPx}
-          className={styles.icon}
+          className={`${styles.icon} ${decryptIcon ? styles.decryptIcon : ""}`}
         />
       ) : null}
     </>

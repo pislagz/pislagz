@@ -8,7 +8,7 @@ export function ContactPage() {
     <section className={styles.page}>
       <h1 className={styles.title}>contact</h1>
       <p className={styles.lead}>
-        If you want to hire me or do some projects together do not hesitate to contact me.
+        If you want to hire me or do some projects together do not hesitate to contact me:
       </p>
       <div className={styles.direct}>
         <div className={styles.method}>

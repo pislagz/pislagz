@@ -19,6 +19,6 @@
     padding: 8px 16px 12px;
     justify-content: flex-start;
     overflow: hidden;
-    touch-action: pan-y;
+    touch-action: none;
   }
 }

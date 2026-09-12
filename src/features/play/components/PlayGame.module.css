@@ -27,6 +27,15 @@
   margin: -5px 0 7px;
 }
 
+.hud,
+.hud *,
+.energyBars,
+.energyBars * {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
 .energyRow {
   position: relative;
   display: flex;
@@ -108,6 +117,25 @@
   animation: power-hint-blink 800ms steps(2, jump-none) infinite;
 }
 
+.timingFeedback {
+  color: #ffd400;
+  white-space: nowrap;
+  text-shadow: 0 0 6px rgba(255, 212, 0, 0.85);
+  animation: timing-feedback 180ms steps(2, jump-none) 4;
+}
+
+.instructionPowerReady {
+  color: #00ff41;
+  text-shadow: 0 0 6px rgba(0, 255, 65, 0.8);
+  animation: power-hint-blink 260ms steps(2, jump-none) infinite;
+}
+
+@keyframes timing-feedback {
+  50% {
+    opacity: 0.2;
+  }
+}
+
 .invaderEnergyRow {
   display: flex;
   min-height: 18px;
@@ -186,30 +214,69 @@
   background: rgba(0, 0, 0, 0.72);
 }
 
+.countdownOverlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.countdownNumber {
+  animation: countdown-tick 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
+.countdownNumber .pixelMessage {
+  height: clamp(68px, 18vw, 104px);
+  filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.25));
+}
+
+@keyframes countdown-tick {
+  0% {
+    opacity: 0;
+    transform: scale(1.28);
+  }
+
+  22% {
+    opacity: 1;
+  }
+
+  72% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
 .pixelMessage {
   display: flex;
-  height: clamp(42px, 7vw, 68px);
+  height: clamp(36px, 5.6vw, 54px);
   align-items: stretch;
-  gap: clamp(5px, 0.8vw, 9px);
+  gap: clamp(4px, 0.7vw, 8px);
 }
 
 .pixelGlyph {
   display: grid;
-  width: calc(
-    (clamp(42px, 7vw, 68px) / 7) * var(--glyph-columns)
-  );
+  height: 100%;
+  aspect-ratio: var(--glyph-columns) / 7;
   grid-template-columns: repeat(var(--glyph-columns), 1fr);
   grid-template-rows: repeat(7, 1fr);
-  gap: 1px;
+  gap: 0;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.28));
 }
 
 .pixelCell[data-on="true"] {
   background: #fff;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.18);
 }
 
 .pixelSpace {
-  width: clamp(8px, 1.4vw, 16px);
+  width: clamp(10px, 1.8vw, 18px);
 }
 
 .overlayActions {
@@ -267,7 +334,7 @@
 
   .canvas {
     width: 100%;
-    height: min(560px, calc(100dvh - 285px));
+    height: min(560px, calc(100dvh - 320px));
   }
 
   .instructions {
@@ -302,7 +369,10 @@
   .scoreFlash,
   .bestFlash,
   .powerHint,
+  .instructionPowerReady,
+  .timingFeedback,
   .burstReady,
+  .countdownNumber,
   .deniedEnergyTrack > span,
   .noPower {
     animation: none;

@@ -10,6 +10,13 @@
   margin: 0 auto;
 }
 
+.header,
+.header * {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
 .desktopNav {
   display: flex;
   align-items: center;
