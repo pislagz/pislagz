@@ -19,3 +19,9 @@
   display: flex;
   flex-direction: column;
 }
+
+/* Header (50) and footer (2) sit above main. During the arsenal fly-in the
+   tiles overflow those siblings, so lift main until they land. */
+:global(html[data-arsenal-flying]) .main {
+  z-index: 80;
+}

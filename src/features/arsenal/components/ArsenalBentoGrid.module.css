@@ -10,6 +10,8 @@
 }
 
 .tile {
+  position: relative;
+  z-index: 1;
   min-width: 0;
 }
 
@@ -42,6 +44,7 @@
 /* iOS unlock fly-in. Fill mode "backwards" keeps tiles hidden during their
    stagger delay, then releases them to natural styles afterwards. */
 .grid[data-armed="true"] .tile {
+  z-index: 2;
   animation: flyIn var(--fly-duration, 1100ms) var(--fly-ease) backwards;
   animation-delay: var(--fly-delay, 0ms);
 }

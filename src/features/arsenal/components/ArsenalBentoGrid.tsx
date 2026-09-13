@@ -118,6 +118,7 @@ export function ArsenalBentoGrid({ items }: { items: ArsenalItem[] }) {
     if (finalized.current) return;
     finalized.current = true;
     document.documentElement.style.removeProperty("overflow");
+    delete document.documentElement.dataset.arsenalFlying;
     document.documentElement.dataset.arsenalSettled = "true";
     window.dispatchEvent(new Event("arsenal-grid-settled"));
   };
@@ -164,6 +165,7 @@ export function ArsenalBentoGrid({ items }: { items: ArsenalItem[] }) {
 
     finalized.current = false;
     settledTiles.current = 0;
+    document.documentElement.dataset.arsenalFlying = "true";
     // Keep mobile pages scrollable throughout the staggered fly-in. Desktop
     // still clips transient overflow so distant tiles cannot flash scrollbars.
     if (!window.matchMedia("(max-width: 900px)").matches) {
@@ -180,6 +182,7 @@ export function ArsenalBentoGrid({ items }: { items: ArsenalItem[] }) {
     return () => {
       window.clearTimeout(safety);
       document.documentElement.style.removeProperty("overflow");
+      delete document.documentElement.dataset.arsenalFlying;
       delete document.documentElement.dataset.arsenalSettled;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
