@@ -11,12 +11,6 @@
 
 .tile {
   min-width: 0;
-  transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.15);
-  will-change: transform, opacity;
-}
-
-.tile:hover {
-  transform: translateY(-4px) scale(1.02);
 }
 
 .arsenalGlass {
@@ -46,8 +40,7 @@
 }
 
 /* iOS unlock fly-in. Fill mode "backwards" keeps tiles hidden during their
-   stagger delay, then releases them to natural styles afterwards so :hover
-   transforms still work. */
+   stagger delay, then releases them to natural styles afterwards. */
 .grid[data-armed="true"] .tile {
   animation: flyIn var(--fly-duration, 1100ms) var(--fly-ease) backwards;
   animation-delay: var(--fly-delay, 0ms);
@@ -294,9 +287,7 @@
     animation: none;
   }
 
-  .tile,
-  .tile:hover {
-    transition: none;
+  .tile {
     transform: none;
   }
 }

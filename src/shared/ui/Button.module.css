@@ -200,6 +200,16 @@
   .glass_md span {
     font-size: 16px;
   }
+
+  .glass_lg {
+    height: 40px;
+    min-width: 0;
+    font-size: 17px;
+  }
+
+  .glass_lg span {
+    font-size: 17px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

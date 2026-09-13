@@ -121,6 +121,14 @@
   }
 
   .cta {
+    --glass-pill-padding-left: 18px;
+    --glass-pill-padding-right: 14px;
+    --glass-pill-gap: 6px;
     margin-top: 18px;
+  }
+
+  .cta img {
+    width: 20px;
+    height: 20px;
   }
 }
