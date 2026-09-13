@@ -6,7 +6,13 @@ import styles from "./ContactPage.module.css";
 export function ContactPage() {
   return (
     <section className={styles.page}>
-      <h1 className={styles.title}>contact</h1>
+      <h1 className={styles.title} aria-label="contact">
+        <span className={styles.titleLetters} aria-hidden="true">
+          {Array.from("contact").map((letter, index) => (
+            <span key={`${letter}-${index}`}>{letter}</span>
+          ))}
+        </span>
+      </h1>
       <p className={styles.lead}>
         Want to hire me or work on a project together?
         <br />

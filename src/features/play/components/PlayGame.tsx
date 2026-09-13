@@ -154,6 +154,7 @@ type Props = {
   onPowerWindowChange?: (open: boolean) => void;
   onCountdownChange?: (value: number | null) => void;
   skipCountdown?: boolean;
+  introReady?: boolean;
   restartToken: number;
 };
 
@@ -528,6 +529,7 @@ function VerticalPong({
   onPowerWindowChange,
   onCountdownChange,
   skipCountdown = false,
+  introReady = true,
   restartToken,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -883,9 +885,7 @@ function VerticalPong({
       frame = requestAnimationFrame(loop);
     };
 
-    if (skipCountdown) {
-      startMatch();
-    } else {
+    const drawWaitingScene = () => {
       const waitingBounds = canvas.getBoundingClientRect();
       const waitingBallWidth = ball.size *
         (waitingBounds.height / height) /
@@ -909,11 +909,20 @@ function VerticalPong({
         waitingBallWidth,
         ball.size,
       );
+    };
+
+    if (skipCountdown) {
+      startMatch();
+    } else if (!introReady) {
+      drawWaitingScene();
+    } else {
+      drawWaitingScene();
 
       const countdownStartedAt = performance.now();
       let reportedCountdown = 3;
       onCountdownChange?.(reportedCountdown);
-      playArcadeSound("countdown-3");
+      unlockArcadeAudio();
+      playArcadeSound("countdown-3", false);
       const countdownLoop = (now: number) => {
         const elapsed = now - countdownStartedAt;
         const nextCountdown = Math.max(1, 3 - Math.floor(elapsed / 600));
@@ -959,6 +968,7 @@ function VerticalPong({
     onScore,
     restartToken,
     skipCountdown,
+    introReady,
   ]);
 
   return (
@@ -990,9 +1000,26 @@ export function PlayGame() {
   const [countdown, setCountdown] = useState<number | null>(null);
   const [skipCountdown, setSkipCountdown] = useState(false);
   const [footerDocked, setFooterDocked] = useState(false);
+  const [crtOn, setCrtOn] = useState(true);
+  const [intro, setIntro] = useState(true);
   const powerTimingTimeoutRef = useRef<number | null>(null);
   const instructionsRef = useRef<HTMLParagraphElement>(null);
   const touchCursorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setCrtOn(false);
+      setIntro(false);
+      return;
+    }
+    unlockArcadeAudio();
+    const crtTimer = window.setTimeout(() => setCrtOn(false), 1120);
+    const introTimer = window.setTimeout(() => setIntro(false), 1680);
+    return () => {
+      window.clearTimeout(crtTimer);
+      window.clearTimeout(introTimer);
+    };
+  }, []);
 
   useEffect(() => {
     if (!mobile) {
@@ -1108,7 +1135,7 @@ export function PlayGame() {
   }, [footerDocked, mobile]);
 
   return (
-    <div className={styles.game}>
+    <div className={styles.game} data-intro={intro ? "true" : undefined}>
       <div className={styles.hud} onContextMenu={(event) => event.preventDefault()}>
         <span key={`score-${score}`} className={styles.scoreFlash}>
           score {String(score).padStart(4, "0")}
@@ -1178,6 +1205,7 @@ export function PlayGame() {
             onPowerWindowChange={setPowerWindowOpen}
             onCountdownChange={setCountdown}
             skipCountdown={skipCountdown}
+            introReady={!crtOn}
             restartToken={restartToken}
           />
         ) : (
@@ -1189,6 +1217,12 @@ export function PlayGame() {
             restartToken={restartToken}
           />
         )}
+        {crtOn ? (
+          <div className={styles.crtBoot} aria-hidden="true">
+            <span className={styles.crtBeam} />
+            <span className={styles.crtScan} />
+          </div>
+        ) : null}
         {mobile && countdown !== null && status === "playing" ? (
           <div className={styles.countdownOverlay}>
             <div key={countdown} className={styles.countdownNumber}>

@@ -322,9 +322,9 @@ export function Footer() {
                     : styles.message
                 }
               >
-                {onHirePage ? "Homepage" : "Send message"}
+                {onHirePage ? "Homepage" : "Contact me"}
                 <img
-                  src={onHirePage ? "/assets/icons/home.svg" : "/assets/icons/send.svg"}
+                  src={onHirePage ? "/assets/icons/home.svg" : "/assets/icons/mail.svg"}
                   alt=""
                   width={12}
                   height={12}

@@ -98,15 +98,15 @@ export function playArcadeSound(sound: ArcadeSound, allowCreate = true) {
     ],
     "game-over": [[220, 0, 0.12], [165, 0.12, 0.12], [110, 0.24, 0.2]],
     select: [[330, 0, 0.045], [520, 0.045, 0.06]],
-    "countdown-3": [[330, 0, 0.1]],
+    "countdown-3": [[330, 0, 0.11]],
     "countdown-2": [[440, 0, 0.11]],
     "countdown-1": [[554, 0, 0.11]],
     "countdown-go": [[880, 0, 0.08], [1175, 0.07, 0.22]],
     navigate: [],
   };
   const start = audio.currentTime;
-  const volume = sound === "countdown-go" ? 0.07 : sound === "countdown-3" ? 0.022 : 0.035;
-  const wave: OscillatorType = sound === "countdown-3" ? "triangle" : "square";
+  const volume = sound === "countdown-go" ? 0.07 : 0.035;
+  const wave: OscillatorType = "square";
   notes[sound].forEach(([frequency, delay, duration]) => {
     const oscillator = audio.createOscillator();
     const gain = audio.createGain();

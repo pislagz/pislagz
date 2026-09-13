@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useMediaQuery } from "@shared/hooks/use-media-query";
 import { CRYSTAL_PALETTES, type CrystalPalette } from "./crystal-palettes";
@@ -27,6 +27,7 @@ export function PageBackground() {
   const pathname = usePathname();
   const palette = paletteForPath(pathname);
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const [canvasReady, setCanvasReady] = useState(false);
   paletteRef.current = palette;
 
   useEffect(() => {
@@ -40,6 +41,7 @@ export function PageBackground() {
       const field = createCrystalField(canvas, {
         reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
         palette: paletteRef.current,
+        onReady: () => setCanvasReady(true),
       });
       fieldRef.current = field;
     }).catch(() => {
@@ -63,7 +65,10 @@ export function PageBackground() {
 
   return (
     <div className={styles.root} aria-hidden="true">
-      <canvas ref={canvasRef} className={styles.canvas} />
+      <canvas
+        ref={canvasRef}
+        className={`${styles.canvas} ${canvasReady ? styles.canvasReady : ""}`}
+      />
     </div>
   );
 }

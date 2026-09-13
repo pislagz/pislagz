@@ -10,6 +10,7 @@ type FieldHandle = {
 type Options = {
   reducedMotion: boolean;
   palette?: CrystalPalette;
+  onReady?: () => void;
 };
 
 const VERT = /* glsl */ `
@@ -240,6 +241,7 @@ export function createCrystalField(canvas: HTMLCanvasElement, options: Options):
   let renderWidth = 0;
   let renderHeight = 0;
   let renderPixelRatio = 0;
+  let announcedReady = false;
 
   const applyColors = () => {
     const matA = layerA.material as THREE.ShaderMaterial;
@@ -325,6 +327,10 @@ export function createCrystalField(canvas: HTMLCanvasElement, options: Options):
     camera.lookAt(0, 0, 0);
 
     renderer.render(scene, camera);
+    if (!announcedReady) {
+      announcedReady = true;
+      requestAnimationFrame(() => options.onReady?.());
+    }
     raf = requestAnimationFrame(frame);
   };
 
