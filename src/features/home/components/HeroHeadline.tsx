@@ -30,23 +30,18 @@ const HEADLINE_MIN_FONT_PX = 18;
 const PHRASES = [
   "next.js",
   "detail-oriented",
-  "SEO-friendly",
-  "AI-enhanced",
-  "friendly neighborhood",
   "product-conscious",
-  "React-loving",
-  "accessibility-first",
+  "AI-enhanced",
+  "type-safe",
+  "friendly neighborhood",
   "soon-to-be favorite",
+  "SEO-friendly",
+  "accessibility-first",
   "component-obsessed",
   "div-wrangling",
-  "semicolon-optional",
-  "type-safe",
+  "React-loving",
   "performance-minded",
-  "responsive-design-loving",
-  "accessibility-first",
   "pixel perfect",
-  "web ninja",
-  "accessibility compliant",
   "animation guru",
 ];
 
@@ -147,11 +142,7 @@ export function HeroHeadline() {
       <span className={styles.your}>Your</span>
       <span className={styles.typed}>
         <span className={styles.next}>{text}</span>
-        {caret ? (
-          <span className={styles.caret} aria-hidden="true">
-            |
-          </span>
-        ) : null}
+        {caret ? <span className={styles.caret} aria-hidden="true" /> : null}
       </span>
     </h1>
   );

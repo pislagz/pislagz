@@ -1,5 +1,5 @@
 export const SITE_NAME = "pawelpisulski.pl";
-export const SITE_TITLE = "Pawel Pisulski — Frontend Developer";
+export const SITE_TITLE = "Pawel Pisulski — Frontend Engineer";
 export const CONTACT_EMAIL = "contact@pawelpisulski.pl";
 
 export const SOCIAL = {
