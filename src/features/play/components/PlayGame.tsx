@@ -86,19 +86,45 @@ function PixelPointer() {
   );
 }
 
-function PixelMessage({ text }: { text: string }) {
+function PixelMessage({
+  text,
+  wave = false,
+}: {
+  text: string;
+  wave?: boolean;
+}) {
   return (
-    <strong className={styles.pixelMessage} aria-label={text}>
+    <strong
+      className={`${styles.pixelMessage} ${wave ? styles.pixelMessageWave : ""}`}
+      aria-label={text}
+    >
       {Array.from(text).map((character, characterIndex) => {
+        const letterStyle = wave
+          ? ({ "--letter-index": characterIndex } as CSSProperties)
+          : undefined;
         if (character === " ") {
-          return <span key={characterIndex} className={styles.pixelSpace} aria-hidden="true" />;
+          return (
+            <span
+              key={characterIndex}
+              className={styles.pixelSpace}
+              style={letterStyle}
+              aria-hidden="true"
+            />
+          );
         }
         const glyph = PIXEL_GLYPHS[character] ?? PIXEL_GLYPHS.E;
         return (
           <span
             key={`${character}-${characterIndex}`}
-            className={styles.pixelGlyph}
-            style={{ "--glyph-columns": glyph[0].length } as CSSProperties}
+            className={`${styles.pixelGlyph} ${
+              character === "1" ? styles.pixelGlyphOne : ""
+            }`}
+            style={
+              {
+                "--glyph-columns": glyph[0].length,
+                ...letterStyle,
+              } as CSSProperties
+            }
             aria-hidden="true"
           >
             {glyph.flatMap((row, rowIndex) =>
@@ -1172,12 +1198,19 @@ export function PlayGame() {
         ) : null}
         {status === "game-over" ? (
           <div className={styles.overlay}>
-            <PixelMessage text="GAME OVER" />
+            <PixelMessage text="GAME OVER" wave />
             <div className={styles.overlayActions}>
-              <button type="button" onClick={restart}>restart</button>
-              <Link href="/hire-me" onClick={() => playArcadeSound("select")}>
-                contact me
-              </Link>
+              <button type="button" className={styles.overlayRestart} onClick={restart}>
+                restart
+              </button>
+              <div className={styles.overlayRow}>
+                <Link href="/resume" onClick={() => playArcadeSound("select")}>
+                  see résumé
+                </Link>
+                <Link href="/hire-me" onClick={() => playArcadeSound("select")}>
+                  contact me
+                </Link>
+              </div>
             </div>
           </div>
         ) : null}

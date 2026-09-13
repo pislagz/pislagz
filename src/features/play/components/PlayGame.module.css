@@ -271,6 +271,10 @@
   filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.28));
 }
 
+.pixelGlyphOne {
+  transform: translateX(calc(100% / 12));
+}
+
 .pixelCell[data-on="true"] {
   background: #fff;
 }
@@ -279,24 +283,63 @@
   width: clamp(10px, 1.8vw, 18px);
 }
 
+.pixelMessageWave .pixelGlyph,
+.pixelMessageWave .pixelSpace {
+  animation: game-over-letter-jump 3s ease-in-out infinite;
+  animation-delay: calc(1000ms + var(--letter-index) * 100ms);
+  will-change: transform;
+}
+
+@keyframes game-over-letter-jump {
+  0%,
+  30%,
+  100% {
+    transform: translateY(0);
+  }
+
+  15% {
+    transform: translateY(-7px);
+  }
+}
+
 .overlayActions {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 10px;
+  width: min(88%, 18.5rem);
+}
+
+.overlayRestart {
+  width: 100%;
+}
+
+.overlayRow {
+  display: flex;
+  gap: 10px;
+  width: 100%;
 }
 
 .overlayActions button,
 .overlayActions a {
   border: 2px solid #fff;
-  padding: 10px 22px;
+  padding: 10px 14px;
   background: #fff;
   color: #050505;
   font: 700 14px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   letter-spacing: 0.08em;
   text-align: center;
   text-transform: uppercase;
+  white-space: nowrap;
   cursor: pointer;
+}
+
+.overlayRow a {
+  flex: 1;
+  min-width: 0;
+  padding-inline: 8px;
+  font-size: 14px;
+  letter-spacing: 0.05em;
 }
 
 .overlayActions button:hover,
@@ -503,6 +546,8 @@
   .timingFeedback,
   .burstReady,
   .countdownNumber,
+  .pixelMessageWave .pixelGlyph,
+  .pixelMessageWave .pixelSpace,
   .deniedEnergyTrack > span,
   .noPower,
   .touchCursorVisible .pixelPointer,

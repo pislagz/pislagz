@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type MouseEvent,
+  type PointerEvent,
+} from "react";
 import { useMediaQuery } from "@shared/hooks/use-media-query";
 import { SOCIAL } from "@shared/constants";
 import { Logo } from "./Logo";
@@ -27,12 +34,22 @@ export function Footer() {
   const dockRef = useRef(0);
   const dockTargetRef = useRef(0);
   const sheetDrag = useRef<{
-    y: number;
+    pointerId: number;
+    startX: number;
+    startY: number;
+    lastY: number;
+    lastTime: number;
     start: number;
-    moved: boolean;
+    active: boolean;
     height: number;
+    velocityY: number;
   } | null>(null);
+  const suppressClickRef = useRef(false);
   const footerRef = useRef<HTMLElement>(null);
+
+  const SNAP_THRESHOLD = 0.28;
+  const FLING_VELOCITY = 0.28;
+  const GESTURE_LOCK_PX = 8;
 
   const writeDock = (value: number) => {
     dockRef.current = value;
@@ -42,13 +59,13 @@ export function Footer() {
     );
   };
 
-  const HANDLE_SLOT = 22;
+  const HANDLE_SLOT = 24;
 
   const measureTravel = () => {
     const el = footerRef.current;
     if (!el) return 0;
     const fullHeight = el.offsetHeight + (1 - dockRef.current) * HANDLE_SLOT;
-    return Math.max(fullHeight - 34, 0);
+    return Math.max(fullHeight - 38, 0);
   };
 
   const syncTravel = () => {
@@ -150,7 +167,7 @@ export function Footer() {
   }, [mobile, onPlayPage]);
 
   const snapDock = (value: number) => {
-    const next = value > 0.45 ? 1 : 0;
+    const next = value > SNAP_THRESHOLD ? 1 : 0;
     dockTargetRef.current = next;
     writeDock(next);
     setDragging(false);
@@ -158,43 +175,83 @@ export function Footer() {
 
   const onSheetPointerDown = (event: PointerEvent<HTMLElement>) => {
     if (!playSheet) return;
-    const target = event.target;
-    if (
-      target instanceof Element &&
-      target.closest("a, button") &&
-      !target.closest(`.${styles.handle}`)
-    ) {
-      return;
-    }
     event.currentTarget.setPointerCapture(event.pointerId);
     const travel = measureTravel();
     footerRef.current?.style.setProperty("--dock-travel", `${travel}px`);
+    const now = performance.now();
     sheetDrag.current = {
-      y: event.clientY,
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      lastY: event.clientY,
+      lastTime: now,
       start: dockRef.current,
-      moved: false,
-      height: Math.max(travel, 80),
+      active: false,
+      height: Math.max(travel, 56),
+      velocityY: 0,
     };
     setDragging(true);
   };
   const onSheetPointerMove = (event: PointerEvent<HTMLElement>) => {
     const drag = sheetDrag.current;
-    if (!drag) return;
-    const delta = event.clientY - drag.y;
-    if (Math.abs(delta) > 6) drag.moved = true;
-    const next = Math.min(1, Math.max(0, drag.start + delta / drag.height));
+    if (!drag || event.pointerId !== drag.pointerId) return;
+
+    const deltaX = event.clientX - drag.startX;
+    const deltaY = event.clientY - drag.startY;
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
+
+    if (!drag.active) {
+      if (absX < GESTURE_LOCK_PX && absY < GESTURE_LOCK_PX) return;
+      const verticalIntent =
+        absY > absX * 0.7 || (drag.start > 0.5 && absY > 4);
+      if (!verticalIntent) {
+        sheetDrag.current = null;
+        setDragging(false);
+        event.currentTarget.releasePointerCapture(event.pointerId);
+        return;
+      }
+      drag.active = true;
+    }
+
+    const now = performance.now();
+    const dt = Math.max(now - drag.lastTime, 1);
+    drag.velocityY = (event.clientY - drag.lastY) / dt;
+    drag.lastY = event.clientY;
+    drag.lastTime = now;
+
+    const next = Math.min(1, Math.max(0, drag.start + deltaY / drag.height));
     writeDock(next);
   };
-  const onSheetPointerUp = () => {
+  const onSheetPointerUp = (event: PointerEvent<HTMLElement>) => {
     const drag = sheetDrag.current;
     sheetDrag.current = null;
-    if (!drag) return;
-    if (!drag.moved) {
-      if (drag.start > 0.5) snapDock(0);
+    if (!drag || event.pointerId !== drag.pointerId) {
+      setDragging(false);
+      return;
+    }
+
+    const deltaX = event.clientX - drag.startX;
+    const deltaY = event.clientY - drag.startY;
+    const totalMove = Math.hypot(deltaX, deltaY);
+
+    if (!drag.active) {
+      if (totalMove < GESTURE_LOCK_PX && drag.start > 0.5) snapDock(0);
       else setDragging(false);
       return;
     }
-    snapDock(dockRef.current);
+
+    suppressClickRef.current = true;
+    let snapValue = dockRef.current;
+    if (drag.velocityY > FLING_VELOCITY) snapValue = 1;
+    else if (drag.velocityY < -FLING_VELOCITY) snapValue = 0;
+    snapDock(snapValue);
+  };
+  const onSheetClickCapture = (event: MouseEvent<HTMLElement>) => {
+    if (!suppressClickRef.current) return;
+    event.preventDefault();
+    event.stopPropagation();
+    suppressClickRef.current = false;
   };
 
   const playSheet = onPlayPage && mobile;
@@ -209,6 +266,7 @@ export function Footer() {
       onPointerMove={playSheet ? onSheetPointerMove : undefined}
       onPointerUp={playSheet ? onSheetPointerUp : undefined}
       onPointerCancel={playSheet ? onSheetPointerUp : undefined}
+      onClickCapture={playSheet ? onSheetClickCapture : undefined}
     >
       <div className={styles.panel}>
         {playSheet ? (
@@ -216,8 +274,12 @@ export function Footer() {
             <div className={styles.handle}>
               <svg className={styles.handleIcon} viewBox="0 0 48 14" width="48" height="14">
                 <path
-                  className={styles.handlePath}
-                  d={dragging ? "M4 7 24 7 44 7" : "M5 9.2 24 6.5 43 9.2"}
+                  className={styles.handleChevron}
+                  d="M5 9.2 24 6.5 43 9.2"
+                />
+                <path
+                  className={styles.handleLine}
+                  d="M4 7 24 7 44 7"
                 />
               </svg>
             </div>

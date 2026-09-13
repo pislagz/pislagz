@@ -166,13 +166,18 @@ function makeMaterial(
   });
 }
 
-function gainForWidth(width: number) {
-  return width < 900 ? 0.45 : 0.16;
+function isTouchPrimary() {
+  return window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+}
+
+function gainForViewport() {
+  // Mobile needs higher shader gain; narrow desktop windows should stay dim.
+  return isTouchPrimary() ? 0.45 : 0.16;
 }
 
 export function createCrystalField(canvas: HTMLCanvasElement, options: Options): FieldHandle {
   const initialPalette = options.palette ?? CRYSTAL_PALETTES.home;
-  const mobile = window.innerWidth < 900;
+  const mobile = isTouchPrimary();
   const dprCap = mobile ? 1.25 : 1.5;
   const subdiv = mobile ? 64 : 110;
   const renderer = new THREE.WebGLRenderer({
@@ -271,7 +276,7 @@ export function createCrystalField(canvas: HTMLCanvasElement, options: Options):
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
-    const gain = gainForWidth(window.innerWidth);
+    const gain = gainForViewport();
     (layerA.material as THREE.ShaderMaterial).uniforms.uGain.value = gain;
     (layerB.material as THREE.ShaderMaterial).uniforms.uGain.value = gain;
   };
