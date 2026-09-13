@@ -41,10 +41,14 @@
 .glowCanvas,
 .glyphCanvas {
   position: absolute;
-  inset: 0;
+  top: 50%;
+  right: 0;
   display: block;
-  width: 100%;
-  height: 100%;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  transform: translateY(-50%);
 }
 
 .glyphCanvas {
@@ -79,6 +83,7 @@
     visibility: visible;
     filter: brightness(1.14) contrast(1.06);
   }
+
 }
 
 @media (prefers-reduced-motion: reduce) {

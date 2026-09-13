@@ -11,6 +11,7 @@ export type PortraitImageSource = {
 export type EngineOptions = {
   reducedMotion: boolean;
   onReady?: () => void;
+  onLayout?: (width: number, height: number, mobile: boolean) => void;
 };
 
 export type AsciiPortraitEngineHandle = {
@@ -259,6 +260,23 @@ function measureGrid(
   return { fontSize, cellW, cellH, cols, rows };
 }
 
+export function fitPortraitLayout(containerW: number, containerH: number, imageAspect: number) {
+  if (containerW < 8 || containerH < 8) return { width: 0, height: 0 };
+
+  const boxAspect = containerW / containerH;
+  if (boxAspect > imageAspect) {
+    return {
+      width: Math.round(containerH * imageAspect),
+      height: containerH,
+    };
+  }
+
+  return {
+    width: containerW,
+    height: Math.round(containerW / imageAspect),
+  };
+}
+
 function createSampleCanvas(width: number, height: number): OffscreenCanvas | HTMLCanvasElement {
   if (typeof OffscreenCanvas !== "undefined") {
     return new OffscreenCanvas(width, height);
@@ -394,6 +412,7 @@ export function createAsciiPortraitEngine(
     buildGlowLayer();
     paintGlyphs();
     announceReady();
+    options.onLayout?.(layoutWidth, layoutHeight, isMobileLayout);
   };
 
   const rebuild = () => {
@@ -403,7 +422,6 @@ export function createAsciiPortraitEngine(
     const height = layoutHeight;
     if (width < 8 || height < 8) return;
 
-    isMobileLayout = width < 900;
     const dpr = Math.min(globalThis.devicePixelRatio || 1, profile.dprCap);
     const grid = measureGrid(glyphCtx, width, height, fontStack, profile.maxGridCells);
     const { cols, rows } = grid;
@@ -504,11 +522,17 @@ export function createAsciiPortraitEngine(
   };
 
   return {
-    setSize(width: number, height: number) {
-      const unchanged = width === layoutWidth && height === layoutHeight;
+    setSize(containerW: number, containerH: number) {
+      isMobileLayout = containerW < 900;
+      const imageAspect = image.width / image.height;
+      const fitted = fitPortraitLayout(containerW, containerH, imageAspect);
+      if (fitted.width < 8 || fitted.height < 8) return;
+
+      const unchanged = fitted.width === layoutWidth && fitted.height === layoutHeight;
       if (unchanged && cells.length) return;
-      layoutWidth = width;
-      layoutHeight = height;
+
+      layoutWidth = fitted.width;
+      layoutHeight = fitted.height;
       if (!cells.length) {
         rebuild();
         return;

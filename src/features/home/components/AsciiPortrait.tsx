@@ -75,7 +75,10 @@ export function AsciiPortrait() {
 
         if (!field) {
           ({ glowCanvas, glyphCanvas } = mountCanvases(stack));
-          field = createAsciiPortrait(glowCanvas, glyphCanvas, image, portraitOptions);
+          field = createAsciiPortrait(glowCanvas, glyphCanvas, image, {
+            ...portraitOptions,
+            getSize,
+          });
         }
 
         if (cancelled) {

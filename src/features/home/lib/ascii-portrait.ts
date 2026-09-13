@@ -1,8 +1,96 @@
 import {
   createAsciiPortraitEngine,
+  fitPortraitLayout,
   imageSourceFromElement,
   type AsciiPortraitEngineHandle,
 } from "./ascii-portrait-engine";
+
+const MOBILE_BREAKPOINT = 900;
+const RESIZE_DEBOUNCE_MS = 180;
+
+function createPortraitResizeController({
+  glowCanvas,
+  glyphCanvas,
+  imageAspect,
+  getSize,
+  rebuild,
+}: {
+  glowCanvas: HTMLCanvasElement;
+  glyphCanvas: HTMLCanvasElement;
+  imageAspect: number;
+  getSize: () => { width: number; height: number };
+  rebuild: () => void;
+}) {
+  let resizeTimer = 0;
+  let wasMobile = getSize().width < MOBILE_BREAKPOINT;
+
+  const applyLayoutNow = () => {
+    const { width, height } = getSize();
+    if (width < 8 || height < 8) return undefined;
+
+    const mobile = width < MOBILE_BREAKPOINT;
+    const fitted = fitPortraitLayout(width, height, imageAspect);
+    if (fitted.width < 8 || fitted.height < 8) return undefined;
+
+    applyPortraitCanvasLayout(glowCanvas, glyphCanvas, fitted.width, fitted.height, mobile);
+    return mobile;
+  };
+
+  const onResize = () => {
+    const mobile = applyLayoutNow();
+    if (mobile === undefined) return;
+
+    const crossBreakpoint = mobile !== wasMobile;
+    wasMobile = mobile;
+
+    if (resizeTimer) window.clearTimeout(resizeTimer);
+
+    const runRebuild = () => {
+      requestAnimationFrame(rebuild);
+    };
+
+    if (crossBreakpoint) {
+      runRebuild();
+      return;
+    }
+
+    resizeTimer = window.setTimeout(runRebuild, RESIZE_DEBOUNCE_MS);
+  };
+
+  return {
+    onResize,
+    clear() {
+      if (resizeTimer) window.clearTimeout(resizeTimer);
+      resizeTimer = 0;
+    },
+  };
+}
+
+export function applyPortraitCanvasLayout(
+  glowCanvas: HTMLCanvasElement,
+  glyphCanvas: HTMLCanvasElement,
+  width: number,
+  height: number,
+  mobile: boolean,
+) {
+  for (const canvas of [glowCanvas, glyphCanvas]) {
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    canvas.style.aspectRatio = `${width} / ${height}`;
+    canvas.style.top = "50%";
+    canvas.style.bottom = "auto";
+
+    if (mobile) {
+      canvas.style.left = "50%";
+      canvas.style.right = "auto";
+      canvas.style.transform = "translate(-50%, -50%)";
+    } else {
+      canvas.style.left = "auto";
+      canvas.style.right = "0";
+      canvas.style.transform = "translateY(-50%)";
+    }
+  }
+}
 
 export type AsciiPortraitHandle = {
   destroy: () => void;
@@ -12,6 +100,7 @@ export type AsciiPortraitHandle = {
 type Options = {
   reducedMotion: boolean;
   onReady?: () => void;
+  getSize?: () => { width: number; height: number };
 };
 
 const WORKER_READY_MS = 12_000;
@@ -89,14 +178,15 @@ export function tryCreateAsciiPortraitWorker(
 
   let destroyed = false;
   let resizeObserver: ResizeObserver | null = null;
-  let resizeTimer = 0;
+  let resizeController: ReturnType<typeof createPortraitResizeController> | null = null;
   let ready = false;
   let readyTimeout = 0;
+  const imageAspect = image.naturalWidth / image.naturalHeight;
 
   const cleanup = () => {
     destroyed = true;
     ready = false;
-    if (resizeTimer) window.clearTimeout(resizeTimer);
+    resizeController?.clear();
     if (readyTimeout) window.clearTimeout(readyTimeout);
     resizeObserver?.disconnect();
     document.removeEventListener("visibilitychange", onVisibility);
@@ -110,14 +200,6 @@ export function tryCreateAsciiPortraitWorker(
     const { width, height } = options.getSize();
     if (width < 8 || height < 8) return;
     worker.postMessage({ type: "resize", width, height });
-  };
-
-  const scheduleResize = () => {
-    if (resizeTimer) window.clearTimeout(resizeTimer);
-    resizeTimer = window.setTimeout(() => {
-      resizeTimer = 0;
-      postResize();
-    }, 180);
   };
 
   const onVisibility = () => {
@@ -147,8 +229,25 @@ export function tryCreateAsciiPortraitWorker(
 
     worker!.onerror = () => settle(null);
     worker!.onmessageerror = () => settle(null);
-    worker!.onmessage = (event: MessageEvent<{ type: string }>) => {
-      if (event.data.type !== "ready" || destroyed) return;
+    worker!.onmessage = (
+      event: MessageEvent<{
+        type: string;
+        width?: number;
+        height?: number;
+        mobile?: boolean;
+      }>,
+    ) => {
+      if (destroyed) return;
+
+      if (event.data.type === "layout") {
+        const { width = 0, height = 0, mobile = false } = event.data;
+        if (width > 0 && height > 0) {
+          applyPortraitCanvasLayout(glowCanvas, glyphCanvas, width, height, mobile);
+        }
+        return;
+      }
+
+      if (event.data.type !== "ready") return;
       ready = true;
       options.onReady?.();
       postResize();
@@ -189,10 +288,20 @@ export function tryCreateAsciiPortraitWorker(
 
         postTransfer(worker!, { type: "bitmap", bitmap }, [bitmap]);
 
-        const parent = glowCanvas.parentElement;
-        if (parent) {
-          resizeObserver = new ResizeObserver(() => scheduleResize());
-          resizeObserver.observe(parent);
+        resizeController = createPortraitResizeController({
+          glowCanvas,
+          glyphCanvas,
+          imageAspect,
+          getSize: options.getSize,
+          rebuild: postResize,
+        });
+
+        const resizeTarget = glowCanvas.parentElement?.parentElement ?? glowCanvas.parentElement;
+        if (resizeTarget) {
+          resizeObserver = new ResizeObserver(() => {
+            if (!destroyed) resizeController?.onResize();
+          });
+          resizeObserver.observe(resizeTarget);
         }
         document.addEventListener("visibilitychange", onVisibility);
       } catch {
@@ -212,34 +321,49 @@ export function createAsciiPortrait(
     glowCanvas,
     glyphCanvas,
     imageSourceFromElement(image),
-    options,
+    {
+      ...options,
+      onLayout: (width, height, mobile) => {
+        applyPortraitCanvasLayout(glowCanvas, glyphCanvas, width, height, mobile);
+      },
+    },
   );
 
   let resizeObserver: ResizeObserver | null = null;
-  let resizeTimer = 0;
+  const imageAspect = image.naturalWidth / image.naturalHeight;
 
   const measure = () => {
-    const width = glowCanvas.clientWidth;
-    const height = glowCanvas.clientHeight;
+    const { width, height } = options.getSize?.() ?? {
+      width: glowCanvas.clientWidth,
+      height: glowCanvas.clientHeight,
+    };
     if (width < 8 || height < 8) return;
     engine?.setSize(width, height);
   };
 
-  const scheduleMeasure = () => {
-    if (resizeTimer) window.clearTimeout(resizeTimer);
-    resizeTimer = window.setTimeout(() => {
-      resizeTimer = 0;
-      measure();
-    }, 180);
-  };
+  const resizeController = createPortraitResizeController({
+    glowCanvas,
+    glyphCanvas,
+    imageAspect,
+    getSize: () =>
+      options.getSize?.() ?? {
+        width: glowCanvas.clientWidth,
+        height: glowCanvas.clientHeight,
+      },
+    rebuild: measure,
+  });
 
   const onVisibility = () => {
     engine?.setHidden(document.hidden);
   };
 
-  resizeObserver = new ResizeObserver(() => scheduleMeasure());
-  resizeObserver.observe(glowCanvas);
+  const resizeTarget = glowCanvas.parentElement?.parentElement ?? glowCanvas.parentElement;
+  if (resizeTarget) {
+    resizeObserver = new ResizeObserver(() => resizeController.onResize());
+    resizeObserver.observe(resizeTarget);
+  }
   document.addEventListener("visibilitychange", onVisibility);
+  resizeController.onResize();
   requestAnimationFrame(() => measure());
 
   return {
@@ -247,7 +371,7 @@ export function createAsciiPortrait(
       engine?.setReducedMotion(value);
     },
     destroy() {
-      if (resizeTimer) window.clearTimeout(resizeTimer);
+      resizeController.clear();
       resizeObserver?.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
       engine?.destroy();

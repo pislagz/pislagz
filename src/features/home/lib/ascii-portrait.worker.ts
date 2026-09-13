@@ -44,6 +44,9 @@ function tryStart() {
   handle = createAsciiPortraitEngine(pendingGlow, pendingGlyph, image, {
     reducedMotion: pendingReducedMotion,
     onReady: () => self.postMessage({ type: "ready" }),
+    onLayout: (width, height, mobile) => {
+      self.postMessage({ type: "layout", width, height, mobile });
+    },
   });
   handle.setSize(pendingWidth, pendingHeight);
 
