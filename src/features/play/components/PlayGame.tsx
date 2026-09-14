@@ -919,11 +919,25 @@ function VerticalPong({
       drawWaitingScene();
 
       const countdownStartedAt = performance.now();
+      let countdownLastTime = countdownStartedAt;
       let reportedCountdown = 3;
       onCountdownChange?.(reportedCountdown);
       unlockArcadeAudio();
       playArcadeSound("countdown-3", false);
+      const updatePlayerPosition = (dt: number) => {
+        if (keys.has("ArrowLeft")) player.x -= 260 * dt;
+        if (keys.has("ArrowRight")) player.x += 260 * dt;
+        player.x = Math.max(
+          player.width / 2,
+          Math.min(width - player.width / 2, player.x),
+        );
+      };
       const countdownLoop = (now: number) => {
+        const dt = Math.min((now - countdownLastTime) / 1000, 0.034);
+        countdownLastTime = now;
+        updatePlayerPosition(dt);
+        drawWaitingScene();
+
         const elapsed = now - countdownStartedAt;
         const nextCountdown = Math.max(1, 3 - Math.floor(elapsed / 600));
         if (nextCountdown !== reportedCountdown) {

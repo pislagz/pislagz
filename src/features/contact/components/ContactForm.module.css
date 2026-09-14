@@ -309,6 +309,12 @@
   .full {
     margin-top: 28px;
   }
+
+  .message {
+    min-height: 96px;
+    height: 96px;
+    max-height: 96px;
+  }
 }
 
 @media (max-width: 740px) {

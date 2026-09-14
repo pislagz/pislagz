@@ -4,26 +4,46 @@ import { useEffect, useRef } from "react";
 import { PlayGame } from "../components/PlayGame";
 import styles from "./PlayPage.module.css";
 
+const MOBILE_QUERY = "(max-width: 900px)";
+
+function isInteractiveTouchTarget(target: EventTarget | null) {
+  if (!(target instanceof Element)) return false;
+  return Boolean(
+    target.closest("a, button, input, textarea, select, [role='button'], [contenteditable='true']"),
+  );
+}
+
 export function PlayPage() {
   const pageRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    if (!window.matchMedia("(max-width: 900px)").matches) return;
+    if (!window.matchMedia(MOBILE_QUERY).matches) return;
+
+    document.documentElement.dataset.playMobile = "true";
     document.documentElement.style.overflow = "hidden";
     document.documentElement.style.overscrollBehavior = "none";
     document.body.style.overflow = "hidden";
     document.body.style.overscrollBehavior = "none";
 
+    const onTouchStart = (event: TouchEvent) => {
+      if (isInteractiveTouchTarget(event.target)) return;
+      event.preventDefault();
+    };
+
+    document.addEventListener("touchstart", onTouchStart, { capture: true, passive: false });
+
     return () => {
+      delete document.documentElement.dataset.playMobile;
       document.documentElement.style.removeProperty("overflow");
       document.documentElement.style.removeProperty("overscroll-behavior");
       document.body.style.removeProperty("overflow");
       document.body.style.removeProperty("overscroll-behavior");
+      document.removeEventListener("touchstart", onTouchStart, { capture: true });
     };
   }, []);
 
   useEffect(() => {
-    if (!window.matchMedia("(max-width: 900px)").matches) return;
+    if (!window.matchMedia(MOBILE_QUERY).matches) return;
 
     const forward = (phase: "down" | "move" | "up", event: PointerEvent) => {
       if (event.target instanceof Element && event.target.closest("footer")) return;

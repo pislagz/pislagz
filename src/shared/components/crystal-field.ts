@@ -335,7 +335,14 @@ export function createCrystalField(canvas: HTMLCanvasElement, options: Options):
   };
 
   resize();
-  window.addEventListener("resize", resize);
+  const onViewportChange = () => {
+    resize();
+  };
+  if (mobile) {
+    window.addEventListener("orientationchange", onViewportChange);
+  } else {
+    window.addEventListener("resize", onViewportChange);
+  }
   window.addEventListener("pointermove", onPointer, { passive: true });
   document.addEventListener("visibilitychange", onVisibility);
   raf = requestAnimationFrame(frame);
@@ -358,7 +365,11 @@ export function createCrystalField(canvas: HTMLCanvasElement, options: Options):
     destroy() {
       running = false;
       if (raf) cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
+      if (mobile) {
+        window.removeEventListener("orientationchange", onViewportChange);
+      } else {
+        window.removeEventListener("resize", onViewportChange);
+      }
       window.removeEventListener("pointermove", onPointer);
       document.removeEventListener("visibilitychange", onVisibility);
       geometry.dispose();

@@ -1,5 +1,6 @@
 import { arsenalApi } from "../api";
 import { ArsenalBentoGrid } from "../components/ArsenalBentoGrid";
+import { ArsenalScrollNudge } from "../components/ArsenalScrollNudge";
 import styles from "./ArsenalPage.module.css";
 
 export async function ArsenalPage() {
@@ -8,6 +9,7 @@ export async function ArsenalPage() {
   return (
     <section className={styles.page} aria-label="my arsenal">
       <ArsenalBentoGrid items={items} />
+      <ArsenalScrollNudge />
     </section>
   );
 }

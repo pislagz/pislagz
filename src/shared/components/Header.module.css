@@ -10,6 +10,11 @@
   margin: 0 auto;
 }
 
+:global(html[data-mobile-menu-open]) .header {
+  /* Above arsenal fly-in main (80) so the drawer stays interactive. */
+  z-index: 100;
+}
+
 .header,
 .header * {
   user-select: none;

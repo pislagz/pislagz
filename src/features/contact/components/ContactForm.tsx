@@ -25,6 +25,8 @@ export function ContactForm() {
   }, [form.status, form.lockedOnLoad]);
 
   const fitMessage = useCallback(() => {
+    if (window.matchMedia("(max-width: 900px)").matches) return;
+
     const field = messageRef.current;
     if (!field) return;
 
@@ -35,8 +37,21 @@ export function ContactForm() {
     const reserved = box
       ? box.getBoundingClientRect().bottom - fieldBox.bottom
       : (submit?.getBoundingClientRect().height ?? 28) + 24;
-    const footerTop = footer?.getBoundingClientRect().top ?? window.innerHeight;
-    const maxHeight = Math.max(fieldBox.height, footerTop - fieldBox.top - reserved - FOOTER_GAP);
+
+    if (!footer) {
+      field.style.height = "0px";
+      field.style.height = `${field.scrollHeight}px`;
+      return;
+    }
+
+    // Document-space gap stays stable while scrolling; viewport-space footerTop
+    // changes when iOS Safari toolbar resizes and was causing scroll-end jitter.
+    const fieldDocTop = fieldBox.top + window.scrollY;
+    const footerDocTop = footer.getBoundingClientRect().top + window.scrollY;
+    const maxHeight = Math.max(
+      fieldBox.height,
+      footerDocTop - fieldDocTop - reserved - FOOTER_GAP,
+    );
 
     field.style.height = "0px";
     field.style.height = `${Math.min(field.scrollHeight, maxHeight)}px`;
@@ -47,8 +62,11 @@ export function ContactForm() {
   }, [form.message, form.status, buttonGone, fitMessage]);
 
   useEffect(() => {
-    window.addEventListener("resize", fitMessage);
-    return () => window.removeEventListener("resize", fitMessage);
+    const onOrientationChange = () => {
+      window.requestAnimationFrame(fitMessage);
+    };
+    window.addEventListener("orientationchange", onOrientationChange);
+    return () => window.removeEventListener("orientationchange", onOrientationChange);
   }, [fitMessage]);
 
   return (

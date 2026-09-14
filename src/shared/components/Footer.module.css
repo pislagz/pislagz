@@ -29,6 +29,7 @@
 }
 
 .message {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -44,6 +45,7 @@
   line-height: 1;
   white-space: nowrap;
   flex-shrink: 0;
+  touch-action: manipulation;
 }
 
 .message img {
@@ -63,6 +65,7 @@
 }
 
 .continue {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -78,14 +81,22 @@
   font-weight: 600;
   white-space: nowrap;
   animation: continue-fade 520ms ease-out both;
-  will-change: opacity;
+  touch-action: manipulation;
+  isolation: isolate;
 }
 
-.continuePulse {
+/* Pulse a decorative layer so transform never moves the tap target. */
+.continuePulse::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: inherit;
+  box-shadow: inherit;
+  pointer-events: none;
   transform-origin: center;
-  animation:
-    continue-fade 520ms ease-out both,
-    continue-attention 2.8s ease-in-out 900ms infinite;
+  animation: continue-attention 2.8s ease-in-out 900ms infinite;
 }
 
 .resumeContinue {
@@ -202,6 +213,42 @@
     justify-content: center;
   }
 
+  /* Invisible extra hit area (~44px) that does not overlap the sibling. */
+  .actions > a::after {
+    content: "";
+    position: absolute;
+    left: -14px;
+    right: -14px;
+    top: -4px;
+    bottom: -4px;
+  }
+
+  .actions > a:first-child::after {
+    top: -12px;
+    bottom: -3px;
+  }
+
+  .actions > a:last-child::after {
+    top: -3px;
+    bottom: -12px;
+  }
+
+  .actionsMobileFlip > a:first-child::after,
+  .actionsArsenalFlip > a:first-child::after {
+    top: -3px;
+    bottom: -12px;
+  }
+
+  .actionsMobileFlip > a:last-child::after,
+  .actionsArsenalFlip > a:last-child::after {
+    top: -12px;
+    bottom: -3px;
+  }
+
+  .singleAction > a::after {
+    inset: -12px -14px;
+  }
+
   .copy {
     grid-column: 1;
     grid-row: 2;
@@ -245,7 +292,22 @@
 
   .playSheet .inner {
     opacity: calc(1 - var(--dock, 0));
+    pointer-events: none;
     transition: opacity 0.4s ease;
+  }
+
+  .playSheet .actions {
+    touch-action: manipulation;
+    pointer-events: auto;
+  }
+
+  .playSheet .actions a {
+    cursor: pointer;
+  }
+
+  .playSheet:active .actions a,
+  .playSheet.dragging .actions a {
+    cursor: pointer;
   }
 
   .handleSlot {
@@ -304,7 +366,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .continue,
-  .continuePulse {
+  .continuePulse,
+  .continuePulse::before {
     animation: none;
   }
 

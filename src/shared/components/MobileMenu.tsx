@@ -93,6 +93,18 @@ export function MobileMenu({ open, onClose, originRef }: Props) {
   }, [shown, updateOrigin]);
 
   useEffect(() => {
+    if (!shown) {
+      delete document.documentElement.dataset.mobileMenuOpen;
+      return;
+    }
+
+    document.documentElement.dataset.mobileMenuOpen = "true";
+    return () => {
+      delete document.documentElement.dataset.mobileMenuOpen;
+    };
+  }, [shown]);
+
+  useEffect(() => {
     if (!open) return;
 
     const previousOverflow = document.body.style.overflow;

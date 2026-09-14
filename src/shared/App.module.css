@@ -1,6 +1,8 @@
 .shell {
+  /* svh stays stable while iOS Safari toolbar collapses; dvh was shifting
+     min-height at scroll-end and causing bottom jitter. */
   min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100svh;
   background: var(--color-bg);
   position: relative;
   display: flex;
@@ -9,6 +11,21 @@
      auto, turning the shell into a scroll container whose scrollbar flashes
      during the arsenal fly-in animation. */
   overflow-x: clip;
+}
+
+:global(html[data-mobile-scroll-safe="true"]) .shell {
+  min-height: auto;
+  background: #070910;
+}
+
+:global(html[data-mobile-scroll-safe="true"]) .shell::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 0;
+  padding-bottom: 32px;
+  flex-shrink: 0;
+  pointer-events: none;
 }
 
 .main {

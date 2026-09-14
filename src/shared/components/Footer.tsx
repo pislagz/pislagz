@@ -173,8 +173,15 @@ export function Footer() {
     setDragging(false);
   };
 
+  const isSheetInteractiveTarget = (target: EventTarget | null) => {
+    if (!(target instanceof Element)) return false;
+    return Boolean(
+      target.closest("a, button, input, textarea, select, [role='button']"),
+    );
+  };
+
   const onSheetPointerDown = (event: PointerEvent<HTMLElement>) => {
-    if (!playSheet) return;
+    if (!playSheet || isSheetInteractiveTarget(event.target)) return;
     event.currentTarget.setPointerCapture(event.pointerId);
     const travel = measureTravel();
     footerRef.current?.style.setProperty("--dock-travel", `${travel}px`);
