@@ -5,11 +5,11 @@ Personal demo page. Built with **Next.js 15** (App Router) and CSS modules.
 ## Run
 
 ```bash
-npm install
-npm run dev
+yarn install
+yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Production build: `npm run build && npm start`.
+Open [http://localhost:3000](http://localhost:3000). Production build: `yarn build && yarn start`.
 
 ## Folder structure
 
