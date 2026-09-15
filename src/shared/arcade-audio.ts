@@ -20,16 +20,20 @@ export type ArcadeSound =
 
 let arcadeAudioContext: AudioContext | null = null;
 
-export function unlockArcadeAudio() {
-  if (!arcadeAudioContext) arcadeAudioContext = new AudioContext();
-  if (arcadeAudioContext.state === "suspended") void arcadeAudioContext.resume();
-}
-
-export function playArcadeSound(sound: ArcadeSound, allowCreate = true) {
+export function getArcadeAudioContext(allowCreate = true) {
   if (!arcadeAudioContext && allowCreate) {
     arcadeAudioContext = new AudioContext();
   }
-  const audio = arcadeAudioContext;
+  return arcadeAudioContext;
+}
+
+export function unlockArcadeAudio() {
+  const audio = getArcadeAudioContext();
+  if (audio?.state === "suspended") void audio.resume();
+}
+
+export function playArcadeSound(sound: ArcadeSound, allowCreate = true) {
+  const audio = getArcadeAudioContext(allowCreate);
   if (!audio || audio.state !== "running") {
     if (allowCreate && audio?.state === "suspended") {
       void audio.resume().then(() => playArcadeSound(sound, false));

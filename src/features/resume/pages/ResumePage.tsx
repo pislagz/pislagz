@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
+import { RouteEntranceSound } from "@shared/components/RouteEntranceSound";
 import { RESUME_PDF_PATH } from "@shared/constants";
 import { Button } from "@shared/ui/Button";
 import styles from "./ResumePage.module.css";
@@ -114,6 +115,7 @@ export function ResumePage() {
 
   return (
     <section className={styles.page}>
+      <RouteEntranceSound route="resume" />
       <h1 className={styles.title}>
         <DecryptText text="my résumé" delay={0} duration={1100} />
       </h1>

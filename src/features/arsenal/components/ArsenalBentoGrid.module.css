@@ -49,6 +49,12 @@
   animation-delay: var(--fly-delay, 0ms);
 }
 
+/* Tiles visually cover the header during fly-in, but the nav must stay
+   clickable with normal hover/cursor feedback underneath. */
+:global(html[data-arsenal-flying]) .grid[data-armed="true"] .tile {
+  pointer-events: none;
+}
+
 @keyframes flyIn {
   0% {
     opacity: 0;

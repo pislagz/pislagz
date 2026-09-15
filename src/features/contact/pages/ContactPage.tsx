@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RouteEntranceSound } from "@shared/components/RouteEntranceSound";
 import { CONTACT_EMAIL, SOCIAL } from "@shared/constants";
 import { ContactForm } from "../components/ContactForm";
 import styles from "./ContactPage.module.css";
@@ -6,6 +7,7 @@ import styles from "./ContactPage.module.css";
 export function ContactPage() {
   return (
     <section className={styles.page}>
+      <RouteEntranceSound route="hire-me" />
       <h1 className={styles.title} aria-label="contact">
         <span className={styles.titleLetters} aria-hidden="true">
           {Array.from("contact").map((letter, index) => (
