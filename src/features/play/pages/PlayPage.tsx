@@ -78,7 +78,7 @@ export function PlayPage() {
   }, []);
 
   return (
-    <section ref={pageRef} className={styles.page}>
+    <section ref={pageRef} className={styles.page} data-page="play">
       <PlayGame />
     </section>
   );

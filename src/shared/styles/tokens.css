@@ -41,6 +41,7 @@
   --footer-h: 72px;
   /* Header row + footer slot — used to size desktop pages within 100svh. */
   --desktop-chrome: calc(var(--header-top) + 46px + 12px + var(--footer-h) + 20px);
+  --z-page-atmosphere: 1;
   --z-golden-spiral: 2147483640;
   --z-mobile-menu: 2147483646;
   --z-developer-menu: 2147483647;

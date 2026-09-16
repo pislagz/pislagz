@@ -222,7 +222,7 @@
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  margin: 32px 0 18px;
+  margin: calc(32px + var(--dev-contact-or-offset-y, 0px)) 0 18px;
   font-size: 12px;
   line-height: 1;
   color: var(--color-text-muted);
@@ -266,7 +266,7 @@
   }
 
   .or {
-    margin: 28px 0 18px;
+    margin: calc(28px + var(--dev-contact-or-offset-y, 0px)) 0 18px;
   }
 }
 

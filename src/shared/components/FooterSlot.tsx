@@ -6,12 +6,12 @@ import { FooterCopyright } from "./FooterCopyright";
 import styles from "./Footer.module.css";
 
 export function FooterSlot() {
-  const { footerEnabled } = useDeveloperSettings();
+  const { footerEnabled, rightsEnabled } = useDeveloperSettings();
 
   if (!footerEnabled) {
     return (
       <>
-        <FooterCopyright variant="floating" />
+        {rightsEnabled ? <FooterCopyright variant="floating" /> : null}
         <div className={styles.footerPlaceholder} data-footer-boundary="" aria-hidden="true">
           <div className={styles.footerPlaceholderInner} />
         </div>

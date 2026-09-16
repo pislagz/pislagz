@@ -17,7 +17,7 @@
 @media (min-width: 901px) {
   .page {
     min-height: 0;
-    overflow: hidden;
+    overflow: visible;
   }
 }
 

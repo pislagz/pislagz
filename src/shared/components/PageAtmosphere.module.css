@@ -1,0 +1,73 @@
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-page-atmosphere);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.filterDef {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.grain {
+  position: absolute;
+  top: -120%;
+  left: -120%;
+  width: 340%;
+  height: 340%;
+  opacity: var(--dev-film-grain-opacity, 0);
+  background: #fff;
+  filter: url("#page-film-grain");
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+  animation: grainShift 0.45s steps(4, end) infinite;
+  will-change: transform;
+}
+
+.glow {
+  position: absolute;
+  inset: 0;
+  opacity: var(--dev-page-glow-opacity, 0);
+  background:
+    radial-gradient(ellipse 88% 72% at 50% 40%, rgba(255, 255, 255, 0.16) 0%, transparent 68%),
+    radial-gradient(ellipse 120% 92% at 50% 100%, rgba(175, 6, 255, 0.1) 0%, transparent 58%);
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+
+:global(html:not([data-film-grain-enabled="true"])) .grain {
+  visibility: hidden;
+}
+
+:global(html:not([data-page-glow-enabled="true"])) .glow {
+  visibility: hidden;
+}
+
+@keyframes grainShift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  25% {
+    transform: translate3d(-2.5%, -3.5%, 0);
+  }
+
+  50% {
+    transform: translate3d(3.5%, 1.5%, 0);
+  }
+
+  75% {
+    transform: translate3d(-1.5%, 4%, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain {
+    animation: none;
+  }
+}
