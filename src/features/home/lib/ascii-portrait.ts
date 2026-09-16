@@ -95,6 +95,7 @@ export function applyPortraitCanvasLayout(
 export type AsciiPortraitHandle = {
   destroy: () => void;
   setReducedMotion: (value: boolean) => void;
+  setPointer: (x: number, y: number, active: boolean) => void;
 };
 
 type Options = {
@@ -209,6 +210,9 @@ export function tryCreateAsciiPortraitWorker(
   const handle: AsciiPortraitHandle = {
     setReducedMotion(value: boolean) {
       worker?.postMessage({ type: "setReducedMotion", value });
+    },
+    setPointer(x: number, y: number, active: boolean) {
+      worker?.postMessage({ type: "pointer", x, y, active });
     },
     destroy() {
       cleanup();
@@ -369,6 +373,9 @@ export function createAsciiPortrait(
   return {
     setReducedMotion(value: boolean) {
       engine?.setReducedMotion(value);
+    },
+    setPointer(x: number, y: number, active: boolean) {
+      engine?.setPointer(x, y, active);
     },
     destroy() {
       resizeController.clear();
