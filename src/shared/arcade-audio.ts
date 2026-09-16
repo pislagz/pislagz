@@ -19,24 +19,57 @@ export type ArcadeSound =
   | "navigate";
 
 let arcadeAudioContext: AudioContext | null = null;
+const audioStateListeners = new Set<(running: boolean) => void>();
+
+function notifyAudioState() {
+  const running = arcadeAudioContext?.state === "running";
+  audioStateListeners.forEach((listener) => listener(running));
+}
+
+function watchAudioContext(audio: AudioContext) {
+  audio.addEventListener("statechange", notifyAudioState);
+}
 
 export function getArcadeAudioContext(allowCreate = true) {
   if (!arcadeAudioContext && allowCreate) {
     arcadeAudioContext = new AudioContext();
+    watchAudioContext(arcadeAudioContext);
+    notifyAudioState();
   }
   return arcadeAudioContext;
 }
 
-export function unlockArcadeAudio() {
+export function isArcadeAudioRunning() {
+  return arcadeAudioContext?.state === "running";
+}
+
+export function subscribeArcadeAudioState(listener: (running: boolean) => void) {
+  audioStateListeners.add(listener);
+  listener(isArcadeAudioRunning());
+  return () => {
+    audioStateListeners.delete(listener);
+  };
+}
+
+function resumeArcadeAudio() {
   const audio = getArcadeAudioContext();
-  if (audio?.state === "suspended") void audio.resume();
+  if (!audio) return Promise.resolve();
+  if (audio.state === "running") {
+    notifyAudioState();
+    return Promise.resolve();
+  }
+  return audio.resume().then(() => notifyAudioState());
+}
+
+export function unlockArcadeAudio() {
+  void resumeArcadeAudio();
 }
 
 export function playArcadeSound(sound: ArcadeSound, allowCreate = true) {
   const audio = getArcadeAudioContext(allowCreate);
   if (!audio || audio.state !== "running") {
     if (allowCreate && audio?.state === "suspended") {
-      void audio.resume().then(() => playArcadeSound(sound, false));
+      void resumeArcadeAudio().then(() => playArcadeSound(sound, false));
     }
     return;
   }

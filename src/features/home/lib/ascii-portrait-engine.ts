@@ -34,7 +34,6 @@ type Cell = {
   rampIndex: number;
   opacity: number;
   hoverBoost: number;
-  hoverErasePad: number;
 };
 
 type RuntimeProfile = {
@@ -340,6 +339,7 @@ export function createAsciiPortraitEngine(
   let hoverFrame = 0;
   let cellGrid = new Map<string, Cell>();
   let lastHoverCell: Cell | null = null;
+  let hoverFadeOutCells: Set<Cell> | null = null;
 
   const syncCanvasBitmap = () => {
     const bitmapW = Math.max(1, Math.round(renderWidth * renderDpr));
@@ -356,7 +356,44 @@ export function createAsciiPortraitEngine(
     if (x < 0 || y < 0) return null;
     const col = Math.floor(x / cellW);
     const row = Math.floor(y / cellH);
-    return cellGrid.get(`${col},${row}`) ?? null;
+    let best: Cell | null = null;
+    let bestDist = Infinity;
+    for (let dr = -1; dr <= 1; dr += 1) {
+      for (let dc = -1; dc <= 1; dc += 1) {
+        const cell = cellGrid.get(`${col + dc},${row + dr}`);
+        if (!cell) continue;
+        const cx = cell.x + cellW * 0.5;
+        const cy = cell.y + cellH * 0.72;
+        const dist = (x - cx) ** 2 + (y - cy) ** 2;
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = cell;
+        }
+      }
+    }
+    return best;
+  };
+
+  const neighborCells = (cell: Cell) => {
+    const col = Math.floor(cell.x / cellW);
+    const row = Math.floor(cell.y / cellH);
+    const found: Cell[] = [];
+    for (let dr = -1; dr <= 1; dr += 1) {
+      for (let dc = -1; dc <= 1; dc += 1) {
+        const neighbor = cellGrid.get(`${col + dc},${row + dr}`);
+        if (neighbor) found.push(neighbor);
+      }
+    }
+    return found;
+  };
+
+  const expandHoverDirty = (dirty: Cell[]) => {
+    const expanded = new Set(dirty);
+    for (let i = 0; i < dirty.length; i += 1) {
+      const neighbors = neighborCells(dirty[i]);
+      for (let j = 0; j < neighbors.length; j += 1) expanded.add(neighbors[j]);
+    }
+    return [...expanded];
   };
 
   const indexCells = (next: Cell[]) => {
@@ -398,30 +435,33 @@ export function createAsciiPortraitEngine(
     }
   };
 
-  const hoverClearPad = (cell: Cell) => {
-    if (cell.hoverBoost > 0.001) {
-      return Math.ceil(cellH * 0.35 * (1 + cell.hoverBoost * HOVER_SCALE_MAX));
-    }
-    return cell.hoverErasePad;
-  };
-
   const clearCellArea = (cell: Cell) => {
-    const pad = hoverClearPad(cell);
-    if (pad > 0) {
-      glyphCtx.clearRect(cell.x - pad, cell.y - pad, cellW + pad * 2, cellH + pad * 2);
+    const maxScalePad = Math.ceil(Math.max(cellW, cellH) * HOVER_SCALE_MAX * 0.55);
+    const scalePad = hoverFadeOutCells?.has(cell)
+      ? maxScalePad
+      : cell.hoverBoost > 0.001
+        ? Math.ceil(Math.max(cellW, cellH) * HOVER_SCALE_MAX * cell.hoverBoost * 0.55)
+        : 0;
+    if (scalePad > 0) {
+      glyphCtx.clearRect(
+        cell.x - scalePad,
+        cell.y - scalePad,
+        cellW + scalePad * 2,
+        cellH + scalePad * 2,
+      );
       return;
     }
     glyphCtx.clearRect(cell.x, cell.y, cellW + 1, cellH + 1);
   };
 
-  const paintGlyphs = (dirty?: Cell[]) => {
+  const paintGlyphs = (dirty?: Cell[], hoverPaint = false) => {
     glyphCtx.font = `${fontSize}px ${fontStack}`;
     glyphCtx.textBaseline = "top";
     glyphCtx.textAlign = "left";
 
     const drawCell = (cell: Cell) => {
       const boost = cell.hoverBoost;
-      glyphCtx.globalAlpha = Math.min(1, cell.opacity * (1 + boost * 0.12));
+      glyphCtx.globalAlpha = cell.opacity;
 
       if (boost > 0.001) {
         const cx = cell.x + cellW * 0.5;
@@ -448,11 +488,11 @@ export function createAsciiPortraitEngine(
       return;
     }
 
-    for (let i = 0; i < dirty.length; i += 1) {
-      const cell = dirty[i];
+    const paintList = hoverPaint ? expandHoverDirty(dirty) : dirty;
+    for (let i = 0; i < paintList.length; i += 1) {
+      const cell = paintList[i];
       clearCellArea(cell);
       drawCell(cell);
-      if (cell.hoverBoost <= 0) cell.hoverErasePad = 0;
     }
   };
 
@@ -467,6 +507,7 @@ export function createAsciiPortraitEngine(
     if (!running || reducedMotion || pageHidden || !cells.length) return;
 
     const dirty = new Set<Cell>();
+    const fadingOut = new Set<Cell>();
     let animating = false;
 
     for (let i = 0; i < cells.length; i += 1) {
@@ -475,24 +516,26 @@ export function createAsciiPortraitEngine(
         if (cell.hoverBoost !== 0) {
           cell.hoverBoost = 0;
           dirty.add(cell);
+          fadingOut.add(cell);
         }
         continue;
       }
 
       const prev = cell.hoverBoost;
-      if (prev > 0.001) {
-        cell.hoverErasePad = Math.max(
-          cell.hoverErasePad,
-          Math.ceil(cellH * 0.35 * (1 + prev * HOVER_SCALE_MAX)),
-        );
-      }
       cell.hoverBoost *= HOVER_DECAY;
-      if (cell.hoverBoost < 0.004) cell.hoverBoost = 0;
+      if (cell.hoverBoost < 0.004) {
+        cell.hoverBoost = 0;
+        fadingOut.add(cell);
+      }
       if (cell.hoverBoost !== prev) dirty.add(cell);
       animating = true;
     }
 
-    if (dirty.size) paintGlyphs([...dirty]);
+    if (dirty.size) {
+      hoverFadeOutCells = fadingOut;
+      paintGlyphs([...dirty], true);
+      hoverFadeOutCells = null;
+    }
 
     if (animating) hoverFrame = requestAnimationFrame(tickHover);
   };
@@ -607,7 +650,6 @@ export function createAsciiPortraitEngine(
           glyph: pickFromBucket(processed.rampIndex),
           opacity: 1,
           hoverBoost: 0,
-          hoverErasePad: 0,
         });
       }
     }
@@ -666,7 +708,6 @@ export function createAsciiPortraitEngine(
         lastHoverCell = null;
         for (let i = 0; i < cells.length; i += 1) {
           cells[i].hoverBoost = 0;
-          cells[i].hoverErasePad = 0;
         }
         if (cells.length) paintGlyphs();
       } else {
@@ -700,12 +741,7 @@ export function createAsciiPortraitEngine(
 
       if (isNewCell) options.onGlyphEnter?.();
 
-      cell.hoverErasePad = Math.max(
-        cell.hoverErasePad,
-        Math.ceil(cellH * 0.35 * (1 + cell.hoverBoost * HOVER_SCALE_MAX)),
-      );
-
-      paintGlyphs([cell]);
+      paintGlyphs([cell], true);
       scheduleHover();
     },
     destroy() {
