@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
+import { DeveloperSettingsProvider } from "@shared/developer/DeveloperSettings";
 import { ErrorBoundary } from "@shared/errors";
-import { Footer } from "./components/Footer";
+import { FooterSlot } from "./components/FooterSlot";
+import { GoldenSpiralOverlay } from "./components/GoldenSpiralOverlay";
 import { Header } from "./components/Header";
 import { MobileScrollSafeArea } from "./components/MobileScrollSafeArea";
 import { PageBackground } from "./components/PageBackground";
@@ -14,13 +16,16 @@ type Props = {
 export function App({ children }: Props) {
   return (
     <ErrorBoundary>
-      <ThemeShell>
-        <PageBackground />
-        <Header />
-        <main className={styles.main}>{children}</main>
-        <Footer />
-        <MobileScrollSafeArea />
-      </ThemeShell>
+      <DeveloperSettingsProvider>
+        <ThemeShell>
+          <PageBackground />
+          <GoldenSpiralOverlay />
+          <Header />
+          <main className={styles.main}>{children}</main>
+          <FooterSlot />
+          <MobileScrollSafeArea />
+        </ThemeShell>
+      </DeveloperSettingsProvider>
     </ErrorBoundary>
   );
 }

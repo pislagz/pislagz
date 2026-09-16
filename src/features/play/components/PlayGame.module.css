@@ -389,6 +389,29 @@
   cursor: crosshair;
 }
 
+@media (min-width: 901px) {
+  .game {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    max-height: calc(100svh - var(--desktop-chrome) - var(--page-top) - 48px);
+  }
+
+  .frame {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: stretch;
+  }
+
+  .canvas {
+    height: 100%;
+    max-height: min(480px, 100%);
+    object-fit: contain;
+  }
+}
+
 .overlay {
   position: absolute;
   inset: 0;

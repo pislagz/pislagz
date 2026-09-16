@@ -36,7 +36,14 @@
   --pad-x: 94px;
   --pad-x-inner: 175px;
   --header-top: 66px;
+  --page-top: 68px;
+  --page-top-mobile: 48px;
   --footer-h: 72px;
+  /* Header row + footer slot — used to size desktop pages within 100svh. */
+  --desktop-chrome: calc(var(--header-top) + 46px + 12px + var(--footer-h) + 20px);
+  --z-golden-spiral: 2147483640;
+  --z-mobile-menu: 2147483646;
+  --z-developer-menu: 2147483647;
   --radius-pill: 1000px;
   --radius-card: 10px;
 }

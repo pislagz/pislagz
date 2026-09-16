@@ -1,0 +1,109 @@
+.markTrack {
+  --mark-size: 46px;
+  position: relative;
+  flex: none;
+  width: var(--mark-size);
+  height: var(--mark-size);
+}
+
+.underlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cogTile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  background: rgba(18, 18, 18, 0.92);
+  box-shadow: 0 0 0 1px rgb(40, 40, 40);
+  opacity: 0.72;
+  transform: scale(0.96);
+  transition:
+    opacity 0.22s ease,
+    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+    border-radius 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cogTileVisible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.cogTilePulled {
+  border-radius: 8px 8px 0 0;
+}
+
+.cog {
+  display: flex;
+  width: 22px;
+  height: 22px;
+  color: rgba(245, 245, 247, 0.92);
+  transform-origin: center center;
+  animation: devCogSpin 10s linear infinite;
+  will-change: transform;
+}
+
+@keyframes devCogSpin {
+  from {
+    transform: translateZ(0) rotate(0deg);
+  }
+
+  to {
+    transform: translateZ(0) rotate(1turn);
+  }
+}
+
+.slide {
+  position: relative;
+  z-index: 1;
+  will-change: transform;
+}
+
+.slideDragging {
+  transition: none;
+}
+
+.slideIdle {
+  transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dragHandle {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+@media (max-width: 900px) {
+  .markTrack {
+    --mark-size: 34px;
+  }
+
+  .cog {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slideIdle,
+  .cogTile,
+  .cog {
+    transition: none;
+    animation: none;
+  }
+}

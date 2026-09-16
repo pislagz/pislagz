@@ -8,7 +8,7 @@ export async function ArsenalPage() {
   const items = await arsenalApi.getArsenal();
 
   return (
-    <section className={styles.page} aria-label="my arsenal">
+    <section className={styles.page} data-page="arsenal" aria-label="my arsenal">
       <RouteEntranceSound route="arsenal" />
       <ArsenalBentoGrid items={items} />
       <ArsenalScrollNudge />

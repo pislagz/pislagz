@@ -16,10 +16,6 @@
   perspective: 1600px;
 }
 
-.audioLocked {
-  z-index: 2;
-}
-
 .audioUnlockOverlay {
   position: absolute;
   z-index: 3;

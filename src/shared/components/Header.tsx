@@ -4,20 +4,39 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
 import { NAV_ITEMS, SOCIAL } from "@shared/constants";
+import { isPreviewEnv } from "@shared/env";
 import { Button } from "@shared/ui/Button";
+import { DeveloperMenu } from "./DeveloperMenu";
 import { Logo } from "./Logo";
+import { LogoDevTrigger } from "./LogoDevTrigger";
 import { MobileMenu } from "./MobileMenu";
 import styles from "./Header.module.css";
+
+const previewEnv = isPreviewEnv();
 
 export function Header() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [devMenuOpen, setDevMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const logoOriginRef = useRef<HTMLDivElement>(null);
   const hireActive = pathname === "/hire-me";
 
   return (
-    <header className={styles.header} onContextMenu={(event) => event.preventDefault()}>
-      <Logo />
+    <header
+      className={styles.header}
+      data-page-header=""
+      onContextMenu={(event) => event.preventDefault()}
+    >
+      {previewEnv ? (
+        <LogoDevTrigger
+          originRef={logoOriginRef}
+          devMenuOpen={devMenuOpen}
+          onOpenMenu={() => setDevMenuOpen(true)}
+        />
+      ) : (
+        <Logo />
+      )}
       <nav className={styles.desktopNav} aria-label="Primary">
         <div className={styles.links}>
           {NAV_ITEMS.map((item) => {
@@ -68,6 +87,13 @@ export function Header() {
         <span />
       </button>
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} originRef={menuButtonRef} />
+      {previewEnv ? (
+        <DeveloperMenu
+          open={devMenuOpen}
+          onClose={() => setDevMenuOpen(false)}
+          originRef={logoOriginRef}
+        />
+      ) : null}
     </header>
   );
 }

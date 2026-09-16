@@ -8,6 +8,8 @@ const DURATION = 2.8;
 
 const GLYPH_TICK_HZ = [420, 460, 500, 540, 580, 620, 660, 700, 740, 780];
 const GLYPH_TICK_MIN_MS = 26;
+/** Home portrait hover ticks — kept very quiet as a background quirk. */
+const GLYPH_TICK_PEAK = 0.004;
 
 let lastGlyphTickAt = 0;
 let lastGlyphTickIndex = -1;
@@ -41,8 +43,8 @@ export function playDecipherGlyphTick(allowCreate = true) {
   osc.type = "square";
   osc.frequency.setValueAtTime(hz, start);
   gain.gain.setValueAtTime(0.001, start);
-  gain.gain.exponentialRampToValueAtTime(0.016, start + 0.003);
-  gain.gain.setValueAtTime(0.016, start + 0.012);
+  gain.gain.exponentialRampToValueAtTime(GLYPH_TICK_PEAK, start + 0.003);
+  gain.gain.setValueAtTime(GLYPH_TICK_PEAK, start + 0.012);
   gain.gain.exponentialRampToValueAtTime(0.001, start + 0.04);
   osc.connect(gain);
   gain.connect(audio.destination);
