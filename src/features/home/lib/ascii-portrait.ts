@@ -101,6 +101,7 @@ export type AsciiPortraitHandle = {
 type Options = {
   reducedMotion: boolean;
   onReady?: () => void;
+  onGlyphEnter?: () => void;
   getSize?: () => { width: number; height: number };
 };
 
@@ -251,6 +252,11 @@ export function tryCreateAsciiPortraitWorker(
         return;
       }
 
+      if (event.data.type === "glyphEnter") {
+        options.onGlyphEnter?.();
+        return;
+      }
+
       if (event.data.type !== "ready") return;
       ready = true;
       options.onReady?.();
@@ -326,7 +332,9 @@ export function createAsciiPortrait(
     glyphCanvas,
     imageSourceFromElement(image),
     {
-      ...options,
+      reducedMotion: options.reducedMotion,
+      onReady: options.onReady,
+      onGlyphEnter: options.onGlyphEnter,
       onLayout: (width, height, mobile) => {
         applyPortraitCanvasLayout(glowCanvas, glyphCanvas, width, height, mobile);
       },

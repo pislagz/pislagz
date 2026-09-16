@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { unlockArcadeAudio } from "@shared/arcade-audio";
+import { playDecipherGlyphTick } from "@shared/decipher-sound";
 import { useMediaQuery } from "@shared/hooks/use-media-query";
 import {
   createAsciiPortrait,
@@ -117,6 +119,10 @@ export function AsciiPortrait() {
           reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
           onReady: () => {
             if (!cancelled) reveal();
+          },
+          onGlyphEnter: () => {
+            if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+            playDecipherGlyphTick();
           },
         };
 
@@ -240,6 +246,7 @@ export function AsciiPortrait() {
 
       if (!insideCanvas) return;
 
+      unlockArcadeAudio();
       field.setPointer(clientX - rect.left, clientY - rect.top, true);
     };
 

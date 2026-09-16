@@ -48,6 +48,7 @@ function tryStart() {
     onLayout: (width, height, mobile) => {
       self.postMessage({ type: "layout", width, height, mobile });
     },
+    onGlyphEnter: () => self.postMessage({ type: "glyphEnter" }),
   });
   handle.setSize(pendingWidth, pendingHeight);
 
