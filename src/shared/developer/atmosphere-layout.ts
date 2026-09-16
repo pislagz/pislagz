@@ -23,6 +23,14 @@ export function pageGlowOpacity(intensity: number): number {
   return (intensity / 100) * MAX_PAGE_GLOW_OPACITY;
 }
 
+export function isFilmGrainSettingsChanged(enabled: boolean, intensity: number): boolean {
+  return enabled !== DEFAULT_FILM_GRAIN_ENABLED || Math.round(intensity) !== DEFAULT_FILM_GRAIN_INTENSITY;
+}
+
+export function isPageGlowSettingsChanged(enabled: boolean, intensity: number): boolean {
+  return enabled !== DEFAULT_PAGE_GLOW_ENABLED || Math.round(intensity) !== DEFAULT_PAGE_GLOW_INTENSITY;
+}
+
 export function applyAtmosphereVars(
   filmGrainEnabled: boolean,
   filmGrainIntensity: number,

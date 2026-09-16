@@ -3,6 +3,10 @@ import {
   hasChangedPlaySettings,
 } from "./play-layout";
 import {
+  isFilmGrainSettingsChanged,
+  isPageGlowSettingsChanged,
+} from "./atmosphere-layout";
+import {
   formatChangedArsenalSettings,
   hasChangedArsenalSettings,
 } from "./arsenal-layout";
@@ -87,4 +91,52 @@ export function formatChangedDeveloperLayoutOffsets(
   }
 
   return lines.join("\n");
+}
+
+export const DEFAULT_PORTRAIT_GLYPH_SOUNDS_ENABLED = false;
+
+export function hasChangedDeveloperSettings(
+  footerEnabled: boolean,
+  goldenSpiralEnabled: boolean,
+  goldenSpiralMirrorX: boolean,
+  goldenSpiralMirrorY: boolean,
+  homeOffsets: HomeLayoutOffsets,
+  backgroundScale: number,
+  rightsEnabled: boolean,
+  rightsPosition: PositionOffset,
+  contactOrOffset: number,
+  arsenalTiltMaxDeg: number,
+  arsenalTiltSpillPercent: number,
+  arsenalGlowRadiusPx: number,
+  arsenalGridOffsetY: number,
+  playGameScale: number,
+  playGameOffsetY: number,
+  filmGrainEnabled: boolean,
+  filmGrainIntensity: number,
+  pageGlowEnabled: boolean,
+  pageGlowIntensity: number,
+  portraitGlyphSoundsEnabled: boolean,
+): boolean {
+  return (
+    footerEnabled ||
+    goldenSpiralEnabled ||
+    goldenSpiralMirrorX ||
+    goldenSpiralMirrorY ||
+    !rightsEnabled ||
+    isFilmGrainSettingsChanged(filmGrainEnabled, filmGrainIntensity) ||
+    isPageGlowSettingsChanged(pageGlowEnabled, pageGlowIntensity) ||
+    portraitGlyphSoundsEnabled !== DEFAULT_PORTRAIT_GLYPH_SOUNDS_ENABLED ||
+    hasChangedDeveloperLayoutOffsets(
+      homeOffsets,
+      backgroundScale,
+      rightsPosition,
+      contactOrOffset,
+      arsenalTiltMaxDeg,
+      arsenalTiltSpillPercent,
+      arsenalGlowRadiusPx,
+      arsenalGridOffsetY,
+      playGameScale,
+      playGameOffsetY,
+    )
+  );
 }

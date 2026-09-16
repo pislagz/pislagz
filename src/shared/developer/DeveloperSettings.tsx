@@ -43,6 +43,9 @@ import {
   DEFAULT_PAGE_GLOW_ENABLED,
   DEFAULT_PAGE_GLOW_INTENSITY,
 } from "./atmosphere-layout";
+import {
+  DEFAULT_PORTRAIT_GLYPH_SOUNDS_ENABLED,
+} from "./layout-copy";
 
 type DeveloperSettings = {
   footerEnabled: boolean;
@@ -83,6 +86,9 @@ type DeveloperSettings = {
   setPageGlowEnabled: (value: boolean) => void;
   pageGlowIntensity: number;
   setPageGlowIntensity: (value: number) => void;
+  portraitGlyphSoundsEnabled: boolean;
+  setPortraitGlyphSoundsEnabled: (value: boolean) => void;
+  resetDeveloperSettings: () => void;
 };
 
 const DeveloperSettingsContext = createContext<DeveloperSettings | null>(null);
@@ -112,6 +118,32 @@ export function DeveloperSettingsProvider({ children }: { children: ReactNode })
   const [filmGrainIntensity, setFilmGrainIntensity] = useState(DEFAULT_FILM_GRAIN_INTENSITY);
   const [pageGlowEnabled, setPageGlowEnabled] = useState(DEFAULT_PAGE_GLOW_ENABLED);
   const [pageGlowIntensity, setPageGlowIntensity] = useState(DEFAULT_PAGE_GLOW_INTENSITY);
+  const [portraitGlyphSoundsEnabled, setPortraitGlyphSoundsEnabled] = useState(
+    DEFAULT_PORTRAIT_GLYPH_SOUNDS_ENABLED,
+  );
+
+  const resetDeveloperSettings = useCallback(() => {
+    setFooterEnabled(false);
+    setGoldenSpiralEnabled(false);
+    setGoldenSpiralMirrorX(false);
+    setGoldenSpiralMirrorY(false);
+    setHomeLayoutOffsets(DEFAULT_HOME_LAYOUT_OFFSETS);
+    setHomeBackgroundScale(DEFAULT_HOME_BACKGROUND_SCALE);
+    setRightsEnabled(true);
+    setRightsPosition(DEFAULT_RIGHTS_POSITION);
+    setContactOrOffset(DEFAULT_CONTACT_OR_OFFSET);
+    setArsenalTiltMaxDeg(DEFAULT_ARSENAL_TILT_MAX_DEG);
+    setArsenalTiltSpillPercent(DEFAULT_ARSENAL_TILT_SPILL_PERCENT);
+    setArsenalGlowRadiusPx(DEFAULT_ARSENAL_GLOW_RADIUS_PX);
+    setArsenalGridOffsetY(DEFAULT_ARSENAL_GRID_OFFSET_Y);
+    setPlayGameScale(DEFAULT_PLAY_GAME_SCALE);
+    setPlayGameOffsetY(DEFAULT_PLAY_GAME_OFFSET_Y);
+    setFilmGrainEnabled(DEFAULT_FILM_GRAIN_ENABLED);
+    setFilmGrainIntensity(DEFAULT_FILM_GRAIN_INTENSITY);
+    setPageGlowEnabled(DEFAULT_PAGE_GLOW_ENABLED);
+    setPageGlowIntensity(DEFAULT_PAGE_GLOW_INTENSITY);
+    setPortraitGlyphSoundsEnabled(DEFAULT_PORTRAIT_GLYPH_SOUNDS_ENABLED);
+  }, []);
 
   const setHomeLayoutOffset = useCallback((key: HomeLayoutKey, offset: PositionOffset) => {
     setHomeLayoutOffsets((current) => ({
@@ -250,6 +282,9 @@ export function DeveloperSettingsProvider({ children }: { children: ReactNode })
         setPageGlowEnabled,
         pageGlowIntensity,
         setPageGlowIntensity,
+        portraitGlyphSoundsEnabled,
+        setPortraitGlyphSoundsEnabled,
+        resetDeveloperSettings,
       }}
     >
       {children}

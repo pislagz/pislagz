@@ -9,7 +9,7 @@
   border-radius: 999px;
   background: rgba(18, 18, 18, 0.8);
   box-shadow: 0 0 0 1px rgb(110, 110, 115);
-  cursor: pointer;
+  cursor: grab;
   touch-action: none;
   align-self: center;
   justify-self: start;
@@ -18,6 +18,7 @@
 
 .trackActive {
   box-shadow: 0 0 0 1px var(--color-accent);
+  cursor: grabbing;
 }
 
 .thumb {
