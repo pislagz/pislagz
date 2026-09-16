@@ -2,7 +2,53 @@
  * Decipher — rapid data ticks resolving into a clear tone.
  */
 
+import { getArcadeAudioContext } from "./arcade-audio";
+
 const DURATION = 2.8;
+
+const GLYPH_TICK_HZ = [420, 460, 500, 540, 580, 620, 660, 700, 740, 780];
+const GLYPH_TICK_MIN_MS = 26;
+
+let lastGlyphTickAt = 0;
+let lastGlyphTickIndex = -1;
+
+/** Single decode blip for ASCII portrait glyph hover — matches résumé decipher ticks. */
+export function playDecipherGlyphTick(allowCreate = true) {
+  const audio = getArcadeAudioContext(allowCreate);
+  if (!audio) return;
+  if (audio.state === "suspended") {
+    if (allowCreate) void audio.resume().then(() => playDecipherGlyphTick(false));
+    return;
+  }
+  if (audio.state !== "running") return;
+
+  const now = performance.now();
+  if (now - lastGlyphTickAt < GLYPH_TICK_MIN_MS) return;
+  lastGlyphTickAt = now;
+
+  let index = (Math.random() * GLYPH_TICK_HZ.length) | 0;
+  if (GLYPH_TICK_HZ.length > 1) {
+    while (index === lastGlyphTickIndex) {
+      index = (Math.random() * GLYPH_TICK_HZ.length) | 0;
+    }
+  }
+  lastGlyphTickIndex = index;
+  const hz = GLYPH_TICK_HZ[index];
+
+  const start = audio.currentTime;
+  const osc = audio.createOscillator();
+  const gain = audio.createGain();
+  osc.type = "square";
+  osc.frequency.setValueAtTime(hz, start);
+  gain.gain.setValueAtTime(0.001, start);
+  gain.gain.exponentialRampToValueAtTime(0.016, start + 0.003);
+  gain.gain.setValueAtTime(0.016, start + 0.012);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + 0.04);
+  osc.connect(gain);
+  gain.connect(audio.destination);
+  osc.start(start);
+  osc.stop(start + 0.05);
+}
 
 type Envelope = {
   delay: number;

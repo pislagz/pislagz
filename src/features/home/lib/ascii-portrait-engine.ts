@@ -12,6 +12,7 @@ export type EngineOptions = {
   reducedMotion: boolean;
   onReady?: () => void;
   onLayout?: (width: number, height: number, mobile: boolean) => void;
+  onGlyphEnter?: () => void;
 };
 
 export type AsciiPortraitEngineHandle = {
@@ -338,6 +339,7 @@ export function createAsciiPortraitEngine(
   let sampleCtx: PortraitContext | null = null;
   let hoverFrame = 0;
   let cellGrid = new Map<string, Cell>();
+  let lastHoverCell: Cell | null = null;
 
   const syncCanvasBitmap = () => {
     const bitmapW = Math.max(1, Math.round(renderWidth * renderDpr));
@@ -612,6 +614,7 @@ export function createAsciiPortraitEngine(
 
     applyBottomFade(next, cellH, isMobileLayout ? MOBILE_BOTTOM_FADE_ROWS : BOTTOM_FADE_ROWS);
     cells = next;
+    lastHoverCell = null;
     indexCells(next);
     finishPaint();
   };
@@ -660,6 +663,7 @@ export function createAsciiPortraitEngine(
       if (reducedMotion) {
         stopBoil();
         stopHover();
+        lastHoverCell = null;
         for (let i = 0; i < cells.length; i += 1) {
           cells[i].hoverBoost = 0;
           cells[i].hoverErasePad = 0;
@@ -682,11 +686,19 @@ export function createAsciiPortraitEngine(
       if (reducedMotion || !active || !cells.length) return;
 
       const cell = findCellAt(x, y);
-      if (!cell) return;
+      if (!cell) {
+        lastHoverCell = null;
+        return;
+      }
+
+      const isNewCell = cell !== lastHoverCell;
+      lastHoverCell = cell;
 
       const prev = cell.hoverBoost;
       cell.hoverBoost = Math.min(1, cell.hoverBoost + HOVER_CHARGE);
       if (cell.hoverBoost === prev) return;
+
+      if (isNewCell) options.onGlyphEnter?.();
 
       cell.hoverErasePad = Math.max(
         cell.hoverErasePad,
