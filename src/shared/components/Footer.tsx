@@ -12,12 +12,16 @@ import {
 } from "react";
 import { useMediaQuery } from "@shared/hooks/use-media-query";
 import { SOCIAL } from "@shared/constants";
+import {
+  clearPlayFooterActionDelay,
+  schedulePlayFooterActionDelay,
+  shouldDelayPlayFooterAction,
+} from "@shared/play-footer-action";
 import { FooterCopyright } from "./FooterCopyright";
 import { Logo } from "./Logo";
 import styles from "./Footer.module.css";
 
 let arsenalHasSettled = false;
-let delayPlayFooterAction = false;
 
 export function Footer() {
   const pathname = usePathname();
@@ -27,7 +31,7 @@ export function Footer() {
   const onResumePage = pathname === "/resume";
   const mobile = useMediaQuery("(max-width: 900px)");
   const playActionDelayPending =
-    pathname === "/play" && delayPlayFooterAction;
+    pathname === "/play" && shouldDelayPlayFooterAction();
   const [arsenalReady, setArsenalReady] = useState(arsenalHasSettled);
   const [showPrimaryAction, setShowPrimaryAction] = useState(true);
   const [dragging, setDragging] = useState(false);
@@ -104,11 +108,11 @@ export function Footer() {
   }, [onArsenalPage]);
 
   useEffect(() => {
-    if (pathname !== "/play" || !delayPlayFooterAction) {
+    if (pathname !== "/play" || !shouldDelayPlayFooterAction()) {
       setShowPrimaryAction(true);
       return;
     }
-    delayPlayFooterAction = false;
+    clearPlayFooterActionDelay();
     setShowPrimaryAction(false);
     const timeout = window.setTimeout(() => setShowPrimaryAction(true), 2800);
     return () => window.clearTimeout(timeout);
@@ -340,9 +344,7 @@ export function Footer() {
                 <Link
                   href="/play"
                   className={`${styles.continue} ${styles.continuePulse}`}
-                  onClick={() => {
-                    delayPlayFooterAction = true;
-                  }}
+                  onClick={schedulePlayFooterActionDelay}
                 >
                   Continue
                 </Link>

@@ -1,0 +1,35 @@
+.wrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: clamp(24px, 4vh, 36px);
+  padding-bottom: clamp(12px, 2vh, 24px);
+  pointer-events: auto;
+  animation: continueFade 520ms ease-out both;
+}
+
+.cta {
+  pointer-events: auto;
+}
+
+.cta img {
+  width: 24px;
+  height: 24px;
+  transform: rotate(-135deg);
+}
+
+@keyframes continueFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrap {
+    animation: none;
+  }
+}
