@@ -65,6 +65,10 @@ function AnimatedValue({
     const delay = Number.parseFloat(
       tile?.style.getPropertyValue("--fly-delay") ?? "0",
     );
+    if (!duration) {
+      setCount(target);
+      return;
+    }
     const startedAt = performance.now();
     let frame = 0;
 
@@ -117,10 +121,17 @@ export function ArsenalBentoGrid({ items }: { items: ArsenalItem[] }) {
   const finalize = () => {
     if (finalized.current) return;
     finalized.current = true;
+    gridRef.current?.setAttribute("data-settled", "true");
     document.documentElement.style.removeProperty("overflow");
-    delete document.documentElement.dataset.arsenalFlying;
     document.documentElement.dataset.arsenalSettled = "true";
     window.dispatchEvent(new Event("arsenal-grid-settled"));
+    // Let Safari finish the last compositor frame before dropping the flying
+    // stacking context — avoids a one-frame mask-image flash on all icons.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        delete document.documentElement.dataset.arsenalFlying;
+      });
+    });
   };
 
   useLayoutEffect(() => {
@@ -131,6 +142,13 @@ export function ArsenalBentoGrid({ items }: { items: ArsenalItem[] }) {
       return () => {
         delete document.documentElement.dataset.arsenalSettled;
       };
+    }
+
+    for (const item of items) {
+      if (!item.iconSrc) continue;
+      const icon = new Image();
+      icon.decoding = "async";
+      icon.src = item.iconSrc;
     }
 
     const gridRect = grid.getBoundingClientRect();
@@ -191,7 +209,8 @@ export function ArsenalBentoGrid({ items }: { items: ArsenalItem[] }) {
   const handleAnimationEnd = (event: AnimationEvent<HTMLDivElement>) => {
     if (
       event.target instanceof HTMLElement &&
-      event.target.parentElement === gridRef.current
+      event.target.classList.contains(styles.tileMotion) &&
+      event.target.parentElement?.parentElement === gridRef.current
     ) {
       settledTiles.current += 1;
       if (settledTiles.current >= items.length) finalize();
@@ -213,46 +232,48 @@ export function ArsenalBentoGrid({ items }: { items: ArsenalItem[] }) {
             className={`${styles.tile} ${styles[size]}`}
             data-arsenal-id={item.id}
           >
-            <GlassSurface
-              variant="panel"
-              className={styles.arsenalGlass}
-              active={item.highlighted}
-              effectsEnabled={false}
-            >
-              <div
-                className={[styles.content, styles[`content_${size}`]]
-                  .filter(Boolean)
-                  .join(" ")}
+            <div className={styles.tileMotion}>
+              <GlassSurface
+                variant="panel"
+                className={styles.arsenalGlass}
+                active={item.highlighted}
+                effectsEnabled={false}
               >
-                {item.iconSrc ? (
-                  <>
-                    <span
-                      aria-hidden="true"
-                      className={styles.icon}
-                      style={
-                        {
-                          "--arsenal-icon": `url("${item.iconSrc}")`,
-                        } as CSSProperties
-                      }
-                    />
-                    <span className={styles.label}>{item.label}</span>
-                  </>
-                ) : (
-                  <div className={styles.metric}>
-                    <span className={styles.value}>
-                      <AnimatedValue
-                        value={item.value ?? ""}
-                        armed={armed}
-                        enabled={item.id === "experience" || item.id === "hours"}
+                <div
+                  className={[styles.content, styles[`content_${size}`]]
+                    .filter(Boolean)
+                    .join(" ")}
+                >
+                  {item.iconSrc ? (
+                    <>
+                      <span
+                        aria-hidden="true"
+                        className={styles.icon}
+                        style={
+                          {
+                            "--arsenal-icon": `url("${item.iconSrc}")`,
+                          } as CSSProperties
+                        }
                       />
-                    </span>
-                    {item.subtitle ? (
-                      <span className={styles.subtitle}>{item.subtitle}</span>
-                    ) : null}
-                  </div>
-                )}
-              </div>
-            </GlassSurface>
+                      <span className={styles.label}>{item.label}</span>
+                    </>
+                  ) : (
+                    <div className={styles.metric}>
+                      <span className={styles.value}>
+                        <AnimatedValue
+                          value={item.value ?? ""}
+                          armed={armed}
+                          enabled={item.id === "experience" || item.id === "hours"}
+                        />
+                      </span>
+                      {item.subtitle ? (
+                        <span className={styles.subtitle}>{item.subtitle}</span>
+                      ) : null}
+                    </div>
+                  )}
+                </div>
+              </GlassSurface>
+            </div>
           </div>
         );
       })}
