@@ -14,6 +14,21 @@
   -webkit-touch-callout: none;
 }
 
+.footerPlaceholder {
+  margin-top: auto;
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--page-max);
+  padding: 12px var(--pad-x) 20px;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.footerPlaceholderInner {
+  width: 100%;
+  min-height: var(--footer-h);
+}
+
 .footer img {
   -webkit-user-drag: none;
 }
@@ -164,6 +179,37 @@
   color: rgba(255, 255, 255, 0.42);
   white-space: nowrap;
   margin-right: auto;
+}
+
+.floatingCopyBar {
+  position: fixed;
+  inset-inline: 0;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+.floatingCopyInner {
+  display: flex;
+  justify-content: flex-end;
+  width: min(100%, var(--page-max));
+  padding-inline: var(--pad-x);
+}
+
+.floatingCopy {
+  font-size: 8px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.42);
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .floatingCopyInner {
+    justify-content: center;
+  }
 }
 
 @media (max-width: 740px) {

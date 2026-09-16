@@ -15,7 +15,8 @@
   pointer-events: auto;
 }
 
-:global(html[data-mobile-menu-open]) .header {
+:global(html[data-mobile-menu-open]) .header,
+:global(html[data-developer-menu-open]) .header {
   /* Above arsenal fly-in main (80) so the drawer stays interactive. */
   z-index: 100;
 }
@@ -129,6 +130,14 @@
 
   .menuButton {
     display: block;
+  }
+}
+
+@media (max-width: 1100px) {
+  .header {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
   }
 }
 

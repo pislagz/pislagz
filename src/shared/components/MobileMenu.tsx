@@ -12,8 +12,22 @@ import {
   type RefObject,
   type TransitionEvent,
 } from "react";
+import { createPortal } from "react-dom";
 import { NAV_ITEMS, SOCIAL } from "@shared/constants";
 import styles from "./MobileMenu.module.css";
+
+function MenuCloseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M6 6l12 12M18 6 6 18"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
 
 type Props = {
   open: boolean;
@@ -27,7 +41,12 @@ export function MobileMenu({ open, onClose, originRef }: Props) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const [hold, setHold] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const shown = open || hold;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const updateOrigin = useCallback(() => {
     const origin = originRef.current;
@@ -133,7 +152,7 @@ export function MobileMenu({ open, onClose, originRef }: Props) {
     if (!open) setHold(false);
   };
 
-  return (
+  const menu = (
     <div
       className={`${styles.drawer} ${shown ? styles.present : ""} ${expanded ? styles.expanded : ""}`}
       role="dialog"
@@ -160,6 +179,17 @@ export function MobileMenu({ open, onClose, originRef }: Props) {
           }
         >
           <div className={styles.panel}>
+            <div className={styles.panelHeader}>
+              <button
+                type="button"
+                className={styles.closeButton}
+                aria-label="Close menu"
+                onClick={onClose}
+                tabIndex={open ? 0 : -1}
+              >
+                <MenuCloseIcon />
+              </button>
+            </div>
             <nav className={styles.nav}>
               {NAV_ITEMS.map((item) => {
                 const active = pathname === item.href;
@@ -206,4 +236,8 @@ export function MobileMenu({ open, onClose, originRef }: Props) {
       ) : null}
     </div>
   );
+
+  if (!mounted) return null;
+
+  return createPortal(menu, document.body);
 }

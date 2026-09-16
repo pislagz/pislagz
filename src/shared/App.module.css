@@ -3,10 +3,12 @@
      min-height at scroll-end and causing bottom jitter. */
   min-height: 100vh;
   min-height: 100svh;
+  width: 100%;
+  max-width: 100%;
   background: var(--color-bg);
   position: relative;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
   /* "clip" instead of "hidden": hidden forces overflow-y from visible to
      auto, turning the shell into a scroll container whose scrollbar flashes
      during the arsenal fly-in animation. */
@@ -28,13 +30,45 @@
   pointer-events: none;
 }
 
+.pageFrame {
+  position: relative;
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding-inline: var(--pad-x);
+  min-height: 0;
+}
+
 .main {
   position: relative;
   z-index: 1;
-  flex: 1;
   width: 100%;
   display: flex;
   flex-direction: column;
+}
+
+@media (min-width: 901px) {
+  .shell {
+    height: 100svh;
+    max-height: 100svh;
+    overflow-x: clip;
+  }
+
+  :global(html:not([data-arsenal-flying])) .shell:not(:has([data-page="arsenal"])) {
+    overflow-y: hidden;
+  }
+
+  .main {
+    min-height: 0;
+  }
+
+  :global(html:not([data-arsenal-flying])) .main:not(:has([data-page="arsenal"])) {
+    overflow: hidden;
+  }
+
+  .main:has([data-page="arsenal"]) {
+    overflow: visible;
+  }
 }
 
 /* Header (50) and footer (2) sit above main. During the arsenal fly-in the

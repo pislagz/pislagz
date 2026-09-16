@@ -26,6 +26,8 @@ const TYPEWRITER = {
 } as const;
 
 const HEADLINE_MIN_FONT_PX = 18;
+const HEADLINE_MIN_FONT_MOBILE_PX = 14;
+const MOBILE_QUERY = "(max-width: 900px)";
 
 const PHRASES = [
   "next.js",
@@ -47,8 +49,26 @@ const PHRASES = [
 
 const wait = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
 
+function getHeadlineWidthLimit(heading: HTMLElement) {
+  const hero = heading.parentElement?.parentElement;
+  if (hero) {
+    const styles = getComputedStyle(hero);
+    const padL = Number.parseFloat(styles.paddingLeft) || 0;
+    const padR = Number.parseFloat(styles.paddingRight) || 0;
+    const heroLimit = hero.clientWidth - padL - padR;
+    if (heroLimit > 0) return heroLimit;
+  }
+
+  const padX = Number.parseFloat(
+    getComputedStyle(document.documentElement).getPropertyValue("--pad-x"),
+  );
+  const horizontalPad = Number.isFinite(padX) ? padX * 2 : 42;
+  return Math.max(0, document.documentElement.clientWidth - horizontalPad);
+}
+
 export function HeroHeadline() {
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const mobile = useMediaQuery(MOBILE_QUERY);
   const [text, setText] = useState(START);
   const [caret, setCaret] = useState(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -56,15 +76,22 @@ export function HeroHeadline() {
   const fitHeadline = useCallback(() => {
     const heading = headingRef.current;
     if (!heading) return;
+
+    const minSize = mobile ? HEADLINE_MIN_FONT_MOBILE_PX : HEADLINE_MIN_FONT_PX;
+    const widthLimit = getHeadlineWidthLimit(heading);
+
+    if (widthLimit < 1) return;
+
     heading.style.fontSize = "";
     const max = Number.parseFloat(getComputedStyle(heading).fontSize);
     let size = max;
     heading.style.fontSize = `${size}px`;
-    while (heading.scrollWidth > heading.clientWidth && size > HEADLINE_MIN_FONT_PX) {
+
+    while (heading.scrollWidth > widthLimit && size > minSize) {
       size -= 1;
       heading.style.fontSize = `${size}px`;
     }
-  }, []);
+  }, [mobile]);
 
   useLayoutEffect(() => {
     fitHeadline();
@@ -72,7 +99,12 @@ export function HeroHeadline() {
 
   useEffect(() => {
     window.addEventListener("resize", fitHeadline);
-    return () => window.removeEventListener("resize", fitHeadline);
+    const viewport = window.visualViewport;
+    viewport?.addEventListener("resize", fitHeadline);
+    return () => {
+      window.removeEventListener("resize", fitHeadline);
+      viewport?.removeEventListener("resize", fitHeadline);
+    };
   }, [fitHeadline]);
 
   useEffect(() => {

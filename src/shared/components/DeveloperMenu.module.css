@@ -1,0 +1,294 @@
+.drawer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-developer-menu);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.present {
+  visibility: visible;
+}
+
+.present.expanded {
+  pointer-events: auto;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.28);
+  border: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.expanded .backdrop {
+  opacity: 1;
+}
+
+.sheet {
+  position: absolute;
+  top: var(--sheet-top, 8px);
+  left: var(--sheet-left, 8px);
+  z-index: 1;
+  width: min(300px, calc(100vw - 24px));
+  height: auto;
+  overflow: hidden;
+  isolation: isolate;
+  border: 0;
+  border-radius: 28px;
+  background: rgba(18, 18, 18, 0.8);
+  box-shadow:
+    0 0 0 1px rgb(40, 40, 40),
+    0 8px 32px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  opacity: 0;
+  clip-path: inset(
+    var(--clip-top, 0px)
+    var(--clip-right, 100%)
+    var(--clip-bottom, 100%)
+    var(--clip-left, 0px)
+    round 28px
+  );
+  transition:
+    clip-path 0.4s cubic-bezier(0.4, 0, 1, 1),
+    opacity 0.2s linear;
+}
+
+.expanded .sheet {
+  opacity: 1;
+  clip-path: inset(0 0 0 0 round 28px);
+  transition:
+    clip-path 0.64s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.18s linear;
+}
+
+.panel {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 20px 20px 24px;
+}
+
+.panelHeader,
+.toggles {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition:
+    opacity 0.18s linear,
+    transform 0.18s ease;
+}
+
+.expanded .panelHeader,
+.expanded .toggles {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.expanded .panelHeader {
+  transition-delay: 0.14s;
+}
+
+.expanded .toggles {
+  transition-delay: 0.2s;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-shadow: var(--shadow-nav);
+}
+
+.closeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #f5f5f7;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.closeButton svg {
+  width: 18px;
+  height: 18px;
+}
+
+.toggles {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  width: 100%;
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.toggleControl {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.switchLabel {
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.toggleLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-white);
+  line-height: 1.2;
+}
+
+.toggleLabelSpiral {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.toggleControlSpiral {
+  flex-shrink: 0;
+  justify-content: flex-end;
+  min-width: 116px;
+}
+
+.switch {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 26px;
+  border-radius: 120px;
+  background: rgba(18, 18, 18, 0.8);
+  box-shadow: 0 0 0 1px rgb(110, 110, 115);
+  transition: box-shadow 0.25s ease;
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #f5f5f7;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.switchOn {
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.switchOn::after {
+  transform: translateX(18px);
+  background: var(--color-accent);
+}
+
+.toggleInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.mirrorButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(18, 18, 18, 0.8);
+  box-shadow: 0 0 0 1px rgb(110, 110, 115);
+  color: #f5f5f7;
+  cursor: pointer;
+  transition:
+    opacity 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+}
+
+.mirrorButton svg {
+  width: 16px;
+  height: 16px;
+}
+
+.mirrorButton:hover {
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.mirrorButtonActive {
+  box-shadow: 0 0 0 1px var(--color-accent);
+  color: var(--color-accent);
+}
+
+.mirrorButtons {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .sheet,
+  .panelHeader,
+  .toggles,
+  .expanded .sheet,
+  .expanded .panelHeader,
+  .expanded .toggles,
+  .switch::after {
+    transform: none;
+    clip-path: none;
+    transition: opacity 0.2s linear;
+    transition-delay: 0s;
+  }
+
+  .sheet {
+    opacity: 0;
+  }
+
+  .expanded .sheet,
+  .expanded .panelHeader,
+  .expanded .toggles {
+    opacity: 1;
+  }
+}

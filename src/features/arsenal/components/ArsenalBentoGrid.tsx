@@ -229,8 +229,8 @@ export function ArsenalBentoGrid({ items }: { items: ArsenalItem[] }) {
   const armedAtRef = useRef(0);
   /**
    * Runs once every tile has landed (or via the safety timeout below).
-   * - Restores document overflow, which is clipped during the flight so the
-   *   out-of-viewport tiles don't flash a page scrollbar.
+   * - Clears the transient document overflow clip used during fly-in; desktop
+   *   scroll is locked globally via stylesheet instead.
    * The tiles intentionally keep their lightweight tinted-glass treatment
    * after settling, avoiding an expensive and visually disruptive second
    * liquid-glass mount.

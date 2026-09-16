@@ -5,7 +5,7 @@
   width: min(100%, calc(660px + 2 * var(--pad-x-inner)));
   max-width: var(--page-max);
   margin: 0 auto;
-  padding: 68px var(--pad-x-inner) 80px;
+  padding: var(--page-top) var(--pad-x-inner) 80px;
 }
 
 .page::after {
@@ -143,7 +143,7 @@
 
 @media (max-width: 900px) {
   .page {
-    padding: 48px var(--pad-x) 64px;
+    padding: var(--page-top-mobile) var(--pad-x) 64px;
   }
 
   .sentenceBreak {

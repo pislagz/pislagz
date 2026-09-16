@@ -4,21 +4,27 @@
   width: 100%;
   max-width: var(--page-max);
   margin: 0 auto;
-  padding: 26px var(--pad-x) 48px;
+  padding: var(--page-top) var(--pad-x) 48px;
   flex: 1;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
 }
 
+@media (min-width: 901px) {
+  .page {
+    min-height: 0;
+    overflow: hidden;
+  }
+}
+
 @media (max-width: 900px) {
   .page {
     min-height: 0;
-    padding: 8px 16px 12px;
-    justify-content: flex-start;
+    padding: var(--page-top-mobile) var(--pad-x) 12px;
     overflow: hidden;
     touch-action: none;
   }

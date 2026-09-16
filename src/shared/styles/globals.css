@@ -43,7 +43,20 @@ textarea {
   outline: none;
 }
 
+@media (min-width: 901px) {
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+}
+
 @media (max-width: 900px) {
+  html,
+  body {
+    overflow-x: clip;
+  }
+
   html[data-play-mobile] {
     -webkit-user-select: none;
     -webkit-touch-callout: none;

@@ -12,6 +12,7 @@ import {
 } from "react";
 import { useMediaQuery } from "@shared/hooks/use-media-query";
 import { SOCIAL } from "@shared/constants";
+import { FooterCopyright } from "./FooterCopyright";
 import { Logo } from "./Logo";
 import styles from "./Footer.module.css";
 
@@ -19,7 +20,6 @@ let arsenalHasSettled = false;
 let delayPlayFooterAction = false;
 
 export function Footer() {
-  const currentYear = new Date().getFullYear();
   const pathname = usePathname();
   const onHirePage = pathname === "/hire-me";
   const onArsenalPage = pathname === "/arsenal";
@@ -266,6 +266,7 @@ export function Footer() {
   return (
     <footer
       ref={footerRef}
+      data-footer-boundary=""
       className={`${styles.footer} ${playSheet ? styles.playSheet : ""} ${
         dragging ? styles.dragging : ""
       }`}
@@ -294,9 +295,7 @@ export function Footer() {
         ) : null}
         <div className={styles.inner}>
           <Logo variant="footer" />
-          <p className={styles.copy}>
-            All rights reserved | Pawel Pisulski | {currentYear}
-          </p>
+          <FooterCopyright />
           {showPrimaryAction && !playActionDelayPending ? (
             <div
               className={`${styles.actions} ${
