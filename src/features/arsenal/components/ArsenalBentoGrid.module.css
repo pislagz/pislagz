@@ -15,6 +15,11 @@
   min-width: 0;
 }
 
+.tileMotion {
+  width: 100%;
+  height: 100%;
+}
+
 .arsenalGlass {
   background: rgba(18, 18, 18, 0.8);
   border-color: rgb(40, 40, 40);
@@ -41,11 +46,16 @@
   grid-column: span 2;
 }
 
-/* iOS unlock fly-in. Fill mode "backwards" keeps tiles hidden during their
-   stagger delay, then releases them to natural styles afterwards. */
+/* iOS unlock fly-in. Motion runs on an inner wrapper so the grid cell and
+   masked icons are not tied to the same compositor teardown. "both" keeps
+   the settled frame instead of releasing filter/transform (Safari flashes
+   -webkit-mask-image when those drop). */
 .grid[data-armed="true"] .tile {
   z-index: 2;
-  animation: flyIn var(--fly-duration, 1100ms) var(--fly-ease) backwards;
+}
+
+.grid[data-armed="true"] .tileMotion {
+  animation: flyIn var(--fly-duration, 1100ms) var(--fly-ease) both;
   animation-delay: var(--fly-delay, 0ms);
 }
 
@@ -55,9 +65,13 @@
   pointer-events: none;
 }
 
+/* Blur only has 0%/100% stops so it tracks travel progress 1:1 with
+   transform — same easing, no mid-flight anchor that bunches sharpening
+   into the final moments. Opacity fades in earlier on its own beat. */
 @keyframes flyIn {
   0% {
     opacity: 0;
+    filter: blur(16px);
     transform: translate3d(var(--fly-x, 0px), var(--fly-y, 0px), 0)
       scale(var(--fly-scale, 2));
   }
@@ -66,6 +80,7 @@
   }
   100% {
     opacity: 1;
+    filter: blur(0);
     transform: translate3d(0, 0, 0) scale(1);
   }
 }
@@ -90,10 +105,20 @@
 }
 
 .icon {
+  position: relative;
   display: block;
   flex: none;
   width: 34px;
   height: 34px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  user-select: none;
+}
+
+.icon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background: var(--arsenal-accent);
   mask-image: var(--arsenal-icon);
   mask-position: center;
@@ -103,7 +128,9 @@
   -webkit-mask-position: center;
   -webkit-mask-repeat: no-repeat;
   -webkit-mask-size: contain;
-  user-select: none;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .wide .icon {
@@ -116,14 +143,17 @@
   height: 72px;
 }
 
-.tile[data-arsenal-id="react"] .icon {
+.tile[data-arsenal-id="react"] .icon::before {
   animation: reactSpin 18s linear infinite;
   will-change: transform;
 }
 
 @keyframes reactSpin {
+  from {
+    transform: translateZ(0) rotate(0deg);
+  }
   to {
-    transform: rotate(1turn);
+    transform: translateZ(0) rotate(1turn);
   }
 }
 
@@ -288,15 +318,15 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tile[data-arsenal-id="react"] .icon {
+  .tile[data-arsenal-id="react"] .icon::before {
     animation: none;
   }
 
-  .grid[data-armed="true"] .tile {
+  .grid[data-armed="true"] .tileMotion {
     animation: none;
   }
 
-  .tile {
+  .tileMotion {
     transform: none;
   }
 }

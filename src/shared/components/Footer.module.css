@@ -2,8 +2,11 @@
   position: relative;
   z-index: 2;
   margin-top: auto;
+  margin-inline: auto;
   display: flex;
   justify-content: center;
+  width: 100%;
+  max-width: var(--page-max);
   padding: 12px var(--pad-x) 20px;
   background: transparent;
   user-select: none;
@@ -17,7 +20,6 @@
 
 .panel {
   width: 100%;
-  max-width: var(--page-max);
   min-height: var(--footer-h);
   border-radius: 1000px;
   background: rgba(18, 18, 18, 0.8);
