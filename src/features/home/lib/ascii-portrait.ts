@@ -74,6 +74,8 @@ export function applyPortraitCanvasLayout(
   mobile: boolean,
 ) {
   for (const canvas of [glowCanvas, glyphCanvas]) {
+    canvas.dataset.portraitW = String(width);
+    canvas.dataset.portraitH = String(height);
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
     canvas.style.aspectRatio = `${width} / ${height}`;

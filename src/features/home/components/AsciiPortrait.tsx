@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { unlockArcadeAudio } from "@shared/arcade-audio";
 import { playDecipherGlyphTick } from "@shared/decipher-sound";
+import { useArcadeAudioUnlocked } from "@shared/hooks/use-arcade-audio-unlocked";
 import { useMediaQuery } from "@shared/hooks/use-media-query";
 import {
   createAsciiPortrait,
@@ -79,8 +80,11 @@ export function AsciiPortrait() {
   const rootRef = useRef<HTMLDivElement>(null);
   const tiltRef = useRef<HTMLDivElement>(null);
   const stackRef = useRef<HTMLDivElement>(null);
+  const audioOverlayRef = useRef<HTMLButtonElement>(null);
   const fieldRef = useRef<AsciiPortraitHandle | null>(null);
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const audioUnlocked = useArcadeAudioUnlocked();
+  const audioLocked = !reducedMotion && !audioUnlocked;
 
   useEffect(() => {
     void loadPortraitImage();
@@ -172,6 +176,52 @@ export function AsciiPortrait() {
   }, [reducedMotion]);
 
   useEffect(() => {
+    if (!audioLocked) return;
+
+    const root = rootRef.current;
+    const stack = stackRef.current;
+    const overlay = audioOverlayRef.current;
+    if (!root || !stack || !overlay) return;
+
+    const syncOverlay = () => {
+      const canvas = stack.querySelector<HTMLCanvasElement>("canvas:last-of-type");
+      if (!canvas) return;
+
+      const canvasRect = canvas.getBoundingClientRect();
+      const rootRect = root.getBoundingClientRect();
+      if (canvasRect.width < 1 || canvasRect.height < 1) return;
+
+      overlay.style.left = `${canvasRect.left - rootRect.left}px`;
+      overlay.style.top = `${canvasRect.top - rootRect.top}px`;
+      overlay.style.width = `${canvasRect.width}px`;
+      overlay.style.height = `${canvasRect.height}px`;
+    };
+
+    syncOverlay();
+    const resizeObserver = new ResizeObserver(syncOverlay);
+    resizeObserver.observe(root);
+    resizeObserver.observe(stack);
+    resizeObserver.observe(stack.parentElement ?? stack);
+
+    const mutationObserver = new MutationObserver(syncOverlay);
+    mutationObserver.observe(stack, {
+      attributes: true,
+      attributeFilter: ["class"],
+      childList: true,
+    });
+
+    window.addEventListener("resize", syncOverlay, { passive: true });
+    window.addEventListener("scroll", syncOverlay, { passive: true });
+
+    return () => {
+      resizeObserver.disconnect();
+      mutationObserver.disconnect();
+      window.removeEventListener("resize", syncOverlay);
+      window.removeEventListener("scroll", syncOverlay);
+    };
+  }, [audioLocked]);
+
+  useEffect(() => {
     if (reducedMotion) return;
 
     const root = rootRef.current;
@@ -247,7 +297,11 @@ export function AsciiPortrait() {
       if (!insideCanvas) return;
 
       unlockArcadeAudio();
-      field.setPointer(clientX - rect.left, clientY - rect.top, true);
+      const layoutW = Number(canvas.dataset.portraitW) || rect.width;
+      const layoutH = Number(canvas.dataset.portraitH) || rect.height;
+      const x = ((clientX - rect.left) / rect.width) * layoutW;
+      const y = ((clientY - rect.top) / rect.height) * layoutH;
+      field.setPointer(x, y, true);
     };
 
     const updateFromPoint = (clientX: number, clientY: number) => {
@@ -327,8 +381,25 @@ export function AsciiPortrait() {
     };
   }, [reducedMotion]);
 
+  const handleAudioUnlock = () => {
+    unlockArcadeAudio();
+  };
+
   return (
-    <div ref={rootRef} className={styles.root} aria-hidden="true">
+    <div
+      ref={rootRef}
+      className={`${styles.root} ${audioLocked ? styles.audioLocked : ""}`}
+      aria-hidden="true"
+    >
+      {audioLocked ? (
+        <button
+          ref={audioOverlayRef}
+          type="button"
+          className={styles.audioUnlockOverlay}
+          aria-label="Enable portrait sounds"
+          onPointerDown={handleAudioUnlock}
+        />
+      ) : null}
       <div ref={tiltRef} className={styles.tilt}>
         <div ref={stackRef} className={styles.stack} />
       </div>

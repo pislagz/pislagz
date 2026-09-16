@@ -16,6 +16,21 @@
   perspective: 1600px;
 }
 
+.audioLocked {
+  z-index: 2;
+}
+
+.audioUnlockOverlay {
+  position: absolute;
+  z-index: 3;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  background: transparent;
+}
+
 .tilt {
   width: 100%;
   height: 100%;

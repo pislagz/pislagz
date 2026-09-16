@@ -27,6 +27,7 @@
 }
 
 .headline {
+  pointer-events: none;
   display: flex;
   flex-wrap: nowrap;
   align-items: baseline;
@@ -94,6 +95,7 @@
 }
 
 .role {
+  pointer-events: none;
   margin-top: 4px;
   font-size: 40px;
   font-weight: 600;
