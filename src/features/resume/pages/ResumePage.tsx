@@ -124,17 +124,28 @@ export function ResumePage() {
         <span className={styles.sentenceBreak} aria-hidden="true" />
         <DecryptText text={leadSecond} delay={160} duration={1240} />
       </p>
-      <Button
-        href={RESUME_PDF_PATH}
-        download
-        variant="glass"
-        iconSrc="/assets/icons/pdf.svg"
-        iconSize={18}
-        className={styles.cta}
-        decryptIcon
-      >
-        <DecryptText text="Download PDF" delay={260} duration={1300} />
-      </Button>
+      <div className={styles.ctaRow}>
+        <Button
+          href={RESUME_PDF_PATH}
+          download
+          variant="glass"
+          iconSrc="/assets/icons/pdf.svg"
+          iconSize={18}
+          className={styles.cta}
+          decryptIcon
+        >
+          <DecryptText text="download pdf" delay={260} duration={1300} />
+        </Button>
+        <Button
+          href="/hire-me"
+          variant="glass"
+          iconSrc="/assets/icons/mail.svg"
+          iconSize={18}
+          className={styles.cta}
+        >
+          <DecryptText text="contact" delay={320} duration={1300} />
+        </Button>
+      </div>
     </section>
   );
 }

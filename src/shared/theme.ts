@@ -63,3 +63,8 @@ export function themeForPath(pathname: string): PageTheme {
   if (pathname.startsWith("/hire-me")) return PAGE_THEMES.hire;
   return PAGE_THEMES.home;
 }
+
+export function menuThemeForPath(pathname: string): PageTheme {
+  if (pathname.startsWith("/play")) return PAGE_THEMES.home;
+  return themeForPath(pathname);
+}

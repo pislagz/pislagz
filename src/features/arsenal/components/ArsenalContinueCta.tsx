@@ -7,13 +7,15 @@ import { schedulePlayFooterActionDelay } from "@shared/play-footer-action";
 import { Button } from "@shared/ui/Button";
 import styles from "./ArsenalContinueCta.module.css";
 
+const COMPACT_NAV_QUERY = "(max-width: 1100px)";
+
 export function ArsenalContinueCta() {
   const { footerEnabled } = useDeveloperSettings();
-  const mobile = useMediaQuery("(max-width: 900px)");
+  const compactNav = useMediaQuery(COMPACT_NAV_QUERY);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (footerEnabled || !mobile) {
+    if (footerEnabled || !compactNav) {
       setVisible(false);
       return;
     }
@@ -26,7 +28,7 @@ export function ArsenalContinueCta() {
 
     window.addEventListener("arsenal-grid-settled", reveal);
     return () => window.removeEventListener("arsenal-grid-settled", reveal);
-  }, [footerEnabled, mobile]);
+  }, [footerEnabled, compactNav]);
 
   if (footerEnabled || !visible) return null;
 
