@@ -1,0 +1,51 @@
+.wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 10px;
+  width: 100%;
+  min-height: 49px;
+  margin-top: 14px;
+  flex-shrink: 0;
+  transform: scale(calc(1 / var(--dev-play-game-scale, 1)));
+  transform-origin: center top;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.wrapVisible {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  animation: tabletCtaFade 520ms ease-out both;
+}
+
+.wrap .link {
+  width: fit-content;
+  min-width: 0;
+  flex: 0 0 auto;
+  pointer-events: auto;
+  text-transform: lowercase;
+  font-family: var(--font);
+  --glass-pill-gap: 10px;
+  --glass-pill-padding-left: 20px;
+  --glass-pill-padding-right: 18px;
+}
+
+@keyframes tabletCtaFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrapVisible {
+    animation: none;
+  }
+}

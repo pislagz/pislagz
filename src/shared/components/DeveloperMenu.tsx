@@ -61,7 +61,7 @@ import {
 import { PositionJoystick } from "@shared/developer/PositionJoystick";
 import { ScaleSlider } from "@shared/developer/ScaleSlider";
 import { VerticalOffsetSlider } from "@shared/developer/VerticalOffsetSlider";
-import { themeForPath } from "@shared/theme";
+import { menuThemeForPath } from "@shared/theme";
 import styles from "./DeveloperMenu.module.css";
 
 type Props = {
@@ -129,7 +129,7 @@ function MirrorVerticalIcon() {
 
 export function DeveloperMenu({ open, onClose, originRef }: Props) {
   const pathname = usePathname();
-  const theme = themeForPath(pathname);
+  const theme = menuThemeForPath(pathname);
   const isHomeRoute = pathname === "/";
   const isContactRoute = pathname === "/hire-me";
   const isArsenalRoute = pathname === "/arsenal";

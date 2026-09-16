@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { playArcadeSound, unlockArcadeAudio } from "@shared/arcade-audio";
 import { useMediaQuery } from "@shared/hooks/use-media-query";
+import { PlayTabletCtas } from "./PlayTabletCtas";
 import styles from "./PlayGame.module.css";
 
 const HIGH_SCORE_KEYS = {
@@ -1300,6 +1301,7 @@ export function PlayGame() {
           </div>
         ) : null}
       </div>
+      <PlayTabletCtas gameActive={status === "playing" && !intro && !crtOn} />
     </div>
   );
 }

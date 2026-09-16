@@ -14,6 +14,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { NAV_ITEMS, SOCIAL } from "@shared/constants";
+import { menuThemeForPath } from "@shared/theme";
 import styles from "./MobileMenu.module.css";
 
 function MenuCloseIcon() {
@@ -37,6 +38,7 @@ type Props = {
 
 export function MobileMenu({ open, onClose, originRef }: Props) {
   const pathname = usePathname();
+  const theme = menuThemeForPath(pathname);
   const previousPath = useRef(pathname);
   const sheetRef = useRef<HTMLDivElement>(null);
   const [hold, setHold] = useState(false);
@@ -178,7 +180,16 @@ export function MobileMenu({ open, onClose, originRef }: Props) {
             } as CSSProperties
           }
         >
-          <div className={styles.panel}>
+          <div
+            className={styles.panel}
+            style={
+              {
+                "--color-accent": theme.accent,
+                "--color-accent-deep": theme.accentDeep,
+                "--shadow-nav": theme.shadowNav,
+              } as CSSProperties
+            }
+          >
             <div className={styles.panelHeader}>
               <button
                 type="button"
