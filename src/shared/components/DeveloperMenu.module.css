@@ -209,6 +209,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  cursor: pointer;
 }
 
 .switchLabel {
@@ -231,7 +232,20 @@
 .toggleControlSpiral {
   flex-shrink: 0;
   justify-content: flex-end;
+  width: 116px;
   min-width: 116px;
+}
+
+.mirrorButtons {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+
+.mirrorButtonsHidden {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .switch {
@@ -242,6 +256,7 @@
   border-radius: 120px;
   background: rgba(18, 18, 18, 0.8);
   box-shadow: 0 0 0 1px rgb(110, 110, 115);
+  cursor: pointer;
   transition: box-shadow 0.25s ease;
 }
 
@@ -267,6 +282,10 @@
 }
 
 .toggleControlDisabled {
+  cursor: not-allowed;
+}
+
+.toggleControlDisabled .switch {
   cursor: not-allowed;
 }
 
@@ -322,12 +341,6 @@
 .mirrorButtonActive {
   box-shadow: 0 0 0 1px var(--color-accent);
   color: var(--color-accent);
-}
-
-.mirrorButtons {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .routeSection {
@@ -391,9 +404,36 @@
   color: var(--color-accent);
 }
 
+.resetButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(18, 18, 18, 0.8);
+  box-shadow: 0 0 0 1px rgb(110, 110, 115);
+  color: #f5f5f7;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+}
+
+.resetButton:hover {
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
 .copyFooter {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   width: 100%;
   margin-top: 20px;
   padding-top: 16px;

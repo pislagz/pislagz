@@ -17,6 +17,8 @@ import { useDeveloperSettings } from "@shared/developer/DeveloperSettings";
 import {
   formatChangedDeveloperLayoutOffsets,
   hasChangedDeveloperLayoutOffsets,
+  hasChangedDeveloperSettings,
+  DEFAULT_PORTRAIT_GLYPH_SOUNDS_ENABLED,
 } from "@shared/developer/layout-copy";
 import {
   FILM_GRAIN_INTENSITY_MAX,
@@ -171,6 +173,9 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
     setPageGlowEnabled,
     pageGlowIntensity,
     setPageGlowIntensity,
+    portraitGlyphSoundsEnabled,
+    setPortraitGlyphSoundsEnabled,
+    resetDeveloperSettings,
   } = useDeveloperSettings();
   const sheetRef = useRef<HTMLDivElement>(null);
   const customPositionRef = useRef<{ left: number; top: number } | null>(null);
@@ -199,6 +204,28 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
     arsenalGridOffsetY,
     playGameScale,
     playGameOffsetY,
+  );
+  const hasChangedSettings = hasChangedDeveloperSettings(
+    footerEnabled,
+    goldenSpiralEnabled,
+    goldenSpiralMirrorX,
+    goldenSpiralMirrorY,
+    homeLayoutOffsets,
+    homeBackgroundScale,
+    rightsEnabled,
+    rightsPosition,
+    contactOrOffset,
+    arsenalTiltMaxDeg,
+    arsenalTiltSpillPercent,
+    arsenalGlowRadiusPx,
+    arsenalGridOffsetY,
+    playGameScale,
+    playGameOffsetY,
+    filmGrainEnabled,
+    filmGrainIntensity,
+    pageGlowEnabled,
+    pageGlowIntensity,
+    portraitGlyphSoundsEnabled,
   );
   const footerDisabled = !footerEnabled;
   const showRightsPosition = footerDisabled && rightsEnabled;
@@ -487,30 +514,35 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
                   golden spiral
                 </span>
                 <div className={`${styles.toggleControl} ${styles.toggleControlSpiral}`}>
-                  {goldenSpiralEnabled ? (
-                    <div className={styles.mirrorButtons}>
-                      <button
-                        type="button"
-                        className={`${styles.mirrorButton} ${goldenSpiralMirrorX ? styles.mirrorButtonActive : ""}`}
-                        aria-label="Mirror golden spiral left/right"
-                        aria-pressed={goldenSpiralMirrorX}
-                        onClick={() => setGoldenSpiralMirrorX(!goldenSpiralMirrorX)}
-                        tabIndex={open ? 0 : -1}
-                      >
-                        <MirrorHorizontalIcon />
-                      </button>
-                      <button
-                        type="button"
-                        className={`${styles.mirrorButton} ${goldenSpiralMirrorY ? styles.mirrorButtonActive : ""}`}
-                        aria-label="Mirror golden spiral up/down"
-                        aria-pressed={goldenSpiralMirrorY}
-                        onClick={() => setGoldenSpiralMirrorY(!goldenSpiralMirrorY)}
-                        tabIndex={open ? 0 : -1}
-                      >
-                        <MirrorVerticalIcon />
-                      </button>
-                    </div>
-                  ) : null}
+                  <div
+                    className={`${styles.mirrorButtons} ${
+                      goldenSpiralEnabled ? "" : styles.mirrorButtonsHidden
+                    }`}
+                    aria-hidden={!goldenSpiralEnabled}
+                  >
+                    <button
+                      type="button"
+                      className={`${styles.mirrorButton} ${goldenSpiralMirrorX ? styles.mirrorButtonActive : ""}`}
+                      aria-label="Mirror golden spiral left/right"
+                      aria-pressed={goldenSpiralMirrorX}
+                      onClick={() => setGoldenSpiralMirrorX(!goldenSpiralMirrorX)}
+                      tabIndex={goldenSpiralEnabled && open ? 0 : -1}
+                      disabled={!goldenSpiralEnabled}
+                    >
+                      <MirrorHorizontalIcon />
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.mirrorButton} ${goldenSpiralMirrorY ? styles.mirrorButtonActive : ""}`}
+                      aria-label="Mirror golden spiral up/down"
+                      aria-pressed={goldenSpiralMirrorY}
+                      onClick={() => setGoldenSpiralMirrorY(!goldenSpiralMirrorY)}
+                      tabIndex={goldenSpiralEnabled && open ? 0 : -1}
+                      disabled={!goldenSpiralEnabled}
+                    >
+                      <MirrorVerticalIcon />
+                    </button>
+                  </div>
                   <label className={styles.switchLabel}>
                     <input
                       className={styles.toggleInput}
@@ -594,6 +626,22 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
             {isHomeRoute ? (
               <div className={styles.routeSection}>
                 <p className={styles.sectionTitle}>home</p>
+                <div className={styles.toggleRow}>
+                  <span className={styles.toggleLabel}>portrait hover sounds</span>
+                  <label className={styles.toggleControl}>
+                    <input
+                      className={styles.toggleInput}
+                      type="checkbox"
+                      checked={portraitGlyphSoundsEnabled}
+                      onChange={(event) => setPortraitGlyphSoundsEnabled(event.target.checked)}
+                      tabIndex={open ? 0 : -1}
+                    />
+                    <span
+                      className={`${styles.switch} ${portraitGlyphSoundsEnabled ? styles.switchOn : ""}`}
+                      aria-hidden="true"
+                    />
+                  </label>
+                </div>
                 <div className={styles.positionRows}>
                   {HOME_LAYOUT_OPTIONS.map((option) => (
                     <div key={option.key} className={styles.positionRow}>
@@ -752,17 +800,28 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
                 </div>
               ) : null}
             </div>
-            {hasChangedLayoutOffsets ? (
+            {hasChangedSettings ? (
               <div className={styles.copyFooter}>
                 <button
                   type="button"
-                  className={`${styles.copyButton} ${layoutCopied ? styles.copyButtonCopied : ""}`}
-                  aria-label={layoutCopied ? "Copied layout offsets" : "Copy changed layout offsets"}
-                  onClick={() => void copyChangedLayoutOffsets()}
+                  className={styles.resetButton}
+                  aria-label="Reset developer settings to defaults"
+                  onClick={resetDeveloperSettings}
                   tabIndex={open ? 0 : -1}
                 >
-                  {layoutCopied ? "copied" : <CopyIcon />}
+                  reset values
                 </button>
+                {hasChangedLayoutOffsets ? (
+                  <button
+                    type="button"
+                    className={`${styles.copyButton} ${layoutCopied ? styles.copyButtonCopied : ""}`}
+                    aria-label={layoutCopied ? "Copied layout offsets" : "Copy changed layout offsets"}
+                    onClick={() => void copyChangedLayoutOffsets()}
+                    tabIndex={open ? 0 : -1}
+                  >
+                    {layoutCopied ? "copied" : <CopyIcon />}
+                  </button>
+                ) : null}
               </div>
             ) : null}
           </div>

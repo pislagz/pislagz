@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { unlockArcadeAudio } from "@shared/arcade-audio";
 import { playDecipherGlyphTick } from "@shared/decipher-sound";
+import { useDeveloperSettings } from "@shared/developer/DeveloperSettings";
 import { useArcadeAudioUnlocked } from "@shared/hooks/use-arcade-audio-unlocked";
 import { useMediaQuery } from "@shared/hooks/use-media-query";
 import {
@@ -82,9 +83,13 @@ export function AsciiPortrait() {
   const stackRef = useRef<HTMLDivElement>(null);
   const audioOverlayRef = useRef<HTMLButtonElement>(null);
   const fieldRef = useRef<AsciiPortraitHandle | null>(null);
+  const glyphSoundsEnabledRef = useRef(false);
+  const { portraitGlyphSoundsEnabled } = useDeveloperSettings();
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const audioUnlocked = useArcadeAudioUnlocked();
-  const audioLocked = !reducedMotion && !audioUnlocked;
+  const audioLocked = portraitGlyphSoundsEnabled && !reducedMotion && !audioUnlocked;
+
+  glyphSoundsEnabledRef.current = portraitGlyphSoundsEnabled;
 
   useEffect(() => {
     void loadPortraitImage();
@@ -125,6 +130,7 @@ export function AsciiPortrait() {
             if (!cancelled) reveal();
           },
           onGlyphEnter: () => {
+            if (!glyphSoundsEnabledRef.current) return;
             if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
             playDecipherGlyphTick();
           },
