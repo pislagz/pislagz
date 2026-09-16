@@ -19,6 +19,7 @@ export type AsciiPortraitEngineHandle = {
   setReducedMotion: (value: boolean) => void;
   setSize: (width: number, height: number) => void;
   setHidden: (hidden: boolean) => void;
+  setPointer: (x: number, y: number, active: boolean) => void;
 };
 
 type Cell = {
@@ -31,6 +32,8 @@ type Cell = {
   glyph: string;
   rampIndex: number;
   opacity: number;
+  hoverBoost: number;
+  hoverErasePad: number;
 };
 
 type RuntimeProfile = {
@@ -85,6 +88,10 @@ const RESIZE_DEBOUNCE_MS = 180;
 const RAMP_JITTER = 2;
 const BOTTOM_FADE_ROWS = 6;
 const MOBILE_BOTTOM_FADE_ROWS = 10;
+const HOVER_SCALE_MAX = 0.2;
+const HOVER_BRIGHTNESS = 0.62;
+const HOVER_CHARGE = 0.72;
+const HOVER_DECAY = 0.9;
 
 function isSafari() {
   const ua = navigator.userAgent;
@@ -301,6 +308,7 @@ export function createAsciiPortraitEngine(
       setReducedMotion() {},
       setSize() {},
       setHidden() {},
+      setPointer() {},
     };
   }
 
@@ -328,6 +336,8 @@ export function createAsciiPortraitEngine(
   let isMobileLayout = false;
   let sampleCanvas: OffscreenCanvas | HTMLCanvasElement | null = null;
   let sampleCtx: PortraitContext | null = null;
+  let hoverFrame = 0;
+  let cellGrid = new Map<string, Cell>();
 
   const syncCanvasBitmap = () => {
     const bitmapW = Math.max(1, Math.round(renderWidth * renderDpr));
@@ -338,6 +348,31 @@ export function createAsciiPortraitEngine(
     glyphCanvas.height = bitmapH;
     glowCtx.setTransform(renderDpr, 0, 0, renderDpr, 0, 0);
     glyphCtx.setTransform(renderDpr, 0, 0, renderDpr, 0, 0);
+  };
+
+  const findCellAt = (x: number, y: number) => {
+    if (x < 0 || y < 0) return null;
+    const col = Math.floor(x / cellW);
+    const row = Math.floor(y / cellH);
+    return cellGrid.get(`${col},${row}`) ?? null;
+  };
+
+  const indexCells = (next: Cell[]) => {
+    cellGrid = new Map();
+    for (let i = 0; i < next.length; i += 1) {
+      const cell = next[i];
+      const col = Math.floor(cell.x / cellW);
+      const row = Math.floor(cell.y / cellH);
+      cellGrid.set(`${col},${row}`, cell);
+    }
+  };
+
+  const brightenedColor = (cell: Cell, boost: number) => {
+    const mix = boost * HOVER_BRIGHTNESS;
+    const r = clampByte(cell.r + (255 - cell.r) * mix);
+    const g = clampByte(cell.g + (255 - cell.g) * mix);
+    const b = clampByte(cell.b + (255 - cell.b) * mix);
+    return `rgb(${r},${g},${b})`;
   };
 
   const buildGlowLayer = () => {
@@ -361,15 +396,47 @@ export function createAsciiPortraitEngine(
     }
   };
 
+  const hoverClearPad = (cell: Cell) => {
+    if (cell.hoverBoost > 0.001) {
+      return Math.ceil(cellH * 0.35 * (1 + cell.hoverBoost * HOVER_SCALE_MAX));
+    }
+    return cell.hoverErasePad;
+  };
+
+  const clearCellArea = (cell: Cell) => {
+    const pad = hoverClearPad(cell);
+    if (pad > 0) {
+      glyphCtx.clearRect(cell.x - pad, cell.y - pad, cellW + pad * 2, cellH + pad * 2);
+      return;
+    }
+    glyphCtx.clearRect(cell.x, cell.y, cellW + 1, cellH + 1);
+  };
+
   const paintGlyphs = (dirty?: Cell[]) => {
     glyphCtx.font = `${fontSize}px ${fontStack}`;
     glyphCtx.textBaseline = "top";
     glyphCtx.textAlign = "left";
 
     const drawCell = (cell: Cell) => {
-      glyphCtx.globalAlpha = cell.opacity;
-      glyphCtx.fillStyle = cell.color;
-      glyphCtx.fillText(cell.glyph, cell.x, cell.y);
+      const boost = cell.hoverBoost;
+      glyphCtx.globalAlpha = Math.min(1, cell.opacity * (1 + boost * 0.12));
+
+      if (boost > 0.001) {
+        const cx = cell.x + cellW * 0.5;
+        const cy = cell.y + cellH * 0.5;
+        const scale = 1 + boost * HOVER_SCALE_MAX;
+        glyphCtx.save();
+        glyphCtx.translate(cx, cy);
+        glyphCtx.scale(scale, scale);
+        glyphCtx.translate(-cx, -cy);
+        glyphCtx.fillStyle = brightenedColor(cell, boost);
+        glyphCtx.fillText(cell.glyph, cell.x, cell.y);
+        glyphCtx.restore();
+      } else {
+        glyphCtx.fillStyle = cell.color;
+        glyphCtx.fillText(cell.glyph, cell.x, cell.y);
+      }
+
       glyphCtx.globalAlpha = 1;
     };
 
@@ -379,12 +446,58 @@ export function createAsciiPortraitEngine(
       return;
     }
 
-    const padX = cellW + 1;
-    const padY = cellH + 1;
     for (let i = 0; i < dirty.length; i += 1) {
       const cell = dirty[i];
-      glyphCtx.clearRect(cell.x, cell.y, padX, padY);
+      clearCellArea(cell);
       drawCell(cell);
+      if (cell.hoverBoost <= 0) cell.hoverErasePad = 0;
+    }
+  };
+
+  const stopHover = () => {
+    if (!hoverFrame) return;
+    cancelAnimationFrame(hoverFrame);
+    hoverFrame = 0;
+  };
+
+  const tickHover = () => {
+    hoverFrame = 0;
+    if (!running || reducedMotion || pageHidden || !cells.length) return;
+
+    const dirty = new Set<Cell>();
+    let animating = false;
+
+    for (let i = 0; i < cells.length; i += 1) {
+      const cell = cells[i];
+      if (cell.hoverBoost <= 0.004) {
+        if (cell.hoverBoost !== 0) {
+          cell.hoverBoost = 0;
+          dirty.add(cell);
+        }
+        continue;
+      }
+
+      const prev = cell.hoverBoost;
+      if (prev > 0.001) {
+        cell.hoverErasePad = Math.max(
+          cell.hoverErasePad,
+          Math.ceil(cellH * 0.35 * (1 + prev * HOVER_SCALE_MAX)),
+        );
+      }
+      cell.hoverBoost *= HOVER_DECAY;
+      if (cell.hoverBoost < 0.004) cell.hoverBoost = 0;
+      if (cell.hoverBoost !== prev) dirty.add(cell);
+      animating = true;
+    }
+
+    if (dirty.size) paintGlyphs([...dirty]);
+
+    if (animating) hoverFrame = requestAnimationFrame(tickHover);
+  };
+
+  const scheduleHover = () => {
+    if (!hoverFrame && !reducedMotion && running && !pageHidden) {
+      hoverFrame = requestAnimationFrame(tickHover);
     }
   };
 
@@ -491,12 +604,15 @@ export function createAsciiPortraitEngine(
           rampIndex: processed.rampIndex,
           glyph: pickFromBucket(processed.rampIndex),
           opacity: 1,
+          hoverBoost: 0,
+          hoverErasePad: 0,
         });
       }
     }
 
     applyBottomFade(next, cellH, isMobileLayout ? MOBILE_BOTTOM_FADE_ROWS : BOTTOM_FADE_ROWS);
     cells = next;
+    indexCells(next);
     finishPaint();
   };
 
@@ -541,17 +657,49 @@ export function createAsciiPortraitEngine(
     },
     setReducedMotion(value: boolean) {
       reducedMotion = value;
-      if (reducedMotion) stopBoil();
-      else startBoil();
+      if (reducedMotion) {
+        stopBoil();
+        stopHover();
+        for (let i = 0; i < cells.length; i += 1) {
+          cells[i].hoverBoost = 0;
+          cells[i].hoverErasePad = 0;
+        }
+        if (cells.length) paintGlyphs();
+      } else {
+        startBoil();
+      }
     },
     setHidden(hidden: boolean) {
       pageHidden = hidden;
-      if (pageHidden) stopBoil();
-      else startBoil();
+      if (pageHidden) {
+        stopBoil();
+        stopHover();
+      } else {
+        startBoil();
+      }
+    },
+    setPointer(x: number, y: number, active: boolean) {
+      if (reducedMotion || !active || !cells.length) return;
+
+      const cell = findCellAt(x, y);
+      if (!cell) return;
+
+      const prev = cell.hoverBoost;
+      cell.hoverBoost = Math.min(1, cell.hoverBoost + HOVER_CHARGE);
+      if (cell.hoverBoost === prev) return;
+
+      cell.hoverErasePad = Math.max(
+        cell.hoverErasePad,
+        Math.ceil(cellH * 0.35 * (1 + cell.hoverBoost * HOVER_SCALE_MAX)),
+      );
+
+      paintGlyphs([cell]);
+      scheduleHover();
     },
     destroy() {
       running = false;
       stopBoil();
+      stopHover();
       if (resizeTimer) clearTimeout(resizeTimer);
       image.dispose?.();
     },

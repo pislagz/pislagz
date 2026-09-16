@@ -26,6 +26,7 @@ type WorkerMessage =
   | { type: "resize"; width: number; height: number }
   | { type: "setReducedMotion"; value: boolean }
   | { type: "visibility"; hidden: boolean }
+  | { type: "pointer"; x: number; y: number; active: boolean }
   | { type: "destroy" };
 
 let handle: AsciiPortraitEngineHandle | null = null;
@@ -79,6 +80,9 @@ self.onmessage = (event: MessageEvent<WorkerMessage>) => {
       break;
     case "visibility":
       handle?.setHidden(message.hidden);
+      break;
+    case "pointer":
+      handle?.setPointer(message.x, message.y, message.active);
       break;
     case "destroy":
       handle?.destroy();

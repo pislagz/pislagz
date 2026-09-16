@@ -9,7 +9,7 @@ export function HomePage() {
       <AsciiPortrait />
       <div className={styles.copy}>
         <HeroHeadline />
-        <p className={styles.role}>Frontend Engineer</p>
+        <p className={styles.role}>Software Engineer</p>
         <SeeArsenalButton />
       </div>
     </section>
