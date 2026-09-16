@@ -12,7 +12,8 @@
   padding: 20px;
   box-sizing: content-box;
   contain: layout style paint;
-  transform: translateY(40px);
+  transform: translateY(40px)
+    translate(var(--dev-home-portrait-x, 0px), var(--dev-home-portrait-y, 0px));
   perspective: 1600px;
 }
 
@@ -81,7 +82,8 @@
     left: 50%;
     width: min(96vw, 410px);
     height: auto;
-    transform: translateX(-50%);
+    transform: translateX(-50%)
+      translate(var(--dev-home-portrait-x, 0px), var(--dev-home-portrait-y, 0px));
     padding: 0;
   }
 

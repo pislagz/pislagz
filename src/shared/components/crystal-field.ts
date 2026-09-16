@@ -5,6 +5,8 @@ type FieldHandle = {
   destroy: () => void;
   setReducedMotion: (value: boolean) => void;
   setPalette: (palette: CrystalPalette) => void;
+  setEpicenterOffset: (offset: { x: number; y: number }) => void;
+  setEpicenterScale: (scale: number) => void;
 };
 
 type Options = {
@@ -205,8 +207,8 @@ export function createCrystalField(canvas: HTMLCanvasElement, options: Options):
   camera.position.set(0, 0, 9);
 
   const spin = (Math.random() < 0.5 ? -1 : 1) * rand(0.045, 0.085);
-  const shiftX = rand(2.2, 3.4);
-  const shiftY = rand(-0.7, 0.7);
+  const baseShiftX = rand(2.2, 3.4);
+  const baseShiftY = rand(-0.7, 0.7);
   const layerBTimeScale = rand(0.68, 0.95);
   const layerBTimeOffset = rand(0.4, 4.8);
   const randomPhase = () => new THREE.Vector3(rand(0, Math.PI * 2), rand(0, Math.PI * 2), rand(0, Math.PI * 2));
@@ -220,8 +222,8 @@ export function createCrystalField(canvas: HTMLCanvasElement, options: Options):
     geometry,
     makeMaterial(rand(28, 40), rand(0.44, 0.52), spin * rand(0.7, 1.15), rand(18, 30), randomPhase(), initialPalette),
   );
-  layerA.position.set(shiftX, shiftY, 0);
-  layerB.position.set(shiftX, shiftY, 0);
+  layerA.position.set(baseShiftX, baseShiftY, 0);
+  layerB.position.set(baseShiftX, baseShiftY, 0);
   layerA.rotation.z = rand(-0.12, 0.12);
   layerB.rotation.z = rand(-0.35, 0.35);
   scene.add(layerA, layerB);
@@ -242,6 +244,20 @@ export function createCrystalField(canvas: HTMLCanvasElement, options: Options):
   let renderHeight = 0;
   let renderPixelRatio = 0;
   let announcedReady = false;
+  let epicenterOffset = { x: 0, y: 0 };
+  let epicenterScale = 1;
+
+  const applyEpicenter = () => {
+    const height = renderHeight || canvas.clientHeight || window.innerHeight;
+    const visibleHeight = 2 * camera.position.z * Math.tan((camera.fov * Math.PI) / 180 / 2);
+    const worldPerPixel = visibleHeight / Math.max(height, 1);
+    const x = baseShiftX + epicenterOffset.x * worldPerPixel;
+    const y = baseShiftY - epicenterOffset.y * worldPerPixel;
+    layerA.position.set(x, y, 0);
+    layerB.position.set(x, y, 0);
+    layerA.scale.set(epicenterScale, epicenterScale, epicenterScale);
+    layerB.scale.set(epicenterScale, epicenterScale, epicenterScale);
+  };
 
   const applyColors = () => {
     const matA = layerA.material as THREE.ShaderMaterial;
@@ -281,6 +297,7 @@ export function createCrystalField(canvas: HTMLCanvasElement, options: Options):
     const gain = gainForViewport();
     (layerA.material as THREE.ShaderMaterial).uniforms.uGain.value = gain;
     (layerB.material as THREE.ShaderMaterial).uniforms.uGain.value = gain;
+    applyEpicenter();
   };
 
   const onPointer = (event: PointerEvent) => {
@@ -361,6 +378,14 @@ export function createCrystalField(canvas: HTMLCanvasElement, options: Options):
         colorC.copy(targetC);
         applyColors();
       }
+    },
+    setEpicenterOffset(offset: { x: number; y: number }) {
+      epicenterOffset = offset;
+      applyEpicenter();
+    },
+    setEpicenterScale(scale: number) {
+      epicenterScale = scale;
+      applyEpicenter();
     },
     destroy() {
       running = false;

@@ -5,6 +5,7 @@ import { FooterSlot } from "./components/FooterSlot";
 import { GoldenSpiralOverlay } from "./components/GoldenSpiralOverlay";
 import { Header } from "./components/Header";
 import { MobileScrollSafeArea } from "./components/MobileScrollSafeArea";
+import { PageAtmosphere } from "./components/PageAtmosphere";
 import { PageBackground } from "./components/PageBackground";
 import { ThemeShell } from "./ThemeShell";
 import styles from "./App.module.css";
@@ -19,6 +20,7 @@ export function App({ children }: Props) {
       <DeveloperSettingsProvider>
         <ThemeShell>
           <PageBackground />
+          <PageAtmosphere />
           <GoldenSpiralOverlay />
           <Header />
           <main className={styles.main}>{children}</main>

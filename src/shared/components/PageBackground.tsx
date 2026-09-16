@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useDeveloperSettings } from "@shared/developer/DeveloperSettings";
+import { backgroundScaleMultiplier } from "@shared/developer/home-layout";
 import { useMediaQuery } from "@shared/hooks/use-media-query";
 import { CRYSTAL_PALETTES, type CrystalPalette } from "./crystal-palettes";
 import styles from "./PageBackground.module.css";
@@ -10,6 +12,8 @@ type FieldHandle = {
   destroy: () => void;
   setReducedMotion: (value: boolean) => void;
   setPalette: (palette: CrystalPalette) => void;
+  setEpicenterOffset: (offset: { x: number; y: number }) => void;
+  setEpicenterScale: (scale: number) => void;
 };
 
 function paletteForPath(pathname: string): CrystalPalette {
@@ -27,6 +31,7 @@ export function PageBackground() {
   const pathname = usePathname();
   const palette = paletteForPath(pathname);
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const { homeLayoutOffsets, homeBackgroundScale } = useDeveloperSettings();
   const [canvasReady, setCanvasReady] = useState(false);
   paletteRef.current = palette;
 
@@ -62,6 +67,16 @@ export function PageBackground() {
   useEffect(() => {
     fieldRef.current?.setPalette(palette);
   }, [palette]);
+
+  useEffect(() => {
+    if (pathname !== "/") {
+      fieldRef.current?.setEpicenterOffset({ x: 0, y: 0 });
+      fieldRef.current?.setEpicenterScale(1);
+      return;
+    }
+    fieldRef.current?.setEpicenterOffset(homeLayoutOffsets.background);
+    fieldRef.current?.setEpicenterScale(backgroundScaleMultiplier(homeBackgroundScale));
+  }, [pathname, homeLayoutOffsets.background, homeBackgroundScale]);
 
   return (
     <div className={styles.root} aria-hidden="true">

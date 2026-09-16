@@ -2,6 +2,13 @@
 
 import type { AnimationEvent, CSSProperties } from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useDeveloperSettings } from "@shared/developer/DeveloperSettings";
+import {
+  arsenalGlowReachPx,
+  DEFAULT_ARSENAL_GLOW_RADIUS_PX,
+  DEFAULT_ARSENAL_TILT_MAX_DEG,
+  DEFAULT_ARSENAL_TILT_SPILL_PERCENT,
+} from "@shared/developer/arsenal-layout";
 import { GlassSurface } from "@shared/ui/GlassSurface";
 import type { ArsenalItem } from "../api";
 import styles from "./ArsenalBentoGrid.module.css";
@@ -36,8 +43,6 @@ const FLY_BASE_SCALE = 1.9;
 const FLY_SCALE_SPREAD = 0.7;
 /** Fallback in case some animationend event never fires. */
 const FLY_SAFETY_TIMEOUT_MS = FLY_MAX_DURATION_MS + FLY_MAX_DELAY_MS + 500;
-/** Max tilt on the primary tile under the cursor. */
-const HOVER_TILT_DEG = 9;
 /** Subtle Z lift on the primary tile only. */
 const HOVER_LIFT_PX = 8;
 /** How far past the grid edge the effect stays active (covers inter-tile gaps). */
@@ -181,11 +186,13 @@ function computeTileTilt(
   rect: DOMRect,
   influence: number,
   isPrimary: boolean,
+  maxTiltDeg: number,
+  spillPercent: number,
 ) {
   const weight = Math.pow(influence, 0.95);
-  const spill = isPrimary ? 1 : 0.4;
-  const tiltY = Math.tanh(dx / (rect.width * 0.5)) * HOVER_TILT_DEG * weight * spill;
-  const tiltX = -Math.tanh(dy / (rect.height * 0.5)) * HOVER_TILT_DEG * weight * spill;
+  const spill = isPrimary ? 1 : spillPercent / 100;
+  const tiltY = Math.tanh(dx / (rect.width * 0.5)) * maxTiltDeg * weight * spill;
+  const tiltX = -Math.tanh(dy / (rect.height * 0.5)) * maxTiltDeg * weight * spill;
   const lift = isPrimary ? weight * HOVER_LIFT_PX : 0;
 
   return { tiltX, tiltY, lift };
@@ -223,10 +230,21 @@ function isInsideGridBounds(
 
 export function ArsenalBentoGrid({ items }: { items: ArsenalItem[] }) {
   const gridRef = useRef<HTMLDivElement>(null);
+  const { arsenalTiltMaxDeg, arsenalTiltSpillPercent, arsenalGlowRadiusPx } = useDeveloperSettings();
+  const tiltSettingsRef = useRef({
+    maxTiltDeg: DEFAULT_ARSENAL_TILT_MAX_DEG,
+    spillPercent: DEFAULT_ARSENAL_TILT_SPILL_PERCENT,
+    glowRadiusPx: DEFAULT_ARSENAL_GLOW_RADIUS_PX,
+  });
   const [armed, setArmed] = useState(false);
   const settledTiles = useRef(0);
   const finalized = useRef(false);
   const armedAtRef = useRef(0);
+  tiltSettingsRef.current = {
+    maxTiltDeg: arsenalTiltMaxDeg,
+    spillPercent: arsenalTiltSpillPercent,
+    glowRadiusPx: arsenalGlowRadiusPx,
+  };
   /**
    * Runs once every tile has landed (or via the safety timeout below).
    * - Clears the transient document overflow clip used during fly-in; desktop
@@ -361,7 +379,9 @@ export function ArsenalBentoGrid({ items }: { items: ArsenalItem[] }) {
         const dx = clientX - centerX;
         const dy = clientY - centerY;
         const dist = Math.hypot(dx, dy);
-        const reach = Math.max(rect.width, rect.height) * 1.1 + 72;
+        const reach =
+          Math.max(rect.width, rect.height) * 1.1 +
+          arsenalGlowReachPx(tiltSettingsRef.current.glowRadiusPx);
         const influence = smoothstep(Math.max(0, 1 - dist / reach)) * landingFactor;
         const minInfluence = isTileHoverEngaged(tile)
           ? HOVER_OFF_THRESHOLD
@@ -390,7 +410,16 @@ export function ArsenalBentoGrid({ items }: { items: ArsenalItem[] }) {
         const spotX = ((clientX - rect.left) / rect.width) * 100;
         const spotY = ((clientY - rect.top) / rect.height) * 100;
         const isPrimary = tile === primaryTile && maxInfluence > 0.08;
-        const { tiltX, tiltY, lift } = computeTileTilt(dx, dy, rect, influence, isPrimary);
+        const { maxTiltDeg, spillPercent } = tiltSettingsRef.current;
+        const { tiltX, tiltY, lift } = computeTileTilt(
+          dx,
+          dy,
+          rect,
+          influence,
+          isPrimary,
+          maxTiltDeg,
+          spillPercent,
+        );
 
         tile.setAttribute("data-hovered", "true");
         tile.toggleAttribute("data-primary", isPrimary);

@@ -46,6 +46,7 @@
   white-space: nowrap;
   min-height: 84px;
   align-items: center;
+  transform: translate(var(--dev-home-title-x, 0px), var(--dev-home-title-y, 0px));
 }
 
 .typed {
@@ -107,11 +108,13 @@
   font-weight: 600;
   color: var(--color-white);
   text-shadow: 0 0 18px rgba(7, 9, 16, 0.55);
+  transform: translate(var(--dev-home-subtitle-x, 0px), var(--dev-home-subtitle-y, 0px));
 }
 
 .cta {
   margin-top: 34px;
   pointer-events: auto;
+  transform: translate(var(--dev-home-cta-x, 0px), var(--dev-home-cta-y, 0px));
 }
 
 .cta img {

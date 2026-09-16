@@ -1,5 +1,9 @@
 .game {
   width: min(720px, 100%);
+  overflow: visible;
+  transform: translateY(var(--dev-play-game-offset-y, 0px))
+    scale(var(--dev-play-game-scale, 1));
+  transform-origin: top center;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   color: #fff;
   text-transform: uppercase;
@@ -269,7 +273,7 @@
 
 .frame {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   border: 2px solid rgba(255, 255, 255, 0.75);
   background: rgba(0, 0, 0, 0.72);
   box-shadow:

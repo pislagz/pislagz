@@ -1,0 +1,54 @@
+.control {
+  display: contents;
+}
+
+.pad {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(18, 18, 18, 0.8);
+  box-shadow: 0 0 0 1px rgb(110, 110, 115);
+  cursor: grab;
+  touch-action: none;
+  flex-shrink: 0;
+  justify-self: start;
+  align-self: center;
+  transition: box-shadow 0.2s ease;
+}
+
+.padActive {
+  box-shadow: 0 0 0 1px var(--color-accent);
+  cursor: grabbing;
+}
+
+.knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: #f5f5f7;
+  transition:
+    background 0.2s ease,
+    transform 0.08s linear;
+  pointer-events: none;
+}
+
+.padActive .knob {
+  background: var(--color-accent);
+}
+
+.readout {
+  font-size: 10px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: rgba(245, 245, 247, 0.72);
+  white-space: nowrap;
+  line-height: 1.2;
+  width: 122px;
+  justify-self: end;
+  text-align: right;
+}

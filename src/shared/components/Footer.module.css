@@ -190,6 +190,7 @@
   justify-content: center;
   pointer-events: none;
   user-select: none;
+  transform: translate(var(--dev-rights-x, 0px), var(--dev-rights-y, 0px));
 }
 
 .floatingCopyInner {

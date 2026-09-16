@@ -34,7 +34,7 @@
   top: var(--sheet-top, 8px);
   left: var(--sheet-left, 8px);
   z-index: 1;
-  width: min(300px, calc(100vw - 24px));
+  width: min(340px, calc(100vw - 24px));
   height: auto;
   overflow: hidden;
   isolation: isolate;
@@ -78,7 +78,10 @@
 }
 
 .panelHeader,
-.toggles {
+.panelDragHandle,
+.toggles,
+.routeSection,
+.copyFooter {
   opacity: 0;
   transform: translateY(-10px);
   transition:
@@ -87,7 +90,10 @@
 }
 
 .expanded .panelHeader,
-.expanded .toggles {
+.expanded .panelDragHandle,
+.expanded .toggles,
+.expanded .routeSection,
+.expanded .copyFooter {
   opacity: 1;
   transform: none;
   transition:
@@ -95,12 +101,40 @@
     transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.expanded .panelHeader {
+.expanded .panelDragHandle {
   transition-delay: 0.14s;
 }
 
 .expanded .toggles {
   transition-delay: 0.2s;
+}
+
+.expanded .routeSection {
+  transition-delay: 0.26s;
+}
+
+.routeSection + .routeSection {
+  margin-top: 0;
+}
+
+.expanded .routeSection + .routeSection {
+  transition-delay: 0.32s;
+}
+
+.expanded .copyFooter {
+  transition-delay: 0.38s;
+}
+
+.panelDragHandle {
+  margin: -20px -20px 0;
+  padding: 20px 20px 0;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.panelDragHandleDragging {
+  cursor: grabbing;
 }
 
 .panelHeader {
@@ -145,6 +179,22 @@
   align-items: stretch;
   gap: 16px;
   width: 100%;
+}
+
+.toggleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.toggleSliderRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 88px 122px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding-left: 2px;
 }
 
 .toggleRow {
@@ -216,6 +266,19 @@
   background: var(--color-accent);
 }
 
+.toggleControlDisabled {
+  cursor: not-allowed;
+}
+
+.toggleInput:disabled + .switch {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.toggleInput:disabled + .switch::after {
+  background: #f5f5f7;
+}
+
 .toggleInput {
   position: absolute;
   width: 1px;
@@ -267,14 +330,113 @@
   gap: 8px;
 }
 
+.routeSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(245, 245, 247, 0.08);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-shadow: var(--shadow-nav, none);
+}
+
+.copyButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(18, 18, 18, 0.8);
+  box-shadow: 0 0 0 1px rgb(110, 110, 115);
+  color: #f5f5f7;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+}
+
+.copyButton svg {
+  width: 14px;
+  height: 14px;
+}
+
+.copyButton:hover {
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.copyButtonCopied {
+  box-shadow: 0 0 0 1px var(--color-accent);
+  color: var(--color-accent);
+}
+
+.copyFooter {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(245, 245, 247, 0.08);
+}
+
+.positionRows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.positionRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 88px 122px;
+  align-items: center;
+  column-gap: 8px;
+  width: 100%;
+}
+
+.positionLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-white);
+  line-height: 1.2;
+  min-width: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .backdrop,
   .sheet,
   .panelHeader,
+  .panelDragHandle,
   .toggles,
+  .routeSection,
+  .copyFooter,
   .expanded .sheet,
   .expanded .panelHeader,
+  .expanded .panelDragHandle,
   .expanded .toggles,
+  .expanded .routeSection,
+  .expanded .copyFooter,
   .switch::after {
     transform: none;
     clip-path: none;
@@ -288,7 +450,10 @@
 
   .expanded .sheet,
   .expanded .panelHeader,
-  .expanded .toggles {
+  .expanded .panelDragHandle,
+  .expanded .toggles,
+  .expanded .routeSection,
+  .expanded .copyFooter {
     opacity: 1;
   }
 }
