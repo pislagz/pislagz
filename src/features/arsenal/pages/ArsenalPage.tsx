@@ -1,6 +1,7 @@
 import { arsenalApi } from "../api";
 import { RouteEntranceSound } from "@shared/components/RouteEntranceSound";
 import { ArsenalBentoGrid } from "../components/ArsenalBentoGrid";
+import { ArsenalContinueCta } from "../components/ArsenalContinueCta";
 import { ArsenalScrollNudge } from "../components/ArsenalScrollNudge";
 import styles from "./ArsenalPage.module.css";
 
@@ -11,6 +12,7 @@ export async function ArsenalPage() {
     <section className={styles.page} data-page="arsenal" aria-label="my arsenal">
       <RouteEntranceSound route="arsenal" />
       <ArsenalBentoGrid items={items} />
+      <ArsenalContinueCta />
       <ArsenalScrollNudge />
     </section>
   );
