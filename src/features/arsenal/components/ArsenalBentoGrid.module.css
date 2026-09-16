@@ -20,12 +20,80 @@
   height: 100%;
 }
 
+.grid[data-armed="true"] {
+  perspective: 1000px;
+  perspective-origin: center;
+}
+
+.tileInteractive {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg))
+    translateZ(var(--lift, 0px));
+  transition: transform 280ms cubic-bezier(0.25, 1, 0.35, 1);
+}
+
+.grid[data-armed="true"] .tile[data-hovered="true"] .tileInteractive {
+  will-change: transform;
+}
+
+.grid[data-armed="true"] .tile[data-hovered="true"] {
+  z-index: 2;
+}
+
+.grid[data-armed="true"] .tile[data-primary="true"] {
+  z-index: 4;
+}
+
+.spotlight {
+  --spot-size: 200px;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: var(--spot-opacity, 0);
+  transition: opacity 200ms ease;
+  background: radial-gradient(
+    var(--spot-size) circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    rgba(255, 168, 72, 0.24),
+    rgba(255, 138, 0, 0.08) 38%,
+    transparent 62%
+  );
+}
+
+.wide .spotlight {
+  --spot-size: 230px;
+}
+
+.feature .spotlight {
+  --spot-size: 260px;
+}
+
+.grid[data-armed="true"] .tile[data-hovered="true"] .arsenalGlass {
+  border-color: rgba(255, 138, 0, calc(0.12 + var(--spot-opacity, 0) * 0.28));
+  box-shadow:
+    0 0 0 1px rgba(255, 138, 0, calc(var(--spot-opacity, 0) * 0.22)),
+    0 10px 36px rgba(0, 0, 0, 0.34),
+    0 0 calc(18px + var(--spot-opacity, 0) * 28px)
+      rgba(255, 120, 0, calc(var(--spot-opacity, 0) * 0.14));
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
 .arsenalGlass {
+  position: relative;
+  overflow: hidden;
   background: rgba(18, 18, 18, 0.8);
   border-color: rgb(40, 40, 40);
   box-shadow:
     0 0 0 1px rgb(40, 40, 40),
     0 8px 32px rgba(0, 0, 0, 0.28);
+  transition:
+    border-color 280ms ease,
+    box-shadow 280ms ease;
 }
 
 .arsenalGlass[data-effects-enabled="false"] {
@@ -328,5 +396,15 @@
 
   .tileMotion {
     transform: none;
+  }
+
+  .tileInteractive {
+    transform: none;
+    transition: none;
+    will-change: auto;
+  }
+
+  .spotlight {
+    display: none;
   }
 }
