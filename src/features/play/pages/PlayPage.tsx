@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { PlayGame } from "../components/PlayGame";
 import styles from "./PlayPage.module.css";
 
-const MOBILE_QUERY = "(max-width: 900px)";
+const PONG_QUERY = "(width < 684px)";
 
 function isInteractiveTouchTarget(target: EventTarget | null) {
   if (!(target instanceof Element)) return false;
@@ -15,9 +15,22 @@ function isInteractiveTouchTarget(target: EventTarget | null) {
 
 export function PlayPage() {
   const pageRef = useRef<HTMLElement>(null);
+  const [pong, setPong] = useState(false);
+
+  useLayoutEffect(() => {
+    const media = window.matchMedia(PONG_QUERY);
+    const onChange = () => setPong(media.matches || window.innerWidth < 684);
+    onChange();
+    media.addEventListener("change", onChange);
+    window.addEventListener("resize", onChange);
+    return () => {
+      media.removeEventListener("change", onChange);
+      window.removeEventListener("resize", onChange);
+    };
+  }, []);
 
   useEffect(() => {
-    if (!window.matchMedia(MOBILE_QUERY).matches) return;
+    if (!pong) return;
 
     document.documentElement.dataset.playMobile = "true";
     document.documentElement.style.overflow = "hidden";
@@ -40,10 +53,10 @@ export function PlayPage() {
       document.body.style.removeProperty("overscroll-behavior");
       document.removeEventListener("touchstart", onTouchStart, { capture: true });
     };
-  }, []);
+  }, [pong]);
 
   useEffect(() => {
-    if (!window.matchMedia(MOBILE_QUERY).matches) return;
+    if (!pong) return;
 
     const forward = (phase: "down" | "move" | "up", event: PointerEvent) => {
       if (event.target instanceof Element && event.target.closest("footer")) return;
@@ -75,11 +88,16 @@ export function PlayPage() {
       document.removeEventListener("pointerup", onUp);
       document.removeEventListener("pointercancel", onUp);
     };
-  }, []);
+  }, [pong]);
 
   return (
-    <section ref={pageRef} className={styles.page} data-page="play">
-      <PlayGame />
+    <section
+      ref={pageRef}
+      className={styles.page}
+      data-page="play"
+      data-play-pong={pong ? "true" : undefined}
+    >
+      <PlayGame pong={pong} />
     </section>
   );
 }

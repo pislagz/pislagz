@@ -8,7 +8,7 @@
   min-height: 49px;
   margin-top: 14px;
   flex-shrink: 0;
-  transform: scale(calc(1 / var(--dev-play-game-scale, 1)));
+  transform: scale(calc(1 / (var(--play-fit-scale, 1) * var(--dev-play-game-scale, 1))));
   transform-origin: center top;
   visibility: hidden;
   opacity: 0;

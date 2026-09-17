@@ -50,6 +50,8 @@
 .title {
   font-size: var(--type-aeonik-36);
   font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 
 .cipherText {
@@ -116,12 +118,12 @@
 }
 
 .lead {
-  margin-top: 28px;
+  margin-top: 21px;
   max-width: 520px;
   font-size: var(--type-aeonik-21);
   font-weight: 400;
   color: var(--color-text-muted);
-  line-height: 1.35;
+  line-height: 1.5;
 }
 
 .sentenceBreak {
@@ -133,7 +135,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  margin-top: 36px;
+  margin-top: 34px;
 }
 
 .ctaRow .cta {

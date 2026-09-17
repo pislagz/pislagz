@@ -393,27 +393,77 @@
   cursor: crosshair;
 }
 
+.game[data-mode="invaders"] {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: min(960px, 100%);
+}
+
 @media (min-width: 901px) {
-  .game {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
-    max-height: calc(100svh - var(--desktop-chrome) - var(--page-top) - 48px);
+  .game[data-mode="invaders"] {
+    --play-fit-scale: 0.92;
+    transform: translateY(var(--dev-play-game-offset-y, 0px))
+      scale(calc(var(--play-fit-scale) * var(--dev-play-game-scale, 1)));
   }
+}
 
-  .frame {
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    align-items: stretch;
-  }
+.game[data-mode="invaders"] .hud {
+  width: var(--crt-width, 100%);
+  max-width: 100%;
+  align-self: center;
+  font-size: var(--type-quantico-12);
+  margin-bottom: 6px;
+  gap: 16px;
+  letter-spacing: 0.06em;
+}
 
-  .canvas {
-    height: 100%;
-    max-height: min(480px, 100%);
-    object-fit: contain;
-  }
+.game[data-mode="invaders"] .invaderEnergyRow {
+  width: var(--crt-width, 100%);
+  max-width: 100%;
+  align-self: center;
+  min-height: 14px;
+  margin: 0 0 6px;
+  font-size: var(--type-quantico-12);
+  letter-spacing: 0.04em;
+}
+
+.game[data-mode="invaders"] .invaderEnergyTrack {
+  width: 120px;
+  height: 6px;
+}
+
+.game[data-mode="invaders"] .instructions {
+  margin-top: 8px;
+  font-size: var(--type-quantico-12);
+}
+
+.game[data-mode="invaders"] .hud,
+.game[data-mode="invaders"] .invaderEnergyRow,
+.game[data-mode="invaders"] .touchpad {
+  flex-shrink: 0;
+}
+
+.game[data-mode="invaders"] .screen {
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  container-type: size;
+  display: grid;
+  place-items: center;
+}
+
+.game[data-mode="invaders"] .frame {
+  width: min(100cqw, calc(100cqh * 3 / 2));
+  aspect-ratio: 3 / 2;
+  height: auto;
+}
+
+.game[data-mode="invaders"] .canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
 }
 
 .overlay {
@@ -598,65 +648,63 @@
   background: rgba(255, 255, 255, 0.22);
 }
 
-@media (max-width: 900px) {
-  .game {
-    width: 100%;
-    margin-top: 14px;
-    margin-inline: auto;
-  }
+.game[data-mode="pong"] {
+  width: 100%;
+  margin-top: 14px;
+  margin-inline: auto;
+}
 
-  .hud {
-    gap: 10px;
-    font-size: var(--type-quantico-12);
-  }
+.game[data-mode="pong"] .hud {
+  gap: 10px;
+  font-size: var(--type-quantico-12);
+}
 
-  .frame {
-    width: 100%;
-    margin-inline: auto;
-  }
+.game[data-mode="pong"] .frame {
+  width: 100%;
+  margin-inline: auto;
+}
 
-  .canvas {
-    width: 100%;
-    height: min(560px, calc(100dvh - 320px));
-  }
+.game[data-mode="pong"] .canvas {
+  width: 100%;
+  height: min(560px, calc(100dvh - 320px));
+}
 
-  .instructions {
-    cursor: pointer;
-    touch-action: none;
-    user-select: none;
-    -webkit-user-select: none;
-  }
+.game[data-mode="pong"] .instructions {
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
 
-  .touchCursor {
-    display: flex;
-    position: fixed;
-    top: 0;
-    left: 50%;
-    z-index: 4;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.5s ease;
-  }
+.game[data-mode="pong"] .touchCursor {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 50%;
+  z-index: 4;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
 
-  .touchCursorVisible {
-    opacity: 1;
-  }
+.game[data-mode="pong"] .touchCursorVisible {
+  opacity: 1;
+}
 
-  .touchCursor .pixelPointer {
-    animation: touch-cursor-demo 5.2s ease-in-out infinite;
-  }
+.game[data-mode="pong"] .touchCursor .pixelPointer {
+  animation: touch-cursor-demo 5.2s ease-in-out infinite;
+}
 
-  .touchCursor:not(.touchCursorVisible) .pixelPointer {
-    animation-play-state: paused;
-  }
+.game[data-mode="pong"] .touchCursor:not(.touchCursorVisible) .pixelPointer {
+  animation-play-state: paused;
+}
 
-  .hintPlaying .instructionDrag {
-    animation: hint-drag-blink 5.2s steps(2, jump-none) infinite;
-  }
+.game[data-mode="pong"] .hintPlaying .instructionDrag {
+  animation: hint-drag-blink 5.2s steps(2, jump-none) infinite;
+}
 
-  .hintPlaying .instructionTap:not(.instructionPowerReady) {
-    animation: hint-tap-blink 5.2s steps(2, jump-none) infinite;
-  }
+.game[data-mode="pong"] .hintPlaying .instructionTap:not(.instructionPowerReady) {
+  animation: hint-tap-blink 5.2s steps(2, jump-none) infinite;
 }
 
 @keyframes touch-cursor-demo {

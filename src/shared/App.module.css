@@ -54,7 +54,7 @@
     overflow-x: clip;
   }
 
-  :global(html:not([data-arsenal-flying])) .shell:not(:has([data-page="arsenal"], [data-page="play"], [data-page="hire-me"])) {
+  :global(html:not([data-arsenal-flying])) .shell:not(:has([data-page="arsenal"], [data-page="play"])) {
     overflow-y: hidden;
   }
 
@@ -62,7 +62,7 @@
     min-height: 0;
   }
 
-  :global(html:not([data-arsenal-flying])) .main:not(:has([data-page="arsenal"], [data-page="play"], [data-page="hire-me"])) {
+  :global(html:not([data-arsenal-flying])) .main:not(:has([data-page="arsenal"], [data-page="play"])) {
     overflow: hidden;
   }
 
@@ -70,17 +70,18 @@
     overflow: visible;
   }
 
-  .shell:has([data-page="hire-me"]) {
-    height: 100svh;
-    max-height: 100svh;
-    min-height: 100svh;
-    overflow-x: clip;
-    overflow-y: auto;
+  .main:has([data-page="hire-me"]) {
+    min-height: 0;
+    overflow: visible;
   }
 
-  .main:has([data-page="hire-me"]) {
-    overflow: visible;
-    min-height: auto;
+  .shell:has([data-page="hire-me"], [data-page="play"]) :global([data-footer-placeholder]) {
+    padding-top: 4px;
+    padding-bottom: 12px;
+  }
+
+  .shell:has([data-page="hire-me"], [data-page="play"]) :global([data-footer-placeholder] > *) {
+    min-height: 0;
   }
 }
 

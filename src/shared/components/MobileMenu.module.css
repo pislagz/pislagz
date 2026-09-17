@@ -149,9 +149,10 @@
 }
 
 .link {
-  font-family: var(--font-quantico), sans-serif;
-  font-size: var(--type-quantico-18);
+  font-family: var(--font), sans-serif;
+  font-size: var(--type-aeonik-21);
   font-weight: 600;
+  letter-spacing: -0.02em;
   color: var(--color-white);
   transition:
     color 0.55s ease,

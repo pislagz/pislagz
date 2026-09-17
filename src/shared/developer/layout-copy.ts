@@ -11,14 +11,11 @@ import {
   hasChangedArsenalSettings,
 } from "./arsenal-layout";
 import {
-  formatContactOrOffset,
-  isContactOrOffsetChanged,
-} from "./contact-layout";
-import {
   formatChangedHeaderGradientSettings,
   hasChangedHeaderGradientSettings,
 } from "./header-gradient-layout";
 import {
+  DEFAULT_BIG_HEADER_ENABLED,
   formatChangedHomeLayoutOffsets,
   formatPositionAxis,
   hasChangedHomeLayoutOffsets,
@@ -31,7 +28,6 @@ export function hasChangedDeveloperLayoutOffsets(
   homeOffsets: HomeLayoutOffsets,
   backgroundScale: number,
   rightsPosition: PositionOffset,
-  contactOrOffset: number,
   arsenalTiltMaxDeg: number,
   arsenalTiltSpillPercent: number,
   arsenalGlowRadiusPx: number,
@@ -42,7 +38,6 @@ export function hasChangedDeveloperLayoutOffsets(
   return (
     hasChangedHomeLayoutOffsets(homeOffsets, backgroundScale) ||
     isHomeLayoutOffsetChanged(rightsPosition) ||
-    isContactOrOffsetChanged(contactOrOffset) ||
     hasChangedArsenalSettings(
       arsenalTiltMaxDeg,
       arsenalTiltSpillPercent,
@@ -57,13 +52,13 @@ export function formatChangedDeveloperLayoutOffsets(
   homeOffsets: HomeLayoutOffsets,
   backgroundScale: number,
   rightsPosition: PositionOffset,
-  contactOrOffset: number,
   arsenalTiltMaxDeg: number,
   arsenalTiltSpillPercent: number,
   arsenalGlowRadiusPx: number,
   arsenalGridOffsetY: number,
   playGameScale: number,
   playGameOffsetY: number,
+  bigHeaderEnabled: boolean,
   dynamicHeaderGlowEnabled: boolean,
   headerGradientColorA: string,
   headerGradientColorB: string,
@@ -74,6 +69,10 @@ export function formatChangedDeveloperLayoutOffsets(
 
   if (homeLines) {
     lines.push(homeLines);
+  }
+
+  if (bigHeaderEnabled !== DEFAULT_BIG_HEADER_ENABLED) {
+    lines.push(`enable big header: ${bigHeaderEnabled ? "on" : "off"}`);
   }
 
   const headerGradientLines = formatChangedHeaderGradientSettings(
@@ -90,10 +89,6 @@ export function formatChangedDeveloperLayoutOffsets(
     lines.push(
       `rights position: x: ${formatPositionAxis(rightsPosition.x)} y: ${formatPositionAxis(rightsPosition.y)}`,
     );
-  }
-
-  if (isContactOrOffsetChanged(contactOrOffset)) {
-    lines.push(`or distance: ${formatContactOrOffset(contactOrOffset)}`);
   }
 
   const arsenalLines = formatChangedArsenalSettings(
@@ -125,7 +120,6 @@ export function hasChangedDeveloperSettings(
   backgroundScale: number,
   rightsEnabled: boolean,
   rightsPosition: PositionOffset,
-  contactOrOffset: number,
   arsenalTiltMaxDeg: number,
   arsenalTiltSpillPercent: number,
   arsenalGlowRadiusPx: number,
@@ -137,6 +131,7 @@ export function hasChangedDeveloperSettings(
   pageGlowEnabled: boolean,
   pageGlowIntensity: number,
   portraitGlyphSoundsEnabled: boolean,
+  bigHeaderEnabled: boolean,
   dynamicHeaderGlowEnabled: boolean,
   headerGradientColorA: string,
   headerGradientColorB: string,
@@ -151,6 +146,7 @@ export function hasChangedDeveloperSettings(
     isFilmGrainSettingsChanged(filmGrainEnabled, filmGrainIntensity) ||
     isPageGlowSettingsChanged(pageGlowEnabled, pageGlowIntensity) ||
     portraitGlyphSoundsEnabled !== DEFAULT_PORTRAIT_GLYPH_SOUNDS_ENABLED ||
+    bigHeaderEnabled !== DEFAULT_BIG_HEADER_ENABLED ||
     hasChangedHeaderGradientSettings(
       dynamicHeaderGlowEnabled,
       headerGradientColorA,
@@ -161,7 +157,6 @@ export function hasChangedDeveloperSettings(
       homeOffsets,
       backgroundScale,
       rightsPosition,
-      contactOrOffset,
       arsenalTiltMaxDeg,
       arsenalTiltSpillPercent,
       arsenalGlowRadiusPx,

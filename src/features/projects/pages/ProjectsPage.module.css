@@ -1,25 +1,27 @@
 .page {
   max-width: var(--page-max);
   margin: 0 auto;
-  padding: 68px var(--pad-x-inner) 80px;
+  padding: var(--page-top) var(--pad-x-inner) 80px;
 }
 
 .title {
   font-size: var(--type-aeonik-36);
   font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 
 .lead {
-  margin-top: 16px;
+  margin-top: 21px;
   max-width: 425px;
   font-size: var(--type-aeonik-21);
   font-weight: 400;
   color: var(--color-text-muted);
-  line-height: 1.35;
+  line-height: 1.5;
 }
 
 .grid {
-  margin-top: 54px;
+  margin-top: 55px;
   display: grid;
   grid-template-columns: repeat(3, 293px);
   gap: 33px 24px;
@@ -33,7 +35,7 @@
 
 @media (max-width: 900px) {
   .page {
-    padding: 48px var(--pad-x) 64px;
+    padding: var(--page-top-mobile) var(--pad-x) 64px;
   }
 
   .grid {
