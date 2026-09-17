@@ -44,6 +44,15 @@ import {
   DEFAULT_PAGE_GLOW_INTENSITY,
 } from "./atmosphere-layout";
 import {
+  applyHeaderGradientVars,
+  clearHeaderGradientVars,
+  DEFAULT_DYNAMIC_HEADER_GLOW_ENABLED,
+  DEFAULT_HEADER_GRADIENT_COLOR_A,
+  DEFAULT_HEADER_GRADIENT_COLOR_B,
+  DEFAULT_HEADER_GRADIENT_DIRECTION,
+  normalizeHeaderGradientColor,
+} from "./header-gradient-layout";
+import {
   DEFAULT_PORTRAIT_GLYPH_SOUNDS_ENABLED,
 } from "./layout-copy";
 
@@ -88,6 +97,14 @@ type DeveloperSettings = {
   setPageGlowIntensity: (value: number) => void;
   portraitGlyphSoundsEnabled: boolean;
   setPortraitGlyphSoundsEnabled: (value: boolean) => void;
+  dynamicHeaderGlowEnabled: boolean;
+  setDynamicHeaderGlowEnabled: (value: boolean) => void;
+  headerGradientColorA: string;
+  setHeaderGradientColorA: (value: string) => void;
+  headerGradientColorB: string;
+  setHeaderGradientColorB: (value: string) => void;
+  headerGradientDirection: PositionOffset;
+  setHeaderGradientDirection: (offset: PositionOffset) => void;
   resetDeveloperSettings: () => void;
 };
 
@@ -121,6 +138,14 @@ export function DeveloperSettingsProvider({ children }: { children: ReactNode })
   const [portraitGlyphSoundsEnabled, setPortraitGlyphSoundsEnabled] = useState(
     DEFAULT_PORTRAIT_GLYPH_SOUNDS_ENABLED,
   );
+  const [dynamicHeaderGlowEnabled, setDynamicHeaderGlowEnabled] = useState(
+    DEFAULT_DYNAMIC_HEADER_GLOW_ENABLED,
+  );
+  const [headerGradientColorA, setHeaderGradientColorA] = useState(DEFAULT_HEADER_GRADIENT_COLOR_A);
+  const [headerGradientColorB, setHeaderGradientColorB] = useState(DEFAULT_HEADER_GRADIENT_COLOR_B);
+  const [headerGradientDirection, setHeaderGradientDirection] = useState(
+    DEFAULT_HEADER_GRADIENT_DIRECTION,
+  );
 
   const resetDeveloperSettings = useCallback(() => {
     setFooterEnabled(false);
@@ -143,6 +168,10 @@ export function DeveloperSettingsProvider({ children }: { children: ReactNode })
     setPageGlowEnabled(DEFAULT_PAGE_GLOW_ENABLED);
     setPageGlowIntensity(DEFAULT_PAGE_GLOW_INTENSITY);
     setPortraitGlyphSoundsEnabled(DEFAULT_PORTRAIT_GLYPH_SOUNDS_ENABLED);
+    setDynamicHeaderGlowEnabled(DEFAULT_DYNAMIC_HEADER_GLOW_ENABLED);
+    setHeaderGradientColorA(DEFAULT_HEADER_GRADIENT_COLOR_A);
+    setHeaderGradientColorB(DEFAULT_HEADER_GRADIENT_COLOR_B);
+    setHeaderGradientDirection(DEFAULT_HEADER_GRADIENT_DIRECTION);
   }, []);
 
   const setHomeLayoutOffset = useCallback((key: HomeLayoutKey, offset: PositionOffset) => {
@@ -184,14 +213,29 @@ export function DeveloperSettingsProvider({ children }: { children: ReactNode })
   useEffect(() => {
     if (pathname === "/") {
       applyHomeLayoutVars(homeLayoutOffsets);
+      applyHeaderGradientVars(
+        dynamicHeaderGlowEnabled,
+        headerGradientColorA,
+        headerGradientColorB,
+        headerGradientDirection,
+      );
       return;
     }
 
     clearHomeLayoutVars();
+    clearHeaderGradientVars();
     return () => {
       clearHomeLayoutVars();
+      clearHeaderGradientVars();
     };
-  }, [pathname, homeLayoutOffsets]);
+  }, [
+    pathname,
+    homeLayoutOffsets,
+    dynamicHeaderGlowEnabled,
+    headerGradientColorA,
+    headerGradientColorB,
+    headerGradientDirection,
+  ]);
 
   useEffect(() => {
     if (pathname === "/hire-me") {
@@ -284,6 +328,16 @@ export function DeveloperSettingsProvider({ children }: { children: ReactNode })
         setPageGlowIntensity,
         portraitGlyphSoundsEnabled,
         setPortraitGlyphSoundsEnabled,
+        dynamicHeaderGlowEnabled,
+        setDynamicHeaderGlowEnabled,
+        headerGradientColorA,
+        setHeaderGradientColorA: (value: string) =>
+          setHeaderGradientColorA(normalizeHeaderGradientColor(value)),
+        headerGradientColorB,
+        setHeaderGradientColorB: (value: string) =>
+          setHeaderGradientColorB(normalizeHeaderGradientColor(value)),
+        headerGradientDirection,
+        setHeaderGradientDirection,
         resetDeveloperSettings,
       }}
     >

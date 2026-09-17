@@ -2,43 +2,34 @@
   display: contents;
 }
 
-.pad {
+.inputWrap {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: rgba(18, 18, 18, 0.8);
   box-shadow: 0 0 0 1px rgb(110, 110, 115);
-  cursor: grab;
-  touch-action: none;
-  flex-shrink: 0;
-  justify-self: start;
+  cursor: pointer;
   align-self: center;
+  justify-self: start;
+  flex-shrink: 0;
+  overflow: hidden;
   transition: box-shadow 0.2s ease;
 }
 
-.padActive {
+.inputWrap:focus-within {
   box-shadow: 0 0 0 1px var(--color-accent);
-  cursor: grabbing;
 }
 
-.knob {
+.input {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 14px;
-  height: 14px;
-  margin: -7px 0 0 -7px;
-  border-radius: 50%;
-  background: #f5f5f7;
-  transition:
-    background 0.2s ease,
-    transform 0.08s linear;
-  pointer-events: none;
-}
-
-.padActive .knob {
-  background: var(--color-accent);
+  inset: -8px;
+  width: calc(100% + 16px);
+  height: calc(100% + 16px);
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  background: transparent;
 }
 
 .readout {
@@ -51,4 +42,5 @@
   width: 122px;
   justify-self: end;
   text-align: right;
+  align-self: center;
 }

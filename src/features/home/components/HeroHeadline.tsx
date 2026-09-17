@@ -41,11 +41,14 @@ const PHRASES = [
   "accessibility-first",
   "component-obsessed",
   "div-wrangling",
-  "React-loving",
+  "react-loving",
   "performance-minded",
   "pixel perfect",
   "animation guru",
-];
+] as const;
+
+/** Every string the typewriter can show — used once to lock headline font size. */
+const HEADLINE_FIT_PHRASES = [START, ...PHRASES];
 
 const wait = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
 
@@ -77,6 +80,9 @@ export function HeroHeadline() {
     const heading = headingRef.current;
     if (!heading) return;
 
+    const typed = heading.querySelector<HTMLElement>(`.${styles.next}`);
+    if (!typed) return;
+
     const minSize = mobile ? HEADLINE_MIN_FONT_MOBILE_PX : HEADLINE_MIN_FONT_PX;
     const widthLimit = getHeadlineWidthLimit(heading);
 
@@ -84,18 +90,29 @@ export function HeroHeadline() {
 
     heading.style.fontSize = "";
     const max = Number.parseFloat(getComputedStyle(heading).fontSize);
-    let size = max;
-    heading.style.fontSize = `${size}px`;
+    const savedText = typed.textContent ?? "";
+    let fittedSize = max;
 
-    while (heading.scrollWidth > widthLimit && size > minSize) {
-      size -= 1;
+    for (const phrase of HEADLINE_FIT_PHRASES) {
+      typed.textContent = phrase;
+      let size = max;
       heading.style.fontSize = `${size}px`;
+
+      while (heading.scrollWidth > widthLimit && size > minSize) {
+        size -= 1;
+        heading.style.fontSize = `${size}px`;
+      }
+
+      fittedSize = Math.min(fittedSize, size);
     }
+
+    typed.textContent = savedText;
+    heading.style.fontSize = `${fittedSize}px`;
   }, [mobile]);
 
   useLayoutEffect(() => {
     fitHeadline();
-  }, [text, caret, fitHeadline]);
+  }, [fitHeadline]);
 
   useEffect(() => {
     window.addEventListener("resize", fitHeadline);
@@ -174,7 +191,10 @@ export function HeroHeadline() {
       <span className={styles.your}>Your</span>
       <span className={styles.typed}>
         <span className={styles.next}>{text}</span>
-        {caret ? <span className={styles.caret} aria-hidden="true" /> : null}
+        <span
+          className={`${styles.caret} ${caret ? "" : styles.caretHidden}`}
+          aria-hidden="true"
+        />
       </span>
     </h1>
   );

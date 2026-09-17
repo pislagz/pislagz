@@ -54,29 +54,33 @@ export function ScaleSlider({
   const onPointerDown = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
       event.preventDefault();
-      event.currentTarget.setPointerCapture(event.pointerId);
+      event.stopPropagation();
       draggingRef.current = true;
       setActive(true);
       updateFromClientX(event.clientX);
+
+      const pointerId = event.pointerId;
+
+      const onMove = (moveEvent: PointerEvent) => {
+        if (moveEvent.pointerId !== pointerId) return;
+        updateFromClientX(moveEvent.clientX);
+      };
+
+      const onUp = (upEvent: PointerEvent) => {
+        if (upEvent.pointerId !== pointerId) return;
+        draggingRef.current = false;
+        setActive(false);
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+        window.removeEventListener("pointercancel", onUp);
+      };
+
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
+      window.addEventListener("pointercancel", onUp);
     },
     [updateFromClientX],
   );
-
-  const onPointerMove = useCallback(
-    (event: ReactPointerEvent<HTMLDivElement>) => {
-      if (!draggingRef.current) return;
-      updateFromClientX(event.clientX);
-    },
-    [updateFromClientX],
-  );
-
-  const onPointerUp = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!draggingRef.current) return;
-
-    draggingRef.current = false;
-    setActive(false);
-    event.currentTarget.releasePointerCapture(event.pointerId);
-  }, []);
 
   const thumbLeft = `${valueToPercent(value, min, max)}%`;
 
@@ -87,9 +91,6 @@ export function ScaleSlider({
         className={`${styles.track} ${active ? styles.trackActive : ""}`}
         style={{ "--thumb-left": thumbLeft } as CSSProperties}
         onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
         role="slider"
         aria-label={ariaLabel}
         aria-valuemin={min}

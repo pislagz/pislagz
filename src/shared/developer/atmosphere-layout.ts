@@ -8,8 +8,8 @@ export const DEFAULT_PAGE_GLOW_INTENSITY = 20;
 export const PAGE_GLOW_INTENSITY_MIN = 0;
 export const PAGE_GLOW_INTENSITY_MAX = 100;
 
-const MAX_FILM_GRAIN_OPACITY = 0.11;
-const MAX_PAGE_GLOW_OPACITY = 0.16;
+const MAX_FILM_GRAIN_OPACITY = 0.38;
+const MAX_PAGE_GLOW_OPACITY = 0.52;
 
 export function formatAtmosphereIntensity(value: number): string {
   return `${Math.round(value)}%`;

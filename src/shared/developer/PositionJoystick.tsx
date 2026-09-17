@@ -10,7 +10,7 @@ type Props = {
   tabIndex?: number;
 };
 
-const MAX_KNOB_TRAVEL_PX = 8;
+const MAX_KNOB_TRAVEL_PX = 10;
 
 export function PositionJoystick({ value, onChange, tabIndex = -1 }: Props) {
   const padRef = useRef<HTMLDivElement>(null);
@@ -22,10 +22,7 @@ export function PositionJoystick({ value, onChange, tabIndex = -1 }: Props) {
   const onPointerDown = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
       event.preventDefault();
-      const pad = padRef.current;
-      if (!pad) return;
-
-      pad.setPointerCapture(event.pointerId);
+      event.stopPropagation();
       draggingRef.current = true;
       setActive(true);
       dragStartRef.current = {
@@ -34,37 +31,41 @@ export function PositionJoystick({ value, onChange, tabIndex = -1 }: Props) {
         valueX: value.x,
         valueY: value.y,
       };
+
+      const pointerId = event.pointerId;
+
+      const onMove = (moveEvent: PointerEvent) => {
+        if (!draggingRef.current || moveEvent.pointerId !== pointerId) return;
+
+        const dx = moveEvent.clientX - dragStartRef.current.pointerX;
+        const dy = moveEvent.clientY - dragStartRef.current.pointerY;
+
+        onChange({
+          x: dragStartRef.current.valueX + dx,
+          y: dragStartRef.current.valueY + dy,
+        });
+
+        const distance = Math.hypot(dx, dy);
+        const scale = distance > MAX_KNOB_TRAVEL_PX ? MAX_KNOB_TRAVEL_PX / distance : 1;
+        setKnobOffset({ x: dx * scale, y: dy * scale });
+      };
+
+      const onUp = (upEvent: PointerEvent) => {
+        if (upEvent.pointerId !== pointerId) return;
+        draggingRef.current = false;
+        setActive(false);
+        setKnobOffset({ x: 0, y: 0 });
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+        window.removeEventListener("pointercancel", onUp);
+      };
+
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
+      window.addEventListener("pointercancel", onUp);
     },
-    [value.x, value.y],
+    [onChange, value.x, value.y],
   );
-
-  const onPointerMove = useCallback(
-    (event: ReactPointerEvent<HTMLDivElement>) => {
-      if (!draggingRef.current) return;
-
-      const dx = event.clientX - dragStartRef.current.pointerX;
-      const dy = event.clientY - dragStartRef.current.pointerY;
-
-      onChange({
-        x: dragStartRef.current.valueX + dx,
-        y: dragStartRef.current.valueY + dy,
-      });
-
-      const distance = Math.hypot(dx, dy);
-      const scale = distance > MAX_KNOB_TRAVEL_PX ? MAX_KNOB_TRAVEL_PX / distance : 1;
-      setKnobOffset({ x: dx * scale, y: dy * scale });
-    },
-    [onChange],
-  );
-
-  const onPointerUp = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!draggingRef.current) return;
-
-    draggingRef.current = false;
-    setActive(false);
-    setKnobOffset({ x: 0, y: 0 });
-    event.currentTarget.releasePointerCapture(event.pointerId);
-  }, []);
 
   return (
     <div className={styles.control}>
@@ -72,9 +73,6 @@ export function PositionJoystick({ value, onChange, tabIndex = -1 }: Props) {
         ref={padRef}
         className={`${styles.pad} ${active ? styles.padActive : ""}`}
         onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
         role="slider"
         aria-label="Adjust position"
         aria-valuetext={`x ${formatPositionAxis(value.x)}, y ${formatPositionAxis(value.y)}`}
