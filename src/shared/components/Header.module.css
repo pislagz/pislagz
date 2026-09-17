@@ -16,6 +16,12 @@
 }
 
 :global(html[data-mobile-menu-open]) .header {
+  /* Drop the header stacking context so the portaled sheet can sit above the
+     logo, while the close control still stacks above the sheet. */
+  z-index: auto;
+}
+
+:global(html[data-mobile-menu-open]) .menuButton {
   z-index: calc(var(--z-mobile-menu) + 1);
 }
 

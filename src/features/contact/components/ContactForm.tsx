@@ -1,14 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useDeveloperSettings } from "@shared/developer/DeveloperSettings";
 import { useContactForm } from "../hooks/use-contact-form";
 import styles from "./ContactForm.module.css";
 
 const BUTTON_OUT_MS = 520;
 const MESSAGE_MAX_PX = 240;
+const FORM_BOTTOM_GAP_PX = 8;
 
 export function ContactForm() {
   const form = useContactForm();
+  const { footerEnabled } = useDeveloperSettings();
   const messageRef = useRef<HTMLTextAreaElement>(null);
   const [buttonGone, setButtonGone] = useState(false);
   const locked = form.status === "sent";
@@ -28,15 +31,39 @@ export function ContactForm() {
     const field = messageRef.current;
     if (!field) return;
 
+    field.style.minHeight = "";
     field.style.height = "0px";
-    const next = Math.min(field.scrollHeight, MESSAGE_MAX_PX);
+    const contentHeight = field.scrollHeight;
+    const formEl = field.closest("form");
+    const main = field.closest("main");
+    const boundary = document.querySelector("[data-footer-boundary]");
+
+    let next = Math.min(contentHeight, MESSAGE_MAX_PX);
+    const desktop = window.matchMedia("(min-width: 901px)").matches;
+
+    if (desktop && formEl && main) {
+      const fieldBox = field.getBoundingClientRect();
+      const formBox = formEl.getBoundingClientRect();
+      const belowField = formBox.bottom - fieldBox.bottom;
+      const limit = boundary
+        ? boundary.getBoundingClientRect().top
+        : main.getBoundingClientRect().bottom;
+      const available = Math.floor(limit - FORM_BOTTOM_GAP_PX - fieldBox.top - belowField);
+      if (Number.isFinite(available)) {
+        next = Math.min(next, Math.max(0, available));
+      }
+    }
+
+    field.style.minHeight = `${next}px`;
     field.style.height = `${next}px`;
-    field.style.overflowY = field.scrollHeight > MESSAGE_MAX_PX ? "auto" : "hidden";
+    field.style.overflowY = contentHeight > next + 1 ? "auto" : "hidden";
   }, []);
 
   useLayoutEffect(() => {
     fitMessage();
-  }, [form.message, form.status, buttonGone, fitMessage]);
+    window.addEventListener("resize", fitMessage);
+    return () => window.removeEventListener("resize", fitMessage);
+  }, [form.message, form.status, buttonGone, footerEnabled, fitMessage]);
 
   return (
     <form

@@ -72,7 +72,7 @@
 
   .main:has([data-page="hire-me"]) {
     min-height: 0;
-    overflow: visible;
+    overflow: hidden;
   }
 
   .shell:has([data-page="hire-me"], [data-page="play"]) :global([data-footer-placeholder]) {
