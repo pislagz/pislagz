@@ -120,7 +120,9 @@ export function ResumePage() {
         <DecryptText text="my résumé" delay={0} duration={1100} />
       </h1>
       <p className={styles.lead}>
-        <DecryptText text={leadFirst} delay={100} duration={1250} />
+        <span className={styles.leadFirst}>
+          <DecryptText text={leadFirst} delay={100} duration={1250} />
+        </span>
         <span className={styles.sentenceBreak} aria-hidden="true" />
         <DecryptText text={leadSecond} delay={160} duration={1240} />
       </p>

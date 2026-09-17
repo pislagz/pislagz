@@ -78,29 +78,9 @@
 }
 
 .panelHeader {
-  display: flex;
   width: 100%;
-  justify-content: flex-end;
+  min-height: 32px;
   margin-bottom: 8px;
-}
-
-.closeButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: #f5f5f7;
-  cursor: pointer;
-}
-
-.closeButton svg {
-  width: 18px;
-  height: 18px;
 }
 
 .panelHeader,

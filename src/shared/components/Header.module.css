@@ -15,7 +15,10 @@
   pointer-events: auto;
 }
 
-:global(html[data-mobile-menu-open]) .header,
+:global(html[data-mobile-menu-open]) .header {
+  z-index: calc(var(--z-mobile-menu) + 1);
+}
+
 :global(html[data-developer-menu-open]) .header {
   /* Above arsenal fly-in main (80) so the drawer stays interactive. */
   z-index: 100;

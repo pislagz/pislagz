@@ -28,6 +28,13 @@
   }
 }
 
+@media (min-width: 901px) and (max-width: 1100px) {
+  .wrap {
+    margin-top: 24px;
+    padding-bottom: 8px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .wrap {
     animation: none;
