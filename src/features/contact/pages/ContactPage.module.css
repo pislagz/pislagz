@@ -318,6 +318,10 @@
   .page :global(form) {
     flex: 0 0 auto;
   }
+
+  :global(html[data-footer-enabled]) .or {
+    margin: 16px 0 10px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

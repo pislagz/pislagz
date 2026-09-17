@@ -312,6 +312,15 @@
   opacity: 0.62;
 }
 
+@media (min-width: 901px) {
+  :global(html[data-footer-enabled]) .grid {
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+    grid-auto-rows: minmax(0, 1fr);
+  }
+}
+
 @media (max-width: 900px) {
   .grid {
     grid-template-columns: repeat(4, 1fr);

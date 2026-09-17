@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import {
   DEFAULT_ARSENAL_GLOW_RADIUS_PX,
@@ -182,7 +182,7 @@ export function DeveloperSettingsProvider({ children }: { children: ReactNode })
     setRightsEnabled(false);
   }, [footerEnabled]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (footerEnabled) {
       document.documentElement.dataset.footerEnabled = "true";
       return;
