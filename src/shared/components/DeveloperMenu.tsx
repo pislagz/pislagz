@@ -42,10 +42,6 @@ import {
   formatArsenalTiltSpill,
 } from "@shared/developer/arsenal-layout";
 import {
-  CONTACT_OR_OFFSET_MAX,
-  CONTACT_OR_OFFSET_MIN,
-} from "@shared/developer/contact-layout";
-import {
   formatBackgroundScale,
   HOME_BACKGROUND_SCALE_MAX,
   HOME_BACKGROUND_SCALE_MIN,
@@ -132,7 +128,6 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
   const pathname = usePathname();
   const theme = menuThemeForPath(pathname);
   const isHomeRoute = pathname === "/";
-  const isContactRoute = pathname === "/hire-me";
   const isArsenalRoute = pathname === "/arsenal";
   const isPlayRoute = pathname === "/play";
   const {
@@ -148,12 +143,12 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
     setHomeLayoutOffset,
     homeBackgroundScale,
     setHomeBackgroundScale,
+    bigHeaderEnabled,
+    setBigHeaderEnabled,
     rightsEnabled,
     setRightsEnabled,
     rightsPosition,
     setRightsPosition,
-    contactOrOffset,
-    setContactOrOffset,
     arsenalTiltMaxDeg,
     setArsenalTiltMaxDeg,
     arsenalTiltSpillPercent,
@@ -206,7 +201,6 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
     homeLayoutOffsets,
     homeBackgroundScale,
     rightsPosition,
-    contactOrOffset,
     arsenalTiltMaxDeg,
     arsenalTiltSpillPercent,
     arsenalGlowRadiusPx,
@@ -223,7 +217,6 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
     homeBackgroundScale,
     rightsEnabled,
     rightsPosition,
-    contactOrOffset,
     arsenalTiltMaxDeg,
     arsenalTiltSpillPercent,
     arsenalGlowRadiusPx,
@@ -235,6 +228,7 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
     pageGlowEnabled,
     pageGlowIntensity,
     portraitGlyphSoundsEnabled,
+    bigHeaderEnabled,
     dynamicHeaderGlowEnabled,
     headerGradientColorA,
     headerGradientColorB,
@@ -430,13 +424,13 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
       homeLayoutOffsets,
       homeBackgroundScale,
       rightsPosition,
-      contactOrOffset,
       arsenalTiltMaxDeg,
       arsenalTiltSpillPercent,
       arsenalGlowRadiusPx,
       arsenalGridOffsetY,
       playGameScale,
       playGameOffsetY,
+      bigHeaderEnabled,
       dynamicHeaderGlowEnabled,
       headerGradientColorA,
       headerGradientColorB,
@@ -496,7 +490,7 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
               onPointerCancel={onHeaderPointerUp}
             >
               <div className={styles.panelHeader}>
-                <p className={styles.title}>developer</p>
+                <p className={styles.title}>developer menu</p>
                 <button
                   type="button"
                   className={styles.closeButton}
@@ -642,6 +636,22 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
               <div className={styles.routeSection}>
                 <p className={styles.sectionTitle}>home</p>
                 <div className={styles.toggleRow}>
+                  <span className={styles.toggleLabel}>enable big header</span>
+                  <label className={styles.toggleControl}>
+                    <input
+                      className={styles.toggleInput}
+                      type="checkbox"
+                      checked={bigHeaderEnabled}
+                      onChange={(event) => setBigHeaderEnabled(event.target.checked)}
+                      tabIndex={open ? 0 : -1}
+                    />
+                    <span
+                      className={`${styles.switch} ${bigHeaderEnabled ? styles.switchOn : ""}`}
+                      aria-hidden="true"
+                    />
+                  </label>
+                </div>
+                <div className={styles.toggleRow}>
                   <span className={styles.toggleLabel}>portrait hover sounds</span>
                   <label className={styles.toggleControl}>
                     <input
@@ -720,23 +730,6 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
                       onChange={setHomeBackgroundScale}
                       min={HOME_BACKGROUND_SCALE_MIN}
                       max={HOME_BACKGROUND_SCALE_MAX}
-                      tabIndex={open ? 0 : -1}
-                    />
-                  </div>
-                </div>
-              </div>
-            ) : null}
-            {isContactRoute ? (
-              <div className={styles.routeSection}>
-                <p className={styles.sectionTitle}>contact</p>
-                <div className={styles.positionRows}>
-                  <div className={styles.positionRow}>
-                    <span className={styles.positionLabel}>or distance</span>
-                    <VerticalOffsetSlider
-                      value={contactOrOffset}
-                      onChange={setContactOrOffset}
-                      min={CONTACT_OR_OFFSET_MIN}
-                      max={CONTACT_OR_OFFSET_MAX}
                       tabIndex={open ? 0 : -1}
                     />
                   </div>
@@ -860,6 +853,7 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
                 </div>
               ) : null}
             </div>
+            </div>
             {hasChangedSettings ? (
               <div className={styles.copyFooter}>
                 <button
@@ -884,7 +878,6 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
                 ) : null}
               </div>
             ) : null}
-            </div>
           </div>
         </div>
       ) : null}

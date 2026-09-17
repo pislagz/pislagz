@@ -2,19 +2,15 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useContactForm } from "../hooks/use-contact-form";
-import { useMediaQuery } from "@shared/hooks/use-media-query";
 import styles from "./ContactForm.module.css";
 
 const BUTTON_OUT_MS = 520;
-const MOBILE_ACTION_ROOT_MARGIN = "0px 0px -64px 0px";
+const MESSAGE_MAX_PX = 240;
 
 export function ContactForm() {
   const form = useContactForm();
   const messageRef = useRef<HTMLTextAreaElement>(null);
-  const actionSentinelRef = useRef<HTMLDivElement>(null);
-  const mobile = useMediaQuery("(max-width: 900px)");
   const [buttonGone, setButtonGone] = useState(false);
-  const [actionRevealed, setActionRevealed] = useState(false);
   const locked = form.status === "sent";
   const busy = form.status === "sending";
 
@@ -33,30 +29,14 @@ export function ContactForm() {
     if (!field) return;
 
     field.style.height = "0px";
-    field.style.height = `${field.scrollHeight}px`;
+    const next = Math.min(field.scrollHeight, MESSAGE_MAX_PX);
+    field.style.height = `${next}px`;
+    field.style.overflowY = field.scrollHeight > MESSAGE_MAX_PX ? "auto" : "hidden";
   }, []);
 
   useLayoutEffect(() => {
     fitMessage();
   }, [form.message, form.status, buttonGone, fitMessage]);
-
-  useEffect(() => {
-    if (!mobile) {
-      setActionRevealed(true);
-      return;
-    }
-
-    const sentinel = actionSentinelRef.current;
-    if (!sentinel) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => setActionRevealed(entry.isIntersecting),
-      { threshold: 0, rootMargin: MOBILE_ACTION_ROOT_MARGIN },
-    );
-
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [mobile, form.message, form.status, buttonGone]);
 
   return (
     <form
@@ -64,6 +44,7 @@ export function ContactForm() {
       data-status={form.status}
       onSubmit={form.onSubmit}
     >
+      <div className={styles.sweep} aria-hidden="true" />
       <div className={styles.row}>
         <label
           className={`${styles.fieldBox} ${styles.name} ${form.name ? styles.filled : ""}`}
@@ -101,10 +82,11 @@ export function ContactForm() {
           disabled={busy || locked}
         />
       </label>
-      <div ref={actionSentinelRef} className={styles.actionSentinel} aria-hidden="true" />
-      <div
-        className={`${styles.actionRow} ${actionRevealed ? styles.actionRowRevealed : ""}`}
-      >
+      <div className={styles.actionRow}>
+        {form.error ? <p className={styles.error}>{form.error}</p> : null}
+        {buttonGone ? (
+          <p className={`${styles.success} ${styles.successIn}`}>Message sent. Thank you.</p>
+        ) : null}
         {!buttonGone ? (
           <button
             type="submit"
@@ -116,10 +98,6 @@ export function ContactForm() {
             <span>{busy ? "Sending" : "Send message"}</span>
             <img src="/assets/icons/send.svg" alt="" width={12} height={12} />
           </button>
-        ) : null}
-        {form.error ? <p className={styles.error}>{form.error}</p> : null}
-        {buttonGone ? (
-          <p className={`${styles.success} ${styles.successIn}`}>Message sent. Thank you.</p>
         ) : null}
       </div>
     </form>

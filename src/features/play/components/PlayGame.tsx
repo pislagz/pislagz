@@ -1,10 +1,9 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { playArcadeSound, unlockArcadeAudio } from "@shared/arcade-audio";
-import { useMediaQuery } from "@shared/hooks/use-media-query";
 import { PlayTabletCtas } from "./PlayTabletCtas";
 import styles from "./PlayGame.module.css";
 
@@ -997,8 +996,7 @@ function VerticalPong({
   );
 }
 
-export function PlayGame() {
-  const mobile = useMediaQuery("(max-width: 900px)");
+export function PlayGame({ pong }: { pong: boolean }) {
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const highScoreRef = useRef(0);
@@ -1020,6 +1018,8 @@ export function PlayGame() {
   const powerTimingTimeoutRef = useRef<number | null>(null);
   const instructionsRef = useRef<HTMLParagraphElement>(null);
   const touchCursorRef = useRef<HTMLDivElement>(null);
+  const gameRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -1037,8 +1037,11 @@ export function PlayGame() {
   }, []);
 
   useEffect(() => {
-    if (!mobile) {
+    if (!pong) {
       delete document.documentElement.dataset.pongFooterDocked;
+      window.dispatchEvent(
+        new CustomEvent("pong-footer-dock", { detail: { docked: false } }),
+      );
       return;
     }
     const docked = status === "playing";
@@ -1046,10 +1049,10 @@ export function PlayGame() {
     window.dispatchEvent(
       new CustomEvent("pong-footer-dock", { detail: { docked } }),
     );
-  }, [mobile, status]);
+  }, [pong, status]);
 
   useEffect(() => {
-    const key = mobile ? HIGH_SCORE_KEYS.pong : HIGH_SCORE_KEYS.invaders;
+    const key = pong ? HIGH_SCORE_KEYS.pong : HIGH_SCORE_KEYS.invaders;
     setScore(0);
     setPowerCharge(0);
     setEnemyPowerCharge(0);
@@ -1063,7 +1066,7 @@ export function PlayGame() {
     const savedHighScore = Number.parseInt(localStorage.getItem(key) ?? "0", 10) || 0;
     highScoreRef.current = savedHighScore;
     setHighScore(savedHighScore);
-  }, [mobile]);
+  }, [pong]);
 
   useEffect(
     () => () => {
@@ -1080,9 +1083,9 @@ export function PlayGame() {
     const next = Math.max(highScoreRef.current, nextScore);
     highScoreRef.current = next;
     setHighScore(next);
-    const key = mobile ? HIGH_SCORE_KEYS.pong : HIGH_SCORE_KEYS.invaders;
+    const key = pong ? HIGH_SCORE_KEYS.pong : HIGH_SCORE_KEYS.invaders;
     localStorage.setItem(key, String(next));
-  }, [mobile]);
+  }, [pong]);
   const handleGameOver = useCallback(() => setStatus("game-over"), []);
   const handlePowerDenied = useCallback(
     () => setPowerDeniedToken((token) => token + 1),
@@ -1120,7 +1123,7 @@ export function PlayGame() {
   };
 
   useEffect(() => {
-    if (!mobile) return;
+    if (!pong) return;
     const onFooterProgress = (event: Event) => {
       const { dock } = (event as CustomEvent<{ dock: number }>).detail;
       setFooterDocked(dock > 0.9);
@@ -1128,10 +1131,10 @@ export function PlayGame() {
     setFooterDocked(document.documentElement.dataset.pongFooterDocked === "true");
     window.addEventListener("pong-footer-progress", onFooterProgress);
     return () => window.removeEventListener("pong-footer-progress", onFooterProgress);
-  }, [mobile]);
+  }, [pong]);
 
   useEffect(() => {
-    if (!mobile || !footerDocked) return;
+    if (!pong || !footerDocked) return;
     const placeCursor = () => {
       const cursor = touchCursorRef.current;
       const instructions = instructionsRef.current;
@@ -1147,10 +1150,37 @@ export function PlayGame() {
       window.clearTimeout(timeout);
       window.removeEventListener("resize", placeCursor);
     };
-  }, [footerDocked, mobile]);
+  }, [footerDocked, pong]);
+
+  useLayoutEffect(() => {
+    const game = gameRef.current;
+    const frame = frameRef.current;
+    if (!game) return;
+    if (pong) {
+      game.style.removeProperty("--crt-width");
+      return;
+    }
+    if (!frame) return;
+
+    const sync = () => {
+      const width = frame.offsetWidth;
+      if (width > 0) game.style.setProperty("--crt-width", `${width}px`);
+    };
+
+    sync();
+    const observer = new ResizeObserver(sync);
+    observer.observe(frame);
+    return () => observer.disconnect();
+  }, [pong, intro, crtOn]);
 
   return (
-    <div className={styles.game} data-intro={intro ? "true" : undefined}>
+    <div
+      ref={gameRef}
+      className={styles.game}
+      data-play-game=""
+      data-mode={pong ? "pong" : "invaders"}
+      data-intro={intro ? "true" : undefined}
+    >
       <div className={styles.hud} onContextMenu={(event) => event.preventDefault()}>
         <span key={`score-${score}`} className={styles.scoreFlash}>
           score {String(score).padStart(4, "0")}
@@ -1162,7 +1192,7 @@ export function PlayGame() {
           personal best {String(highScore).padStart(4, "0")}
         </span>
       </div>
-      {mobile ? (
+      {pong ? (
         <div className={styles.energyBars} onContextMenu={(event) => event.preventDefault()}>
           <div className={styles.energyRow}>
             <span className={styles.energyLabel}>power</span>
@@ -1207,8 +1237,9 @@ export function PlayGame() {
           ) : null}
         </div>
       )}
-      <div className={styles.frame}>
-        {mobile ? (
+      <div className={styles.screen} data-play-screen="">
+        <div ref={frameRef} className={styles.frame}>
+        {pong ? (
           <VerticalPong
             mobile
             onScore={handleScore}
@@ -1238,7 +1269,7 @@ export function PlayGame() {
             <span className={styles.crtScan} />
           </div>
         ) : null}
-        {mobile && countdown !== null && status === "playing" ? (
+        {pong && countdown !== null && status === "playing" ? (
           <div className={styles.countdownOverlay}>
             <div key={countdown} className={styles.countdownNumber}>
               <PixelMessage text={String(countdown)} />
@@ -1264,14 +1295,15 @@ export function PlayGame() {
           </div>
         ) : null}
       </div>
+      </div>
       <div className={styles.touchpad}>
         <p
           ref={instructionsRef}
           className={`${styles.instructions} ${
-            mobile && footerDocked ? styles.hintPlaying : ""
+            pong && footerDocked ? styles.hintPlaying : ""
           }`}
         >
-          {mobile ? (
+          {pong ? (
             <>
               <span className={styles.instructionDrag}>
                 drag left or right to move the paddle
@@ -1289,7 +1321,7 @@ export function PlayGame() {
             "arrow keys or mouse to move · space or click to fire"
           )}
         </p>
-        {mobile ? (
+        {pong ? (
           <div
             ref={touchCursorRef}
             className={`${styles.touchCursor} ${
@@ -1301,7 +1333,10 @@ export function PlayGame() {
           </div>
         ) : null}
       </div>
-      <PlayTabletCtas gameActive={status === "playing" && !intro && !crtOn} />
+      <PlayTabletCtas
+        pong={pong}
+        gameActive={status === "playing" && !intro && !crtOn}
+      />
     </div>
   );
 }

@@ -15,6 +15,7 @@
 
 .header .name {
   font-size: var(--type-aeonik-24);
+  letter-spacing: -0.02em;
 }
 
 .footer {

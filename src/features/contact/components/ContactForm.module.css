@@ -1,6 +1,7 @@
 .form {
   position: relative;
-  overflow: clip;
+  z-index: 1;
+  overflow: visible;
   width: min(560px, 100%);
   max-width: 100%;
   border-radius: 28px;
@@ -15,13 +16,19 @@
   animation: form-receive 880ms cubic-bezier(0.16, 1, 0.3, 1) 520ms both;
 }
 
-.form::before {
-  content: "";
+.sweep {
   position: absolute;
   inset: 0;
   z-index: 1;
+  overflow: hidden;
   border-radius: inherit;
   pointer-events: none;
+}
+
+.sweep::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background: linear-gradient(
     105deg,
     transparent 18%,
@@ -154,6 +161,11 @@
     color 160ms ease;
 }
 
+.full .label {
+  top: 16px;
+  transform: none;
+}
+
 .fieldBox:focus-within .label,
 .fieldBox.filled .label {
   top: 10px;
@@ -193,22 +205,16 @@
   resize: none;
   overflow-x: hidden;
   overflow-y: hidden;
-  min-height: 72px;
+  min-height: calc(72px + 2lh);
   line-height: 1.4;
   padding: 26px 14px 10px;
-}
-
-.actionSentinel {
-  width: 100%;
-  height: 1px;
-  pointer-events: none;
 }
 
 .actionRow {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: flex-end;
   gap: 12px;
   height: 28px;
   margin-top: 18px;
@@ -268,7 +274,7 @@
   font-size: var(--type-quantico-12);
   line-height: 1.2;
   color: var(--color-text-muted);
-  text-align: right;
+  text-align: left;
 }
 
 .successIn {
@@ -282,7 +288,7 @@
   font-size: var(--type-quantico-12);
   line-height: 1.2;
   color: #ff8f8f;
-  text-align: right;
+  text-align: left;
   animation: success-in 320ms ease both;
 }
 
@@ -337,10 +343,9 @@
   .successIn,
   .error,
   .form,
-  .form::before,
+  .sweep::before,
   .fieldBox,
-  .actionRow,
-  .actionRowRevealed {
+  .actionRow {
     animation: none;
     transition: none;
   }
@@ -367,27 +372,20 @@
   }
 
   .message {
-    min-height: 96px;
+    min-height: calc(96px + 2lh);
     padding: 26px 14px 10px;
   }
 
   .actionRow {
-    max-height: 0;
-    margin-top: 0;
-    opacity: 0;
-    overflow: hidden;
-    pointer-events: none;
-    transition:
-      max-height 220ms ease,
-      margin-top 220ms ease,
-      opacity 180ms ease;
+    height: auto;
+    min-height: 32px;
+    margin-top: 16px;
+    overflow: visible;
   }
 
-  .actionRowRevealed {
-    max-height: 48px;
-    margin-top: 18px;
-    opacity: 1;
-    pointer-events: auto;
+  .submit {
+    height: 32px;
+    padding: 0 14px;
   }
 }
 
@@ -396,5 +394,26 @@
     width: calc(100% + 2 * (var(--pad-x) - 16px));
     max-width: none;
     margin-inline: calc(16px - var(--pad-x));
+  }
+}
+
+@media (min-width: 901px) {
+  .form {
+    display: flex;
+    flex-direction: column;
+    padding: 16px 20px 12px;
+  }
+
+  .fieldBox:not(.full) {
+    min-height: 44px;
+  }
+
+  .message {
+    min-height: calc(80px + 2lh);
+    height: auto;
+  }
+
+  .actionRow {
+    margin-top: 10px;
   }
 }

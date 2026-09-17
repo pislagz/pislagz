@@ -18,6 +18,7 @@ export const DEFAULT_HOME_LAYOUT_OFFSETS: HomeLayoutOffsets = {
 export const DEFAULT_HOME_BACKGROUND_SCALE = 0;
 export const HOME_BACKGROUND_SCALE_MIN = -50;
 export const HOME_BACKGROUND_SCALE_MAX = 50;
+export const DEFAULT_BIG_HEADER_ENABLED = false;
 
 export const HOME_LAYOUT_OPTIONS: ReadonlyArray<{ key: HomeLayoutKey; label: string }> = [
   { key: "title", label: "title position" },

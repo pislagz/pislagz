@@ -32,21 +32,29 @@
 }
 
 .headline {
+  --headline-display: var(--type-aeonik-78);
   pointer-events: none;
   display: flex;
   flex-wrap: nowrap;
-  align-items: baseline;
-  gap: 0.22em;
+  align-items: flex-end;
+  gap: 0.18em;
   width: 100%;
   max-width: 100%;
   overflow: visible;
-  font-size: var(--type-aeonik-48);
+  font-size: var(--headline-display);
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
   white-space: nowrap;
-  min-height: 1.25em;
-  padding-bottom: 0.12em;
+  /* Keep the slot at the display size so shrinking type does not
+     pull the role and CTA up. Extra air goes above the headline. */
+  min-height: calc(var(--headline-display) * 1.22);
+  padding-bottom: 0.08em;
   transform: translate(var(--dev-home-title-x, 0px), var(--dev-home-title-y, 0px));
+}
+
+.bigHeader {
+  --headline-display: var(--type-aeonik-126);
 }
 
 .typed {
@@ -89,6 +97,7 @@
 
 .caretHidden {
   opacity: 0;
+  animation: none;
 }
 
 @keyframes caret-blink {
@@ -111,16 +120,18 @@
 
 .role {
   pointer-events: none;
-  margin-top: 4px;
-  font-size: var(--type-aeonik-36);
+  margin-top: 12px;
+  font-size: var(--type-aeonik-48);
   font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
   color: var(--color-white);
   text-shadow: 0 0 18px rgba(7, 9, 16, 0.55);
   transform: translate(var(--dev-home-subtitle-x, 0px), var(--dev-home-subtitle-y, 0px));
 }
 
 .cta {
-  margin-top: 34px;
+  margin-top: 36px;
   pointer-events: auto;
   transform: translate(var(--dev-home-cta-x, 0px), var(--dev-home-cta-y, 0px));
 }
@@ -129,6 +140,17 @@
   width: 24px;
   height: 24px;
   transform: rotate(-135deg);
+}
+
+@media (max-width: 1100px) {
+  .role {
+    font-size: var(--type-aeonik-36);
+    margin-top: 10px;
+  }
+
+  .cta {
+    margin-top: 28px;
+  }
 }
 
 @media (max-width: 900px) {
@@ -158,23 +180,25 @@
     contain: inline-size;
   }
 
-  .headline {
+  .headline,
+  .bigHeader {
+    --headline-display: var(--type-aeonik-48);
     justify-content: center;
-    font-size: var(--type-aeonik-24);
-    min-height: 1.25em;
-    padding-bottom: 0.12em;
+    letter-spacing: -0.025em;
+    padding-bottom: 0.08em;
   }
 
   .role {
-    font-size: var(--type-aeonik-21);
-    margin-top: 0;
+    font-size: var(--type-aeonik-24);
+    margin-top: 8px;
+    letter-spacing: -0.01em;
   }
 
   .cta {
     --glass-pill-padding-left: 18px;
     --glass-pill-padding-right: 14px;
     --glass-pill-gap: 6px;
-    margin-top: 18px;
+    margin-top: 21px;
   }
 
   .cta img {

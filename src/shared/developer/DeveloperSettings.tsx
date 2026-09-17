@@ -11,15 +11,11 @@ import {
   clearArsenalLayoutVars,
 } from "./arsenal-layout";
 import {
-  applyContactLayoutVars,
-  clearContactLayoutVars,
-  DEFAULT_CONTACT_OR_OFFSET,
-} from "./contact-layout";
-import {
   applyHomeLayoutVars,
   clearHomeLayoutVars,
   DEFAULT_HOME_LAYOUT_OFFSETS,
   DEFAULT_HOME_BACKGROUND_SCALE,
+  DEFAULT_BIG_HEADER_ENABLED,
   type HomeLayoutKey,
   type HomeLayoutOffsets,
   type PositionOffset,
@@ -69,12 +65,12 @@ type DeveloperSettings = {
   setHomeLayoutOffset: (key: HomeLayoutKey, offset: PositionOffset) => void;
   homeBackgroundScale: number;
   setHomeBackgroundScale: (value: number) => void;
+  bigHeaderEnabled: boolean;
+  setBigHeaderEnabled: (value: boolean) => void;
   rightsEnabled: boolean;
   setRightsEnabled: (value: boolean) => void;
   rightsPosition: PositionOffset;
   setRightsPosition: (offset: PositionOffset) => void;
-  contactOrOffset: number;
-  setContactOrOffset: (value: number) => void;
   arsenalTiltMaxDeg: number;
   setArsenalTiltMaxDeg: (value: number) => void;
   arsenalTiltSpillPercent: number;
@@ -120,9 +116,9 @@ export function DeveloperSettingsProvider({ children }: { children: ReactNode })
     DEFAULT_HOME_LAYOUT_OFFSETS,
   );
   const [homeBackgroundScale, setHomeBackgroundScale] = useState(DEFAULT_HOME_BACKGROUND_SCALE);
+  const [bigHeaderEnabled, setBigHeaderEnabled] = useState(DEFAULT_BIG_HEADER_ENABLED);
   const [rightsEnabled, setRightsEnabled] = useState(true);
   const [rightsPosition, setRightsPosition] = useState(DEFAULT_RIGHTS_POSITION);
-  const [contactOrOffset, setContactOrOffset] = useState(DEFAULT_CONTACT_OR_OFFSET);
   const [arsenalTiltMaxDeg, setArsenalTiltMaxDeg] = useState(DEFAULT_ARSENAL_TILT_MAX_DEG);
   const [arsenalTiltSpillPercent, setArsenalTiltSpillPercent] = useState(
     DEFAULT_ARSENAL_TILT_SPILL_PERCENT,
@@ -154,9 +150,9 @@ export function DeveloperSettingsProvider({ children }: { children: ReactNode })
     setGoldenSpiralMirrorY(false);
     setHomeLayoutOffsets(DEFAULT_HOME_LAYOUT_OFFSETS);
     setHomeBackgroundScale(DEFAULT_HOME_BACKGROUND_SCALE);
+    setBigHeaderEnabled(DEFAULT_BIG_HEADER_ENABLED);
     setRightsEnabled(true);
     setRightsPosition(DEFAULT_RIGHTS_POSITION);
-    setContactOrOffset(DEFAULT_CONTACT_OR_OFFSET);
     setArsenalTiltMaxDeg(DEFAULT_ARSENAL_TILT_MAX_DEG);
     setArsenalTiltSpillPercent(DEFAULT_ARSENAL_TILT_SPILL_PERCENT);
     setArsenalGlowRadiusPx(DEFAULT_ARSENAL_GLOW_RADIUS_PX);
@@ -238,18 +234,6 @@ export function DeveloperSettingsProvider({ children }: { children: ReactNode })
   ]);
 
   useEffect(() => {
-    if (pathname === "/hire-me") {
-      applyContactLayoutVars(contactOrOffset);
-      return;
-    }
-
-    clearContactLayoutVars();
-    return () => {
-      clearContactLayoutVars();
-    };
-  }, [pathname, contactOrOffset]);
-
-  useEffect(() => {
     if (pathname.startsWith("/arsenal")) {
       applyArsenalLayoutVars(arsenalGlowRadiusPx, arsenalGridOffsetY);
       return;
@@ -300,12 +284,12 @@ export function DeveloperSettingsProvider({ children }: { children: ReactNode })
         setHomeLayoutOffset,
         homeBackgroundScale,
         setHomeBackgroundScale,
+        bigHeaderEnabled,
+        setBigHeaderEnabled,
         rightsEnabled,
         setRightsEnabled,
         rightsPosition,
         setRightsPosition,
-        contactOrOffset,
-        setContactOrOffset,
         arsenalTiltMaxDeg,
         setArsenalTiltMaxDeg,
         arsenalTiltSpillPercent,

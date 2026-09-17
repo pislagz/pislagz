@@ -188,7 +188,7 @@
   position: fixed;
   inset-inline: 0;
   bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-  z-index: 3;
+  z-index: 0;
   display: flex;
   justify-content: center;
   pointer-events: none;
@@ -209,6 +209,21 @@
   font-weight: 400;
   color: rgba(255, 255, 255, 0.42);
   white-space: nowrap;
+}
+
+@media (min-width: 901px) {
+  .floatingCopyBar {
+    inset-inline: auto;
+    left: auto;
+    right: max(12px, env(safe-area-inset-right, 0px));
+    bottom: max(10px, env(safe-area-inset-bottom, 0px));
+    justify-content: flex-end;
+  }
+
+  .floatingCopyInner {
+    width: auto;
+    padding-inline: 0;
+  }
 }
 
 @media (max-width: 900px) {

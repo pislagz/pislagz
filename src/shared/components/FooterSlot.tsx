@@ -12,7 +12,12 @@ export function FooterSlot() {
     return (
       <>
         {rightsEnabled ? <FooterCopyright variant="floating" /> : null}
-        <div className={styles.footerPlaceholder} data-footer-boundary="" aria-hidden="true">
+        <div
+          className={styles.footerPlaceholder}
+          data-footer-boundary=""
+          data-footer-placeholder=""
+          aria-hidden="true"
+        >
           <div className={styles.footerPlaceholderInner} />
         </div>
       </>

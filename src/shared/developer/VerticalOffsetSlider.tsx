@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
-import { formatContactOrOffset } from "./contact-layout";
 import styles from "./VerticalOffsetSlider.module.css";
 
 type Props = {
@@ -13,6 +12,12 @@ type Props = {
   ariaLabel?: string;
   tabIndex?: number;
 };
+
+function formatOffsetPx(value: number): string {
+  const rounded = Math.round(value);
+  const sign = rounded >= 0 ? "+" : "";
+  return `(${sign}${rounded}px)`;
+}
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -28,7 +33,7 @@ export function VerticalOffsetSlider({
   onChange,
   min,
   max,
-  formatReadout = formatContactOrOffset,
+  formatReadout = formatOffsetPx,
   ariaLabel = "Adjust vertical distance",
   tabIndex = -1,
 }: Props) {
