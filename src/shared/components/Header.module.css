@@ -41,7 +41,7 @@
 }
 
 .link {
-  font-size: 18px;
+  font-size: var(--type-aeonik-21);
   font-weight: 600;
   color: var(--color-white);
   line-height: 22px;

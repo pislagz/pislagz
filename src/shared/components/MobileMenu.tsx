@@ -38,6 +38,7 @@ type Props = {
 
 export function MobileMenu({ open, onClose, originRef }: Props) {
   const pathname = usePathname();
+  const hireActive = pathname === "/hire-me";
   const theme = menuThemeForPath(pathname);
   const previousPath = useRef(pathname);
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -217,7 +218,11 @@ export function MobileMenu({ open, onClose, originRef }: Props) {
               })}
             </nav>
             <div className={styles.hire}>
-              <Link href="/hire-me" className={styles.hireButton} tabIndex={open ? 0 : -1}>
+              <Link
+                href="/hire-me"
+                className={`${styles.hireButton} ${hireActive ? styles.hireActive : ""}`}
+                tabIndex={open ? 0 : -1}
+              >
                 hire me
                 <img src="/assets/icons/work.svg" alt="" width={14} height={14} />
               </Link>

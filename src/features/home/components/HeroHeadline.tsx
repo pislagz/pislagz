@@ -25,8 +25,8 @@ const TYPEWRITER = {
   afterNextBeforeJsMs: 280,
 } as const;
 
-const HEADLINE_MIN_FONT_PX = 18;
-const HEADLINE_MIN_FONT_MOBILE_PX = 14;
+const HEADLINE_MIN_FONT_PX = 21;
+const HEADLINE_MIN_FONT_MOBILE_PX = 21;
 const MOBILE_QUERY = "(max-width: 900px)";
 
 const PHRASES = [

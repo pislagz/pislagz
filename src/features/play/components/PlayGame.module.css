@@ -4,7 +4,7 @@
   transform: translateY(var(--dev-play-game-offset-y, 0px))
     scale(var(--dev-play-game-scale, 1));
   transform-origin: top center;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: var(--font-quantico), sans-serif;
   color: #fff;
   text-transform: uppercase;
   user-select: none;
@@ -17,7 +17,7 @@
   justify-content: space-between;
   gap: 24px;
   margin-bottom: 12px;
-  font-size: 13px;
+  font-size: var(--type-quantico-16);
   font-weight: 700;
   letter-spacing: 0.08em;
 }
@@ -46,7 +46,7 @@
   min-height: 18px;
   align-items: center;
   gap: 8px;
-  font-size: 8px;
+  font-size: var(--type-quantico-12);
   font-weight: 700;
   letter-spacing: 0.08em;
 }
@@ -146,7 +146,7 @@
   align-items: center;
   gap: 9px;
   margin: -5px 0 7px;
-  font-size: 8px;
+  font-size: var(--type-quantico-12);
   font-weight: 700;
   letter-spacing: 0.08em;
 }
@@ -538,7 +538,7 @@
   padding: 10px 14px;
   background: #fff;
   color: #050505;
-  font: 700 14px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font: 700 14px/1 var(--font-quantico), sans-serif;
   letter-spacing: 0.08em;
   text-align: center;
   text-transform: uppercase;
@@ -550,7 +550,7 @@
   flex: 1;
   min-width: 0;
   padding-inline: 8px;
-  font-size: 14px;
+  font-size: var(--type-quantico-14);
   letter-spacing: 0.05em;
 }
 
@@ -570,7 +570,7 @@
 .instructions {
   margin-top: 12px;
   color: rgba(255, 255, 255, 0.55);
-  font-size: 11px;
+  font-size: var(--type-quantico-14);
   letter-spacing: 0.06em;
   text-align: center;
 }
@@ -607,7 +607,7 @@
 
   .hud {
     gap: 10px;
-    font-size: 10px;
+    font-size: var(--type-quantico-12);
   }
 
   .frame {

@@ -15,20 +15,20 @@
 .sm {
   height: 31px;
   padding: 0 14px;
-  font-size: 14px;
+  font-size: var(--type-aeonik-21);
   min-width: 171px;
 }
 
 .md {
   height: 40px;
   padding: 0 16px 0 24px;
-  font-size: 18px;
+  font-size: var(--type-aeonik-21);
 }
 
 .lg {
   height: 49px;
   padding: 0 18px 0 26px;
-  font-size: 21px;
+  font-size: var(--type-aeonik-21);
   min-width: 164px;
 }
 
@@ -154,30 +154,30 @@
 .glass_sm {
   height: 31px;
   min-width: 171px;
-  font-size: 14px;
+  font-size: var(--type-aeonik-21);
 }
 
 .glass_sm span {
-  font-size: 14px;
+  font-size: var(--type-aeonik-21);
 }
 
 .glass_md {
   height: 40px;
-  font-size: 18px;
+  font-size: var(--type-aeonik-21);
 }
 
 .glass_md span {
-  font-size: 18px;
+  font-size: var(--type-aeonik-21);
 }
 
 .glass_lg {
   height: 49px;
   min-width: 164px;
-  font-size: 21px;
+  font-size: var(--type-aeonik-21);
 }
 
 .glass_lg span {
-  font-size: 21px;
+  font-size: var(--type-aeonik-21);
 }
 
 .glassGlow {
@@ -188,27 +188,27 @@
 @media (max-width: 900px) {
   .md {
     height: 35px;
-    font-size: 16px;
+    font-size: var(--type-aeonik-21);
     padding: 0 14px 0 21px;
   }
 
   .glass_md {
     height: 35px;
-    font-size: 16px;
+    font-size: var(--type-aeonik-21);
   }
 
   .glass_md span {
-    font-size: 16px;
+    font-size: var(--type-aeonik-21);
   }
 
   .glass_lg {
     height: 40px;
     min-width: 0;
-    font-size: 17px;
+    font-size: var(--type-aeonik-21);
   }
 
   .glass_lg span {
-    font-size: 17px;
+    font-size: var(--type-aeonik-21);
   }
 }
 

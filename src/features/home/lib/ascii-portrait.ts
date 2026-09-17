@@ -102,6 +102,7 @@ export type AsciiPortraitHandle = {
 
 type Options = {
   reducedMotion: boolean;
+  fontStack?: string;
   onReady?: () => void;
   onGlyphEnter?: () => void;
   getSize?: () => { width: number; height: number };
@@ -294,6 +295,7 @@ export function tryCreateAsciiPortraitWorker(
             width,
             height,
             reducedMotion: options.reducedMotion,
+            fontStack: options.fontStack,
           },
           [glow, glyph],
         );
@@ -335,6 +337,7 @@ export function createAsciiPortrait(
     imageSourceFromElement(image),
     {
       reducedMotion: options.reducedMotion,
+      fontStack: options.fontStack,
       onReady: options.onReady,
       onGlyphEnter: options.onGlyphEnter,
       onLayout: (width, height, mobile) => {

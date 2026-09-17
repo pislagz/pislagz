@@ -55,7 +55,7 @@
 }
 
 .readout {
-  font-size: 10px;
+  font-size: var(--type-quantico-12);
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   color: rgba(245, 245, 247, 0.72);

@@ -2,15 +2,19 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useContactForm } from "../hooks/use-contact-form";
+import { useMediaQuery } from "@shared/hooks/use-media-query";
 import styles from "./ContactForm.module.css";
 
-const FOOTER_GAP = 28;
 const BUTTON_OUT_MS = 520;
+const MOBILE_ACTION_ROOT_MARGIN = "0px 0px -64px 0px";
 
 export function ContactForm() {
   const form = useContactForm();
   const messageRef = useRef<HTMLTextAreaElement>(null);
+  const actionSentinelRef = useRef<HTMLDivElement>(null);
+  const mobile = useMediaQuery("(max-width: 900px)");
   const [buttonGone, setButtonGone] = useState(false);
+  const [actionRevealed, setActionRevealed] = useState(false);
   const locked = form.status === "sent";
   const busy = form.status === "sending";
 
@@ -25,36 +29,11 @@ export function ContactForm() {
   }, [form.status, form.lockedOnLoad]);
 
   const fitMessage = useCallback(() => {
-    if (window.matchMedia("(max-width: 900px)").matches) return;
-
     const field = messageRef.current;
     if (!field) return;
 
-    const box = field.closest("form");
-    const footer = document.querySelector("footer");
-    const submit = box?.querySelector("button[type='submit']");
-    const fieldBox = field.getBoundingClientRect();
-    const reserved = box
-      ? box.getBoundingClientRect().bottom - fieldBox.bottom
-      : (submit?.getBoundingClientRect().height ?? 28) + 24;
-
-    if (!footer) {
-      field.style.height = "0px";
-      field.style.height = `${field.scrollHeight}px`;
-      return;
-    }
-
-    // Document-space gap stays stable while scrolling; viewport-space footerTop
-    // changes when iOS Safari toolbar resizes and was causing scroll-end jitter.
-    const fieldDocTop = fieldBox.top + window.scrollY;
-    const footerDocTop = footer.getBoundingClientRect().top + window.scrollY;
-    const maxHeight = Math.max(
-      fieldBox.height,
-      footerDocTop - fieldDocTop - reserved - FOOTER_GAP,
-    );
-
     field.style.height = "0px";
-    field.style.height = `${Math.min(field.scrollHeight, maxHeight)}px`;
+    field.style.height = `${field.scrollHeight}px`;
   }, []);
 
   useLayoutEffect(() => {
@@ -62,12 +41,22 @@ export function ContactForm() {
   }, [form.message, form.status, buttonGone, fitMessage]);
 
   useEffect(() => {
-    const onOrientationChange = () => {
-      window.requestAnimationFrame(fitMessage);
-    };
-    window.addEventListener("orientationchange", onOrientationChange);
-    return () => window.removeEventListener("orientationchange", onOrientationChange);
-  }, [fitMessage]);
+    if (!mobile) {
+      setActionRevealed(true);
+      return;
+    }
+
+    const sentinel = actionSentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setActionRevealed(entry.isIntersecting),
+      { threshold: 0, rootMargin: MOBILE_ACTION_ROOT_MARGIN },
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [mobile, form.message, form.status, buttonGone]);
 
   return (
     <form
@@ -76,7 +65,9 @@ export function ContactForm() {
       onSubmit={form.onSubmit}
     >
       <div className={styles.row}>
-        <label className={`${styles.field} ${styles.name}`}>
+        <label
+          className={`${styles.fieldBox} ${styles.name} ${form.name ? styles.filled : ""}`}
+        >
           <span className={styles.label}>Full name / Company</span>
           <input
             className={styles.input}
@@ -86,7 +77,9 @@ export function ContactForm() {
             disabled={busy || locked}
           />
         </label>
-        <label className={`${styles.field} ${styles.contact}`}>
+        <label
+          className={`${styles.fieldBox} ${styles.contact} ${form.contact ? styles.filled : ""}`}
+        >
           <span className={styles.label}>E-mail / Phone</span>
           <input
             className={styles.input}
@@ -97,18 +90,21 @@ export function ContactForm() {
           />
         </label>
       </div>
-      <label className={`${styles.field} ${styles.full}`}>
+      <label className={`${styles.fieldBox} ${styles.full} ${form.message ? styles.filled : ""}`}>
         <span className={styles.label}>Message</span>
         <textarea
           ref={messageRef}
           className={`${styles.input} ${styles.message}`}
-          rows={2}
+          rows={1}
           value={form.message}
           onChange={(event) => form.setMessage(event.target.value)}
           disabled={busy || locked}
         />
       </label>
-      <div className={styles.actionRow}>
+      <div ref={actionSentinelRef} className={styles.actionSentinel} aria-hidden="true" />
+      <div
+        className={`${styles.actionRow} ${actionRevealed ? styles.actionRowRevealed : ""}`}
+      >
         {!buttonGone ? (
           <button
             type="submit"

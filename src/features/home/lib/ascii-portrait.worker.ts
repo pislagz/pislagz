@@ -13,6 +13,7 @@ type CanvasesMessage = {
   width: number;
   height: number;
   reducedMotion: boolean;
+  fontStack?: string;
 };
 
 type BitmapMessage = {
@@ -36,6 +37,7 @@ let pendingBitmap: ImageBitmap | null = null;
 let pendingWidth = 0;
 let pendingHeight = 0;
 let pendingReducedMotion = false;
+let pendingFontStack: string | undefined;
 
 function tryStart() {
   if (!pendingGlow || !pendingGlyph || !pendingBitmap) return;
@@ -44,6 +46,7 @@ function tryStart() {
   const image = imageSourceFromBitmap(pendingBitmap);
   handle = createAsciiPortraitEngine(pendingGlow, pendingGlyph, image, {
     reducedMotion: pendingReducedMotion,
+    fontStack: pendingFontStack,
     onReady: () => self.postMessage({ type: "ready" }),
     onLayout: (width, height, mobile) => {
       self.postMessage({ type: "layout", width, height, mobile });
@@ -67,6 +70,7 @@ self.onmessage = (event: MessageEvent<WorkerMessage>) => {
       pendingWidth = message.width;
       pendingHeight = message.height;
       pendingReducedMotion = message.reducedMotion;
+      pendingFontStack = message.fontStack;
       tryStart();
       break;
     case "bitmap":

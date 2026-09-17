@@ -40,7 +40,7 @@
   width: 100%;
   max-width: 100%;
   overflow: visible;
-  font-size: 70px;
+  font-size: var(--type-aeonik-48);
   font-weight: 700;
   line-height: 1.25;
   white-space: nowrap;
@@ -112,7 +112,7 @@
 .role {
   pointer-events: none;
   margin-top: 4px;
-  font-size: 40px;
+  font-size: var(--type-aeonik-36);
   font-weight: 600;
   color: var(--color-white);
   text-shadow: 0 0 18px rgba(7, 9, 16, 0.55);
@@ -160,13 +160,13 @@
 
   .headline {
     justify-content: center;
-    font-size: 28px;
+    font-size: var(--type-aeonik-24);
     min-height: 1.25em;
     padding-bottom: 0.12em;
   }
 
   .role {
-    font-size: 18px;
+    font-size: var(--type-aeonik-21);
     margin-top: 0;
   }
 

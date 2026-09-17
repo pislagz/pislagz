@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { unlockArcadeAudio } from "@shared/arcade-audio";
+import { quantico } from "@shared/styles/fonts";
 import { playDecipherGlyphTick } from "@shared/decipher-sound";
 import { useDeveloperSettings } from "@shared/developer/DeveloperSettings";
 import { useArcadeAudioUnlocked } from "@shared/hooks/use-arcade-audio-unlocked";
@@ -125,6 +126,7 @@ export function AsciiPortrait() {
         if (cancelled || !image || !root.isConnected || !stack.isConnected) return;
 
         const portraitOptions = {
+          fontStack: quantico.style.fontFamily,
           reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
           onReady: () => {
             if (!cancelled) reveal();

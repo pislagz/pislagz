@@ -6,7 +6,7 @@ import styles from "./ContactPage.module.css";
 
 export function ContactPage() {
   return (
-    <section className={styles.page}>
+    <section className={styles.page} data-page="hire-me">
       <RouteEntranceSound route="hire-me" />
       <h1 className={styles.title} aria-label="contact">
         <span className={styles.titleLetters} aria-hidden="true">

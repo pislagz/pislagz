@@ -10,6 +10,7 @@ export type PortraitImageSource = {
 
 export type EngineOptions = {
   reducedMotion: boolean;
+  fontStack?: string;
   onReady?: () => void;
   onLayout?: (width: number, height: number, mobile: boolean) => void;
   onGlyphEnter?: () => void;
@@ -313,8 +314,7 @@ export function createAsciiPortraitEngine(
   }
 
   const profile = runtimeProfile();
-  const fontStack =
-    'ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif';
+  const fontStack = options.fontStack ?? "Quantico, sans-serif";
 
   let running = true;
   let reducedMotion = options.reducedMotion;
