@@ -17,19 +17,6 @@ import { NAV_ITEMS, SOCIAL } from "@shared/constants";
 import { menuThemeForPath } from "@shared/theme";
 import styles from "./MobileMenu.module.css";
 
-function MenuCloseIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M6 6l12 12M18 6 6 18"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -191,17 +178,7 @@ export function MobileMenu({ open, onClose, originRef }: Props) {
               } as CSSProperties
             }
           >
-            <div className={styles.panelHeader}>
-              <button
-                type="button"
-                className={styles.closeButton}
-                aria-label="Close menu"
-                onClick={onClose}
-                tabIndex={open ? 0 : -1}
-              >
-                <MenuCloseIcon />
-              </button>
-            </div>
+            <div className={styles.panelHeader} aria-hidden="true" />
             <nav className={styles.nav}>
               {NAV_ITEMS.map((item) => {
                 const active = pathname === item.href;

@@ -119,11 +119,16 @@
 
 .lead {
   margin-top: 21px;
-  max-width: 520px;
+  max-width: 600px;
   font-size: var(--type-aeonik-21);
   font-weight: 400;
   color: var(--color-text-muted);
   line-height: 1.5;
+}
+
+.leadFirst {
+  display: block;
+  white-space: nowrap;
 }
 
 .sentenceBreak {
@@ -171,6 +176,10 @@
 @media (max-width: 900px) {
   .page {
     padding: var(--page-top-mobile) var(--pad-x) 64px;
+  }
+
+  .leadFirst {
+    white-space: normal;
   }
 
   .sentenceBreak {
