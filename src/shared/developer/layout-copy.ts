@@ -10,7 +10,14 @@ import {
   formatChangedArsenalSettings,
   hasChangedArsenalSettings,
 } from "./arsenal-layout";
-import { formatContactOrOffset, isContactOrOffsetChanged } from "./contact-layout";
+import {
+  formatContactOrOffset,
+  isContactOrOffsetChanged,
+} from "./contact-layout";
+import {
+  formatChangedHeaderGradientSettings,
+  hasChangedHeaderGradientSettings,
+} from "./header-gradient-layout";
 import {
   formatChangedHomeLayoutOffsets,
   formatPositionAxis,
@@ -57,12 +64,26 @@ export function formatChangedDeveloperLayoutOffsets(
   arsenalGridOffsetY: number,
   playGameScale: number,
   playGameOffsetY: number,
+  dynamicHeaderGlowEnabled: boolean,
+  headerGradientColorA: string,
+  headerGradientColorB: string,
+  headerGradientDirection: PositionOffset,
 ): string {
   const lines: string[] = [];
   const homeLines = formatChangedHomeLayoutOffsets(homeOffsets, backgroundScale);
 
   if (homeLines) {
     lines.push(homeLines);
+  }
+
+  const headerGradientLines = formatChangedHeaderGradientSettings(
+    dynamicHeaderGlowEnabled,
+    headerGradientColorA,
+    headerGradientColorB,
+    headerGradientDirection,
+  );
+  if (headerGradientLines) {
+    lines.push(headerGradientLines);
   }
 
   if (isHomeLayoutOffsetChanged(rightsPosition)) {
@@ -116,6 +137,10 @@ export function hasChangedDeveloperSettings(
   pageGlowEnabled: boolean,
   pageGlowIntensity: number,
   portraitGlyphSoundsEnabled: boolean,
+  dynamicHeaderGlowEnabled: boolean,
+  headerGradientColorA: string,
+  headerGradientColorB: string,
+  headerGradientDirection: PositionOffset,
 ): boolean {
   return (
     footerEnabled ||
@@ -126,6 +151,12 @@ export function hasChangedDeveloperSettings(
     isFilmGrainSettingsChanged(filmGrainEnabled, filmGrainIntensity) ||
     isPageGlowSettingsChanged(pageGlowEnabled, pageGlowIntensity) ||
     portraitGlyphSoundsEnabled !== DEFAULT_PORTRAIT_GLYPH_SOUNDS_ENABLED ||
+    hasChangedHeaderGradientSettings(
+      dynamicHeaderGlowEnabled,
+      headerGradientColorA,
+      headerGradientColorB,
+      headerGradientDirection,
+    ) ||
     hasChangedDeveloperLayoutOffsets(
       homeOffsets,
       backgroundScale,

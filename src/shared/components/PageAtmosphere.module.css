@@ -33,8 +33,8 @@
   inset: 0;
   opacity: var(--dev-page-glow-opacity, 0);
   background:
-    radial-gradient(ellipse 88% 72% at 50% 40%, rgba(255, 255, 255, 0.16) 0%, transparent 68%),
-    radial-gradient(ellipse 120% 92% at 50% 100%, rgba(175, 6, 255, 0.1) 0%, transparent 58%);
+    radial-gradient(ellipse 88% 72% at 50% 40%, rgba(255, 255, 255, 0.24) 0%, transparent 68%),
+    radial-gradient(ellipse 120% 92% at 50% 100%, rgba(175, 6, 255, 0.18) 0%, transparent 58%);
   mix-blend-mode: soft-light;
   pointer-events: none;
 }

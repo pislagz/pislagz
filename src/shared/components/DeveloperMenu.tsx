@@ -58,6 +58,7 @@ import {
   PLAY_GAME_SCALE_MIN,
   formatPlayGameOffset,
 } from "@shared/developer/play-layout";
+import { ColorPicker } from "@shared/developer/ColorPicker";
 import { PositionJoystick } from "@shared/developer/PositionJoystick";
 import { ScaleSlider } from "@shared/developer/ScaleSlider";
 import { VerticalOffsetSlider } from "@shared/developer/VerticalOffsetSlider";
@@ -175,6 +176,14 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
     setPageGlowIntensity,
     portraitGlyphSoundsEnabled,
     setPortraitGlyphSoundsEnabled,
+    dynamicHeaderGlowEnabled,
+    setDynamicHeaderGlowEnabled,
+    headerGradientColorA,
+    setHeaderGradientColorA,
+    headerGradientColorB,
+    setHeaderGradientColorB,
+    headerGradientDirection,
+    setHeaderGradientDirection,
     resetDeveloperSettings,
   } = useDeveloperSettings();
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -226,6 +235,10 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
     pageGlowEnabled,
     pageGlowIntensity,
     portraitGlyphSoundsEnabled,
+    dynamicHeaderGlowEnabled,
+    headerGradientColorA,
+    headerGradientColorB,
+    headerGradientDirection,
   );
   const footerDisabled = !footerEnabled;
   const showRightsPosition = footerDisabled && rightsEnabled;
@@ -309,17 +322,14 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
 
   useLayoutEffect(() => {
     if (!open) {
+      customPositionRef.current = null;
       setExpanded(false);
       return;
     }
 
     setHold(true);
     updateOrigin();
-    const frame = requestAnimationFrame(() => {
-      updateOrigin();
-      setExpanded(true);
-    });
-    return () => cancelAnimationFrame(frame);
+    setExpanded(true);
   }, [open, updateOrigin]);
 
   useEffect(() => {
@@ -427,6 +437,10 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
       arsenalGridOffsetY,
       playGameScale,
       playGameOffsetY,
+      dynamicHeaderGlowEnabled,
+      headerGradientColorA,
+      headerGradientColorB,
+      headerGradientDirection,
     );
     if (!payload) return;
 
@@ -495,6 +509,7 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
                 </button>
               </div>
             </div>
+            <div className={styles.panelScroll}>
             <div className={styles.toggles}>
               <div className={styles.toggleRow}>
                 <span className={styles.toggleLabel}>disable footer</span>
@@ -641,6 +656,51 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
                       aria-hidden="true"
                     />
                   </label>
+                </div>
+                <div className={styles.toggleRow}>
+                  <span className={styles.toggleLabel}>dynamic header glow</span>
+                  <label className={styles.toggleControl}>
+                    <input
+                      className={styles.toggleInput}
+                      type="checkbox"
+                      checked={dynamicHeaderGlowEnabled}
+                      onChange={(event) => setDynamicHeaderGlowEnabled(event.target.checked)}
+                      tabIndex={open ? 0 : -1}
+                    />
+                    <span
+                      className={`${styles.switch} ${dynamicHeaderGlowEnabled ? styles.switchOn : ""}`}
+                      aria-hidden="true"
+                    />
+                  </label>
+                </div>
+                <p className={styles.subsectionLabel}>dynamic header gradient</p>
+                <div className={styles.positionRows}>
+                  <div className={styles.positionRow}>
+                    <span className={styles.positionLabel}>color a</span>
+                    <ColorPicker
+                      value={headerGradientColorA}
+                      onChange={setHeaderGradientColorA}
+                      ariaLabel="Choose header gradient start color"
+                      tabIndex={open ? 0 : -1}
+                    />
+                  </div>
+                  <div className={styles.positionRow}>
+                    <span className={styles.positionLabel}>color b</span>
+                    <ColorPicker
+                      value={headerGradientColorB}
+                      onChange={setHeaderGradientColorB}
+                      ariaLabel="Choose header gradient end color"
+                      tabIndex={open ? 0 : -1}
+                    />
+                  </div>
+                  <div className={styles.positionRow}>
+                    <span className={styles.positionLabel}>direction</span>
+                    <PositionJoystick
+                      value={headerGradientDirection}
+                      onChange={setHeaderGradientDirection}
+                      tabIndex={open ? 0 : -1}
+                    />
+                  </div>
                 </div>
                 <div className={styles.positionRows}>
                   {HOME_LAYOUT_OPTIONS.map((option) => (
@@ -824,6 +884,7 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
                 ) : null}
               </div>
             ) : null}
+            </div>
           </div>
         </div>
       ) : null}
