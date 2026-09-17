@@ -14,7 +14,7 @@
 }
 
 .header .name {
-  font-size: 24px;
+  font-size: var(--type-aeonik-24);
 }
 
 .footer {
@@ -27,7 +27,8 @@
 }
 
 .footer .name {
-  font-size: 14px;
+  font-family: var(--font-quantico), sans-serif;
+  font-size: var(--type-quantico-14);
 }
 
 .inverted {
@@ -76,6 +77,6 @@
   }
 
   .header .name {
-    font-size: 18px;
+    font-size: var(--type-aeonik-21);
   }
 }

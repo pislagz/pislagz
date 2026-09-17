@@ -31,7 +31,17 @@
   --shadow-hero-word: 0 4px 4px rgba(0, 0, 0, 0.25);
   --shadow-hero-next: 0 4px 50px rgba(54, 18, 255, 0.4);
   --shadow-card: 0 4px 4px rgba(0, 0, 0, 0.25);
-  --font: "Inter", system-ui, sans-serif;
+  --font: var(--font-aeonik), sans-serif;
+  /* Golden-ratio type scale — Aeonik (main UI) */
+  --type-aeonik-48: 48px;
+  --type-aeonik-36: 36px;
+  --type-aeonik-24: 24px;
+  --type-aeonik-21: 21px;
+  /* Golden-ratio type scale — Quantico (technical UI) */
+  --type-quantico-18: 18px;
+  --type-quantico-16: 16px;
+  --type-quantico-14: 14px;
+  --type-quantico-12: 12px;
   --page-max: 1280px;
   --pad-x: 94px;
   --pad-x-inner: 175px;

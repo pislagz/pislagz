@@ -3,7 +3,7 @@
 import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
 import { RouteEntranceSound } from "@shared/components/RouteEntranceSound";
-import { RESUME_PDF_PATH } from "@shared/constants";
+import { RESUME_PDF_URL } from "@shared/constants";
 import { Button } from "@shared/ui/Button";
 import styles from "./ResumePage.module.css";
 
@@ -126,8 +126,7 @@ export function ResumePage() {
       </p>
       <div className={styles.ctaRow}>
         <Button
-          href={RESUME_PDF_PATH}
-          download
+          href={RESUME_PDF_URL}
           variant="glass"
           iconSrc="/assets/icons/pdf.svg"
           iconSize={18}

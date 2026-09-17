@@ -44,7 +44,8 @@
 
 .label {
   display: block;
-  font-size: 10px;
+  font-family: var(--font-quantico), sans-serif;
+  font-size: var(--type-quantico-12);
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: lowercase;

@@ -218,7 +218,8 @@
 }
 
 .label {
-  font-size: 10px;
+  font-family: var(--font-quantico), sans-serif;
+  font-size: var(--type-quantico-12);
   font-weight: 600;
   letter-spacing: 0.08em;
   line-height: 1.2;
@@ -227,11 +228,11 @@
 }
 
 .wide .label {
-  font-size: 13px;
+  font-size: var(--type-quantico-14);
 }
 
 .feature .label {
-  font-size: 22px;
+  font-size: var(--type-aeonik-24);
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--color-text);
@@ -239,7 +240,7 @@
 
 .tile[data-arsenal-id="ai"] .label {
   color: var(--color-text);
-  font-size: 22px;
+  font-size: var(--type-aeonik-24);
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: 0.02em;
@@ -258,7 +259,7 @@
 
 .value {
   color: var(--color-white);
-  font-size: clamp(22px, 2.15vw, 32px);
+  font-size: clamp(var(--type-aeonik-24), 2.15vw, var(--type-aeonik-36));
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.035em;
@@ -276,7 +277,7 @@
   display: block;
   max-width: 90%;
   margin-inline: auto;
-  font-size: clamp(38px, 4.2vw, 58px);
+  font-size: clamp(var(--type-aeonik-36), 4.2vw, var(--type-aeonik-48));
   font-weight: 750;
   line-height: 0.98;
   white-space: normal;
@@ -293,12 +294,13 @@
 }
 
 .square .value {
-  font-size: clamp(18px, 1.8vw, 25px);
+  font-size: clamp(var(--type-aeonik-21), 1.8vw, var(--type-aeonik-24));
 }
 
 .subtitle {
   color: var(--color-text-muted);
-  font-size: 12px;
+  font-family: var(--font-quantico), sans-serif;
+  font-size: var(--type-quantico-12);
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0.06em;
@@ -338,11 +340,11 @@
   }
 
   .square .value {
-    font-size: 15px;
+    font-size: var(--type-aeonik-21);
   }
 
   .square .subtitle {
-    font-size: 9px;
+    font-size: var(--type-quantico-12);
     letter-spacing: 0.02em;
   }
 
@@ -352,13 +354,13 @@
   }
 
   .value {
-    font-size: clamp(20px, 5.8vw, 28px);
+    font-size: clamp(var(--type-aeonik-21), 5.8vw, var(--type-aeonik-24));
     white-space: normal;
   }
 
   .tile[data-arsenal-id="hours"] .value {
     width: 100%;
-    font-size: 18px;
+    font-size: var(--type-aeonik-21);
     text-align: center;
     white-space: nowrap;
   }
@@ -373,7 +375,7 @@
   }
 
   .feature .value {
-    font-size: clamp(34px, 10vw, 48px);
+    font-size: clamp(var(--type-aeonik-36), 10vw, var(--type-aeonik-48));
   }
 }
 
