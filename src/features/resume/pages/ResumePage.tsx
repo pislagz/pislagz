@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { RouteEntranceSound } from "@shared/components/RouteEntranceSound";
 import { RESUME_PDF_URL } from "@shared/constants";
 import { Button } from "@shared/ui/Button";
@@ -9,6 +9,26 @@ import styles from "./ResumePage.module.css";
 
 const CIPHER_GLYPHS =
   "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜｦﾝ0123456789";
+
+function createCipherDisplay(text: string) {
+  const characters = Array.from(text);
+  return {
+    characters: characters.map((character, index) =>
+      /\s/.test(character)
+        ? character
+        : CIPHER_GLYPHS[(index * 7 + 3) % CIPHER_GLYPHS.length],
+    ),
+    settled: characters.map((character) => /\s/.test(character)),
+  };
+}
+
+function createSettledDisplay(text: string) {
+  const characters = Array.from(text);
+  return {
+    characters,
+    settled: characters.map(() => true),
+  };
+}
 
 function DecryptText({
   text,
@@ -20,13 +40,13 @@ function DecryptText({
   duration: number;
 }) {
   const characters = Array.from(text);
-  const [display, setDisplay] = useState({
-    characters,
-    settled: characters.map(() => true),
-  });
+  const [display, setDisplay] = useState(() => createCipherDisplay(text));
 
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  useLayoutEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setDisplay(createSettledDisplay(text));
+      return;
+    }
     const settlesAt = characters.map((character) =>
       /\s/.test(character)
         ? 0

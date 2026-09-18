@@ -162,6 +162,15 @@
   margin-top: 18px;
 }
 
+.actionRow:has(.error) {
+  flex-direction: row-reverse;
+  justify-content: space-between;
+}
+
+.actionRow:has(.error) .error {
+  text-align: left;
+}
+
 .submit {
   display: inline-flex;
   align-items: center;
@@ -347,5 +356,14 @@
 
   :global(html[data-footer-enabled]) .actionRow {
     margin-top: 14px;
+  }
+
+  :global(html[data-footer-enabled]) .actionRow:has(.error) {
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  :global(html[data-footer-enabled]) .actionRow:has(.error) .error {
+    text-align: right;
   }
 }
