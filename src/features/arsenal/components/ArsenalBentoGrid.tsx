@@ -43,6 +43,12 @@ const FLY_BASE_SCALE = 1.9;
 const FLY_SCALE_SPREAD = 0.7;
 /** Fallback in case some animationend event never fires. */
 const FLY_SAFETY_TIMEOUT_MS = FLY_MAX_DURATION_MS + FLY_MAX_DELAY_MS + 500;
+/** Compact nav + in-page continue CTA (tablet and mobile). */
+const COMPACT_CONTINUE_QUERY = "(max-width: 1100px)";
+/** Show the in-page continue CTA before the slowest tiles finish landing. */
+const CONTINUE_EARLY_MS = 2600;
+/** Or as soon as this many tiles have landed, whichever is first. */
+const CONTINUE_EARLY_TILES = 4;
 /** Subtle Z lift on the primary tile only. */
 const HOVER_LIFT_PX = 8;
 /** How far past the grid edge the effect stays active (covers inter-tile gaps). */
@@ -239,6 +245,7 @@ export function ArsenalBentoGrid({ items }: { items: ArsenalItem[] }) {
   const [armed, setArmed] = useState(false);
   const settledTiles = useRef(0);
   const finalized = useRef(false);
+  const continueReady = useRef(false);
   const armedAtRef = useRef(0);
   tiltSettingsRef.current = {
     maxTiltDeg: arsenalTiltMaxDeg,
@@ -267,6 +274,13 @@ export function ArsenalBentoGrid({ items }: { items: ArsenalItem[] }) {
         delete document.documentElement.dataset.arsenalFlying;
       });
     });
+  };
+
+  const markContinueReady = () => {
+    if (continueReady.current) return;
+    continueReady.current = true;
+    document.documentElement.dataset.arsenalContinueReady = "true";
+    window.dispatchEvent(new Event("arsenal-continue-ready"));
   };
 
   useLayoutEffect(() => {
@@ -318,6 +332,8 @@ export function ArsenalBentoGrid({ items }: { items: ArsenalItem[] }) {
 
     finalized.current = false;
     settledTiles.current = 0;
+    continueReady.current = false;
+    delete document.documentElement.dataset.arsenalContinueReady;
     document.documentElement.dataset.arsenalFlying = "true";
     // Keep mobile pages scrollable throughout the staggered fly-in. Desktop
     // still clips transient overflow so distant tiles cannot flash scrollbars.
@@ -333,11 +349,16 @@ export function ArsenalBentoGrid({ items }: { items: ArsenalItem[] }) {
     setArmed(true);
 
     const safety = window.setTimeout(finalize, FLY_SAFETY_TIMEOUT_MS);
+    const earlyContinue = window.matchMedia(COMPACT_CONTINUE_QUERY).matches
+      ? window.setTimeout(markContinueReady, CONTINUE_EARLY_MS)
+      : 0;
     return () => {
       window.clearTimeout(safety);
+      window.clearTimeout(earlyContinue);
       document.documentElement.style.removeProperty("overflow");
       delete document.documentElement.dataset.arsenalFlying;
       delete document.documentElement.dataset.arsenalSettled;
+      delete document.documentElement.dataset.arsenalContinueReady;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -460,6 +481,12 @@ export function ArsenalBentoGrid({ items }: { items: ArsenalItem[] }) {
       event.target.parentElement?.parentElement === gridRef.current
     ) {
       settledTiles.current += 1;
+      if (
+        window.matchMedia(COMPACT_CONTINUE_QUERY).matches &&
+        settledTiles.current >= CONTINUE_EARLY_TILES
+      ) {
+        markContinueReady();
+      }
       if (settledTiles.current >= items.length) finalize();
     }
   };
