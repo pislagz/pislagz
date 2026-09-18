@@ -1,0 +1,18 @@
+.cta img {
+  width: 24px;
+  height: 24px;
+  transform: rotate(-135deg);
+}
+
+@media (max-width: 900px) {
+  .cta {
+    --glass-pill-padding-left: 18px;
+    --glass-pill-padding-right: 14px;
+    --glass-pill-gap: 6px;
+  }
+
+  .cta img {
+    width: 20px;
+    height: 20px;
+  }
+}

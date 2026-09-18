@@ -53,6 +53,8 @@ import {
 } from "./layout-copy";
 import {
   DEFAULT_GLASS_PRESETS,
+  applyGlassFrostVars,
+  clearGlassFrostVars,
   type GlassMode,
   type GlassNumericParam,
   type GlassPreset,
@@ -316,6 +318,13 @@ export function DeveloperSettingsProvider({ children }: { children: ReactNode })
       clearAtmosphereVars();
     };
   }, [filmGrainEnabled, filmGrainIntensity, pageGlowEnabled, pageGlowIntensity]);
+
+  useLayoutEffect(() => {
+    applyGlassFrostVars(glassPresets.pill);
+    return () => {
+      clearGlassFrostVars();
+    };
+  }, [glassPresets]);
 
   return (
     <DeveloperSettingsContext.Provider

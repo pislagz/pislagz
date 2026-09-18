@@ -61,6 +61,32 @@ export const GLASS_PARAM_RANGES = {
   cornerRadius: { min: 0, max: 100, step: 1 },
 } as const;
 
+const CHROMIUM_FROST_BLUR_PX = 56;
+const CHROMIUM_FROST_SAT_AT_MAX = 160;
+
+export function applyGlassFrostVars(preset: GlassPreset) {
+  if (typeof document === "undefined") return;
+  const root = document.documentElement;
+  const blurMax = GLASS_PARAM_RANGES.blurAmount.max;
+  const satMin = GLASS_PARAM_RANGES.saturation.min;
+  const satMax = GLASS_PARAM_RANGES.saturation.max;
+  const blurPx = blurMax <= 0 ? 0 : (preset.blurAmount / blurMax) * CHROMIUM_FROST_BLUR_PX;
+  const satRange = Math.max(satMax - satMin, 1);
+  const satPx =
+    satMin + ((preset.saturation - satMin) / satRange) * (CHROMIUM_FROST_SAT_AT_MAX - satMin);
+  root.style.setProperty("--pill-glass-blur", `${blurPx}px`);
+  root.style.setProperty("--pill-glass-sat", `${satPx}%`);
+  root.style.setProperty("--pill-glass-radius", `${preset.cornerRadius}px`);
+}
+
+export function clearGlassFrostVars() {
+  if (typeof document === "undefined") return;
+  const root = document.documentElement;
+  root.style.removeProperty("--pill-glass-blur");
+  root.style.removeProperty("--pill-glass-sat");
+  root.style.removeProperty("--pill-glass-radius");
+}
+
 export type GlassNumericParam = keyof typeof GLASS_PARAM_RANGES;
 
 function nearlyEqual(a: number, b: number) {

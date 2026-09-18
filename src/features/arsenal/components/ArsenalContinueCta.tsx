@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useDeveloperSettings } from "@shared/developer/DeveloperSettings";
 import { useMediaQuery } from "@shared/hooks/use-media-query";
 import { schedulePlayFooterActionDelay } from "@shared/play-footer-action";
-import { Button } from "@shared/ui/Button";
+import { GlassArrowCta } from "@shared/ui/GlassArrowCta";
 import styles from "./ArsenalContinueCta.module.css";
 
 const COMPACT_NAV_QUERY = "(max-width: 1100px)";
@@ -21,29 +21,33 @@ export function ArsenalContinueCta() {
     }
 
     const reveal = () => setVisible(true);
-    if (document.documentElement.dataset.arsenalSettled === "true") {
+    if (
+      document.documentElement.dataset.arsenalSettled === "true" ||
+      document.documentElement.dataset.arsenalContinueReady === "true"
+    ) {
       setVisible(true);
       return;
     }
 
     window.addEventListener("arsenal-grid-settled", reveal);
-    return () => window.removeEventListener("arsenal-grid-settled", reveal);
+    window.addEventListener("arsenal-continue-ready", reveal);
+    return () => {
+      window.removeEventListener("arsenal-grid-settled", reveal);
+      window.removeEventListener("arsenal-continue-ready", reveal);
+    };
   }, [footerEnabled, compactNav]);
 
   if (footerEnabled || !visible) return null;
 
   return (
     <div className={styles.wrap}>
-      <Button
+      <GlassArrowCta
         href="/play"
-        variant="glass"
-        iconSrc="/assets/icons/arrow-circle.svg"
-        iconSize={24}
         className={styles.cta}
         onClick={schedulePlayFooterActionDelay}
       >
         continue
-      </Button>
+      </GlassArrowCta>
     </div>
   );
 }
