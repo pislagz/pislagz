@@ -55,6 +55,7 @@ import {
   formatPlayGameOffset,
 } from "@shared/developer/play-layout";
 import { ColorPicker } from "@shared/developer/ColorPicker";
+import { GlassPresetControls } from "@shared/developer/GlassPresetControls";
 import { PositionJoystick } from "@shared/developer/PositionJoystick";
 import { ScaleSlider } from "@shared/developer/ScaleSlider";
 import { VerticalOffsetSlider } from "@shared/developer/VerticalOffsetSlider";
@@ -179,6 +180,9 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
     setHeaderGradientColorB,
     headerGradientDirection,
     setHeaderGradientDirection,
+    glassPresets,
+    setGlassPresetParam,
+    setGlassPresetMode,
     resetDeveloperSettings,
   } = useDeveloperSettings();
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -207,6 +211,7 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
     arsenalGridOffsetY,
     playGameScale,
     playGameOffsetY,
+    glassPresets,
   );
   const hasChangedSettings = hasChangedDeveloperSettings(
     footerEnabled,
@@ -233,6 +238,7 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
     headerGradientColorA,
     headerGradientColorB,
     headerGradientDirection,
+    glassPresets,
   );
   const footerDisabled = !footerEnabled;
   const showRightsPosition = footerDisabled && rightsEnabled;
@@ -435,6 +441,7 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
       headerGradientColorA,
       headerGradientColorB,
       headerGradientDirection,
+      glassPresets,
     );
     if (!payload) return;
 
@@ -852,6 +859,15 @@ export function DeveloperMenu({ open, onClose, originRef }: Props) {
                   </div>
                 </div>
               ) : null}
+            </div>
+            <div className={styles.routeSection}>
+              <p className={styles.sectionTitle}>liquid glass</p>
+              <GlassPresetControls
+                presets={glassPresets}
+                onChangeParam={setGlassPresetParam}
+                onChangeMode={setGlassPresetMode}
+                tabIndex={open ? 0 : -1}
+              />
             </div>
             </div>
             {hasChangedSettings ? (
