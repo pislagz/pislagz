@@ -67,11 +67,19 @@ function getHeadlineWidthLimit(heading: HTMLElement) {
 }
 
 function measureHeadlineContent(heading: HTMLElement) {
-  const gap = Number.parseFloat(getComputedStyle(heading).gap) || 0;
+  const styles = getComputedStyle(heading);
+  const gap = Number.parseFloat(styles.gap) || 0;
   const children = Array.from(heading.children) as HTMLElement[];
   if (children.length === 0) return heading.scrollWidth;
-  const textWidth = children.reduce((sum, child) => sum + child.scrollWidth, 0);
-  return textWidth + gap * Math.max(0, children.length - 1);
+  const useGap = styles.display.includes("flex") || styles.display.includes("grid");
+  const textWidth = children.reduce((sum, child) => {
+    const childStyles = getComputedStyle(child);
+    const margin =
+      (Number.parseFloat(childStyles.marginLeft) || 0) +
+      (Number.parseFloat(childStyles.marginRight) || 0);
+    return sum + child.scrollWidth + margin;
+  }, 0);
+  return textWidth + (useGap ? gap * Math.max(0, children.length - 1) : 0);
 }
 
 export function HeroHeadline() {

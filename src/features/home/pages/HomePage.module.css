@@ -58,6 +58,7 @@
 }
 
 .typed {
+  position: relative;
   white-space: nowrap;
 }
 
@@ -135,6 +136,39 @@
   margin-top: 36px;
   pointer-events: auto;
   transform: translate(var(--dev-home-cta-x, 0px), var(--dev-home-cta-y, 0px));
+}
+
+@media (min-width: 901px) {
+  :global(html:not([data-footer-enabled])) .hero {
+    padding-block: 0;
+  }
+
+  :global(html:not([data-footer-enabled])) .headline {
+    /* Inline layout keeps “Your” and the typewriter on one baseline.
+       Drop the reserved display-size slot so unused space cannot sit
+       above the glyphs and pull the cluster toward the bottom. */
+    display: block;
+    min-height: 0;
+    padding-bottom: 0;
+  }
+
+  :global(html:not([data-footer-enabled])) .typed {
+    margin-left: 0.18em;
+  }
+
+  :global(html:not([data-footer-enabled])) .caret {
+    position: absolute;
+    left: 100%;
+    top: 0;
+  }
+
+  :global(html:not([data-footer-enabled])) .role {
+    margin-top: 6px;
+  }
+
+  :global(html:not([data-footer-enabled])) .cta {
+    margin-top: 26px;
+  }
 }
 
 @media (max-width: 1100px) {
