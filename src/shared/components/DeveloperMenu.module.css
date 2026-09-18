@@ -196,7 +196,7 @@
 .title {
   font-family: var(--font), sans-serif;
   font-size: var(--type-aeonik-21);
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: -0.02em;
   color: var(--color-accent);
   text-shadow: none;

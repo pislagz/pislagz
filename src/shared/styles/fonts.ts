@@ -30,13 +30,13 @@ export const aeonik = localFont({
       style: "normal",
     },
     {
-      path: "../../assets/fonts/Aeonik-Bold.ttf",
-      weight: "600",
+      path: "../../assets/fonts/Aeonik-Regular.ttf",
+      weight: "500",
       style: "normal",
     },
     {
       path: "../../assets/fonts/Aeonik-Bold.ttf",
-      weight: "700",
+      weight: "600",
       style: "normal",
     },
   ],
