@@ -143,6 +143,10 @@
     padding-block: 0;
   }
 
+  :global(html:not([data-footer-enabled])) .copy {
+    transform: translateY(-5px);
+  }
+
   :global(html:not([data-footer-enabled])) .headline {
     /* Inline layout keeps “Your” and the typewriter on one baseline.
        Drop the reserved display-size slot so unused space cannot sit
@@ -154,12 +158,6 @@
 
   :global(html:not([data-footer-enabled])) .typed {
     margin-left: 0.18em;
-  }
-
-  :global(html:not([data-footer-enabled])) .caret {
-    position: absolute;
-    left: 100%;
-    top: 0;
   }
 
   :global(html:not([data-footer-enabled])) .role {
