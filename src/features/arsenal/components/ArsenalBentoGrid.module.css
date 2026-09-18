@@ -234,7 +234,7 @@
 .feature .label {
   font-family: var(--font);
   font-size: var(--type-aeonik-24);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--color-text);
   text-transform: none;
@@ -244,7 +244,7 @@
   font-family: var(--font);
   color: var(--color-text);
   font-size: var(--type-aeonik-24);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.2;
   letter-spacing: 0.02em;
   text-transform: none;
@@ -264,7 +264,7 @@
 .value {
   color: var(--color-white);
   font-size: clamp(var(--type-aeonik-24), 2.15vw, var(--type-aeonik-36));
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1;
   letter-spacing: -0.035em;
   white-space: nowrap;
@@ -282,7 +282,7 @@
   max-width: 90%;
   margin-inline: auto;
   font-size: clamp(var(--type-aeonik-36), 4.2vw, var(--type-aeonik-48));
-  font-weight: 750;
+  font-weight: 600;
   line-height: 0.98;
   white-space: normal;
 }

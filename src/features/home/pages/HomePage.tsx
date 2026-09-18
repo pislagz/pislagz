@@ -5,7 +5,7 @@ import styles from "./HomePage.module.css";
 
 export function HomePage() {
   return (
-    <section className={styles.hero}>
+    <section className={styles.hero} data-page="home">
       <AsciiPortrait />
       <div className={styles.copy}>
         <HeroHeadline />

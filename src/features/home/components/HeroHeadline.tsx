@@ -38,7 +38,6 @@ const PHRASES = [
   "AI-enhanced",
   "type-safe",
   "friendly neighborhood",
-  "soon-to-be favorite",
   "SEO-friendly",
   "accessibility-first",
   "component-obsessed",
@@ -46,7 +45,6 @@ const PHRASES = [
   "react-loving",
   "performance-minded",
   "pixel perfect",
-  "animation guru",
 ] as const;
 
 const wait = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));

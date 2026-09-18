@@ -42,7 +42,7 @@
   max-width: 100%;
   overflow: visible;
   font-size: var(--headline-display);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.05;
   letter-spacing: -0.035em;
   white-space: nowrap;
@@ -123,7 +123,7 @@
   pointer-events: none;
   margin-top: 12px;
   font-size: var(--type-aeonik-48);
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.15;
   letter-spacing: -0.02em;
   color: var(--color-white);

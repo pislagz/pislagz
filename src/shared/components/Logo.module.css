@@ -30,6 +30,15 @@
 .footer .name {
   font-family: var(--font-quantico), sans-serif;
   font-size: var(--type-quantico-14);
+  font-weight: 600;
+}
+
+.footer .regular {
+  font-weight: 400;
+}
+
+.footer .bold {
+  font-weight: 600;
 }
 
 .inverted {
@@ -54,17 +63,17 @@
 }
 
 .name {
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.2;
   white-space: nowrap;
 }
 
 .regular {
-  font-weight: 400;
+  font-weight: 500;
 }
 
 .bold {
-  font-weight: 600;
+  font-weight: 500;
 }
 
 @media (max-width: 900px) {

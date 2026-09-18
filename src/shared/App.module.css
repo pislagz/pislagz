@@ -109,6 +109,10 @@
   .shell:has([data-page="hire-me"], [data-page="play"]) :global([data-footer-placeholder] > *) {
     min-height: 0;
   }
+
+  :global(html:not([data-footer-enabled])) .shell:has([data-page="home"]) :global([data-footer-placeholder]) {
+    display: none;
+  }
 }
 
 /* Header (50) and footer (2) sit above main. During the arsenal fly-in the

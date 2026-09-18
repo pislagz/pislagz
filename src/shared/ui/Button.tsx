@@ -49,7 +49,7 @@ export function Button({
 
   const content = (
     <>
-      <span>{children}</span>
+      <span className={styles.label}>{children}</span>
       {iconSrc ? (
         <img
           src={iconSrc}

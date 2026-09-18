@@ -6,10 +6,15 @@
   border-radius: var(--radius-pill);
   background-image: var(--gradient-button);
   color: var(--color-white);
-  font-weight: 600;
+  font-weight: 500;
   white-space: nowrap;
   line-height: 1;
   flex-shrink: 0;
+}
+
+.button .label {
+  display: inline-block;
+  translate: 0 -0.08em;
 }
 
 .sm {
@@ -134,7 +139,7 @@
   display: inline-flex;
   align-items: stretch;
   color: var(--color-white);
-  font-weight: 600;
+  font-weight: 500;
   white-space: nowrap;
   line-height: 1;
   flex-shrink: 0;
@@ -146,9 +151,12 @@
   width: 100%;
 }
 
-.glassWrap span {
+.glassWrap .label {
+  display: inline-block;
   font-family: var(--font);
-  font-weight: 600;
+  font-weight: 500;
+  /* Aeonik's em box sits slightly low vs the icon; nudge for optical center. */
+  translate: 0 -0.08em;
 }
 
 .glass_sm {
@@ -157,7 +165,7 @@
   font-size: var(--type-aeonik-21);
 }
 
-.glass_sm span {
+.glass_sm .label {
   font-size: var(--type-aeonik-21);
 }
 
@@ -166,7 +174,7 @@
   font-size: var(--type-aeonik-21);
 }
 
-.glass_md span {
+.glass_md .label {
   font-size: var(--type-aeonik-21);
 }
 
@@ -176,7 +184,7 @@
   font-size: var(--type-aeonik-21);
 }
 
-.glass_lg span {
+.glass_lg .label {
   font-size: var(--type-aeonik-21);
 }
 
@@ -197,7 +205,7 @@
     font-size: var(--type-aeonik-21);
   }
 
-  .glass_md span {
+  .glass_md .label {
     font-size: var(--type-aeonik-21);
   }
 
@@ -207,7 +215,7 @@
     font-size: var(--type-aeonik-21);
   }
 
-  .glass_lg span {
+  .glass_lg .label {
     font-size: var(--type-aeonik-21);
   }
 }
