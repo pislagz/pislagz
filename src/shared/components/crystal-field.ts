@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { CRYSTAL_PALETTES, type CrystalPalette, type CrystalRgb } from "./crystal-palettes";
+import { needsSceneCopyForGlass } from "../ui/glass-engine";
 
 type FieldHandle = {
   destroy: () => void;
@@ -183,12 +184,13 @@ export function createCrystalField(canvas: HTMLCanvasElement, options: Options):
   const mobile = isTouchPrimary();
   const dprCap = mobile ? 1.25 : 1.5;
   const subdiv = mobile ? 64 : 110;
+  const copySceneForGlass = needsSceneCopyForGlass();
   const renderer = new THREE.WebGLRenderer({
     canvas,
     alpha: false,
     antialias: false,
     powerPreference: "high-performance",
-    preserveDrawingBuffer: false,
+    preserveDrawingBuffer: copySceneForGlass,
   });
   renderer.setClearColor(0x070910, 1);
   renderer.toneMapping = THREE.NoToneMapping;
@@ -200,6 +202,65 @@ export function createCrystalField(canvas: HTMLCanvasElement, options: Options):
     };
     console.error("Crystal shader error", err);
     (window as Window & { __shaderErr?: unknown }).__shaderErr = err;
+  };
+
+  const sceneView = copySceneForGlass ? document.createElement("canvas") : null;
+  const sceneViewCtx = sceneView?.getContext("2d", { alpha: false }) ?? null;
+  let sceneViewClassObserver: MutationObserver | null = null;
+  if (sceneView && sceneViewCtx) {
+    sceneView.className = canvas.className;
+    sceneView.setAttribute("aria-hidden", "true");
+    sceneView.style.visibility = "hidden";
+    canvas.after(sceneView);
+    const syncSceneViewClass = () => {
+      sceneView.className = canvas.className;
+    };
+    sceneViewClassObserver = new MutationObserver(syncSceneViewClass);
+    sceneViewClassObserver.observe(canvas, { attributes: true, attributeFilter: ["class"] });
+  }
+
+  const blitScale = 0.5;
+  let blitTick = 0;
+  let glassCopyActive = false;
+
+  const hasVisibleGlass = () => {
+    const nodes = document.querySelectorAll("[data-glass-surface][data-ready='true']");
+    for (const node of nodes) {
+      const style = getComputedStyle(node);
+      if (style.display === "none" || style.visibility === "hidden") continue;
+      if (Number.parseFloat(style.opacity) === 0) continue;
+      const rect = node.getBoundingClientRect();
+      if (rect.width < 2 || rect.height < 2) continue;
+      if (
+        rect.bottom < 0 ||
+        rect.right < 0 ||
+        rect.top > window.innerHeight ||
+        rect.left > window.innerWidth
+      ) {
+        continue;
+      }
+      return true;
+    }
+    return false;
+  };
+
+  const setGlassCopyActive = (active: boolean) => {
+    if (!sceneView) return;
+    glassCopyActive = active;
+    canvas.style.visibility = active ? "hidden" : "";
+    sceneView.style.visibility = active ? "" : "hidden";
+  };
+
+  const blitSceneView = () => {
+    if (!sceneView || !sceneViewCtx || !glassCopyActive) return;
+    const source = renderer.domElement;
+    const width = Math.max(1, Math.round(source.width * blitScale));
+    const height = Math.max(1, Math.round(source.height * blitScale));
+    if (sceneView.width !== width || sceneView.height !== height) {
+      sceneView.width = width;
+      sceneView.height = height;
+    }
+    sceneViewCtx.drawImage(source, 0, 0, width, height);
   };
 
   const scene = new THREE.Scene();
@@ -344,6 +405,19 @@ export function createCrystalField(canvas: HTMLCanvasElement, options: Options):
     camera.lookAt(0, 0, 0);
 
     renderer.render(scene, camera);
+    blitTick += 1;
+    if (sceneView) {
+      if (blitTick === 1 || blitTick % 8 === 0) {
+        const needed = hasVisibleGlass();
+        if (needed !== glassCopyActive) {
+          setGlassCopyActive(needed);
+          if (needed) blitSceneView();
+        }
+      }
+      if (glassCopyActive && blitTick % 2 === 0) {
+        blitSceneView();
+      }
+    }
     if (!announcedReady) {
       announcedReady = true;
       requestAnimationFrame(() => options.onReady?.());
@@ -397,6 +471,9 @@ export function createCrystalField(canvas: HTMLCanvasElement, options: Options):
       }
       window.removeEventListener("pointermove", onPointer);
       document.removeEventListener("visibilitychange", onVisibility);
+      sceneViewClassObserver?.disconnect();
+      sceneView?.remove();
+      canvas.style.visibility = "";
       geometry.dispose();
       (layerA.material as THREE.ShaderMaterial).dispose();
       (layerB.material as THREE.ShaderMaterial).dispose();

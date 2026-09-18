@@ -24,6 +24,18 @@
   -webkit-backdrop-filter: none;
 }
 
+:global(html[data-glass-engine="chromium"]) .dock[data-ready="true"],
+:global(html[data-glass-engine="chromium"]) .panel[data-ready="true"] {
+  overflow: visible;
+  background: rgba(255, 255, 255, 0.02);
+  -webkit-backdrop-filter: blur(56px) saturate(160%);
+  backdrop-filter: blur(56px) saturate(160%);
+}
+
+:global(html[data-glass-engine="chromium"]) .slot[data-ready="true"] :global(.glass__warp) {
+  display: none !important;
+}
+
 .sizer {
   display: flex;
   width: 100%;
@@ -44,6 +56,10 @@
   box-sizing: border-box;
   box-shadow: none !important;
   background: rgba(255, 255, 255, 0.08) !important;
+}
+
+:global(html[data-glass-engine="chromium"]) .slot[data-ready="true"] :global(.glass) {
+  background: transparent !important;
 }
 
 .slot[data-ready="true"] > span {

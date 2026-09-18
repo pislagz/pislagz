@@ -88,8 +88,10 @@
     min-height: 0;
   }
 
+  /* Visible overflow so glass pills can backdrop-filter the page scene.
+     Hidden overflow makes Chromium treat main as the backdrop root. */
   :global(html:not([data-arsenal-flying])) .main:not(:has([data-page="arsenal"], [data-page="play"])) {
-    overflow: hidden;
+    overflow: visible;
   }
 
   .main:has([data-page="arsenal"], [data-page="play"]) {
