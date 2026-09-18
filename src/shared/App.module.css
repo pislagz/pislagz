@@ -15,6 +15,19 @@
   overflow-x: clip;
 }
 
+/* Pong locks the shell to the visual viewport so the play-sheet footer can
+   dock in place instead of extending the page and forcing a scroll. */
+:global(html[data-play-mobile]) .shell {
+  height: 100svh;
+  max-height: 100svh;
+  overflow: hidden;
+}
+
+:global(html[data-play-mobile]) .main {
+  min-height: 0;
+  overflow: hidden;
+}
+
 :global(html[data-mobile-scroll-safe="true"]) .shell {
   min-height: auto;
   background: #070910;
@@ -45,6 +58,19 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+}
+
+/* Below 901px the shell is otherwise height:auto, so 1fr cannot shrink the
+   invaders CRT when the window narrows. Lock play to the viewport at every
+   width so resize-from-desktop matches resize-from-mobile. */
+.shell:has([data-page="play"]) {
+  height: 100svh;
+  max-height: 100svh;
+}
+
+.main:has([data-page="play"]) {
+  min-width: 0;
+  min-height: 0;
 }
 
 @media (min-width: 901px) {

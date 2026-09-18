@@ -1,8 +1,6 @@
 .game {
   width: min(720px, 100%);
   overflow: visible;
-  transform: translateY(var(--dev-play-game-offset-y, 0px))
-    scale(var(--dev-play-game-scale, 1));
   transform-origin: top center;
   font-family: var(--font-quantico), sans-serif;
   color: #fff;
@@ -397,15 +395,21 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-width: 0;
   min-height: 0;
   width: min(960px, 100%);
 }
 
 @media (min-width: 901px) {
+  .game {
+    transform: translateY(var(--dev-play-game-offset-y, 36px))
+      scale(var(--dev-play-game-scale, 0.85));
+  }
+
   .game[data-mode="invaders"] {
     --play-fit-scale: 0.92;
-    transform: translateY(var(--dev-play-game-offset-y, 0px))
-      scale(calc(var(--play-fit-scale) * var(--dev-play-game-scale, 1)));
+    transform: translateY(var(--dev-play-game-offset-y, 36px))
+      scale(calc(var(--play-fit-scale) * var(--dev-play-game-scale, 0.85)));
   }
 }
 
@@ -413,7 +417,7 @@
   width: var(--crt-width, 100%);
   max-width: 100%;
   align-self: center;
-  font-size: var(--type-quantico-12);
+  font-size: var(--type-quantico-16);
   margin-bottom: 6px;
   gap: 16px;
   letter-spacing: 0.06em;
@@ -425,7 +429,7 @@
   align-self: center;
   min-height: 14px;
   margin: 0 0 6px;
-  font-size: var(--type-quantico-12);
+  font-size: var(--type-quantico-16);
   letter-spacing: 0.04em;
 }
 
@@ -436,7 +440,7 @@
 
 .game[data-mode="invaders"] .instructions {
   margin-top: 8px;
-  font-size: var(--type-quantico-12);
+  font-size: var(--type-quantico-16);
 }
 
 .game[data-mode="invaders"] .hud,
@@ -447,15 +451,16 @@
 
 .game[data-mode="invaders"] .screen {
   flex: 1 1 0;
+  min-width: 0;
   min-height: 0;
   width: 100%;
-  container-type: size;
   display: grid;
   place-items: center;
 }
 
 .game[data-mode="invaders"] .frame {
-  width: min(100cqw, calc(100cqh * 3 / 2));
+  width: min(100%, var(--crt-width, 100%));
+  max-height: 100%;
   aspect-ratio: 3 / 2;
   height: auto;
 }
@@ -652,6 +657,16 @@
   width: 100%;
   margin-top: 14px;
   margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.game[data-mode="pong"] .hud,
+.game[data-mode="pong"] .energyBars,
+.game[data-mode="pong"] .touchpad {
+  flex-shrink: 0;
 }
 
 .game[data-mode="pong"] .hud {
@@ -659,14 +674,24 @@
   font-size: var(--type-quantico-12);
 }
 
+.game[data-mode="pong"] .screen {
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+}
+
 .game[data-mode="pong"] .frame {
   width: 100%;
+  flex: 1;
+  min-height: 0;
+  max-height: 560px;
   margin-inline: auto;
 }
 
 .game[data-mode="pong"] .canvas {
   width: 100%;
-  height: min(560px, calc(100dvh - 320px));
+  height: 100%;
 }
 
 .game[data-mode="pong"] .instructions {
@@ -677,7 +702,7 @@
 }
 
 .game[data-mode="pong"] .touchCursor {
-  display: flex;
+  display: none;
   position: fixed;
   top: 0;
   left: 50%;
@@ -705,6 +730,12 @@
 
 .game[data-mode="pong"] .hintPlaying .instructionTap:not(.instructionPowerReady) {
   animation: hint-tap-blink 5.2s steps(2, jump-none) infinite;
+}
+
+@media (max-width: 900px) {
+  .game[data-mode="pong"] .touchCursor {
+    display: flex;
+  }
 }
 
 @keyframes touch-cursor-demo {

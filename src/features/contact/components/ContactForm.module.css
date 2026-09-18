@@ -2,10 +2,10 @@
   position: relative;
   z-index: 1;
   overflow: visible;
-  width: min(560px, 100%);
+  width: 520px;
   max-width: 100%;
   border-radius: 28px;
-  padding: 20px 24px 16px;
+  padding: 24px 24px 20px;
   background: rgba(18, 18, 18, 0.8);
   box-shadow:
     0 0 0 1px rgb(40, 40, 40),
@@ -83,108 +83,43 @@
 
 .row {
   display: flex;
-  gap: 12px;
-  flex-shrink: 0;
+  gap: 52px;
 }
 
-.fieldBox {
-  position: relative;
-  display: block;
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   min-width: 0;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.04);
-  transition:
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    background-color 180ms ease;
-  animation: field-in 640ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.fieldBox:not(.full) {
-  min-height: 50px;
-}
-
-.fieldBox:focus-within {
-  border-color: rgba(126, 249, 255, 0.45);
-  background: rgba(255, 255, 255, 0.055);
-  box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.1);
-}
-
-.name {
-  flex: 1 1 0;
-  min-width: 0;
-  animation-delay: 640ms;
-}
-
-.contact {
-  flex: 1 1 0;
-  min-width: 0;
-  animation-delay: 720ms;
 }
 
 .full {
-  margin-top: 12px;
-  animation-delay: 800ms;
-}
-
-@keyframes field-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
+  margin-top: 20px;
 }
 
 .label {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
   font-family: var(--font-quantico), sans-serif;
   font-size: var(--type-quantico-14);
   font-weight: 400;
-  line-height: 1;
-  color: rgba(255, 255, 255, 0.45);
-  white-space: nowrap;
-  pointer-events: none;
-  transform-origin: left center;
-  transition:
-    top 160ms cubic-bezier(0.4, 0, 0.2, 1),
-    transform 160ms cubic-bezier(0.4, 0, 0.2, 1),
-    font-size 160ms cubic-bezier(0.4, 0, 0.2, 1),
-    color 160ms ease;
-}
-
-.full .label {
-  top: 16px;
-  transform: none;
-}
-
-.fieldBox:focus-within .label,
-.fieldBox.filled .label {
-  top: 10px;
-  transform: translateY(0) scale(0.86);
-  font-size: var(--type-quantico-12);
-  color: rgba(255, 255, 255, 0.58);
+  color: var(--color-white);
+  padding-left: 7px;
 }
 
 .input {
-  display: block;
-  width: 100%;
-  border: 0;
   background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--color-underline);
   color: var(--color-white);
   font-family: var(--font-quantico), sans-serif;
   font-size: var(--type-quantico-14);
-  line-height: 1.35;
-  padding: 24px 14px 8px;
+  padding: 0 7px 8px;
+  width: 100%;
   color-scheme: dark;
+}
+
+.input:focus {
+  outline: none;
+  border-bottom-color: var(--color-accent);
 }
 
 .form .input::-webkit-credentials-auto-fill-button,
@@ -197,29 +132,34 @@
 .form .input:-webkit-autofill:focus {
   -webkit-text-fill-color: var(--color-white);
   caret-color: var(--color-white);
-  box-shadow: 0 0 0 1000px rgba(28, 28, 30, 0.95) inset;
+  box-shadow: 0 0 0 1000px rgba(18, 18, 18, 0.95) inset;
   transition: background-color 99999s ease-out;
 }
 
 .message {
   resize: none;
   overflow-x: hidden;
-  overflow-y: hidden;
-  min-height: calc(72px + 2lh);
+  overflow-y: auto;
+  min-height: 57px;
   line-height: 1.4;
-  padding: 26px 14px 10px;
+}
+
+.name {
+  width: 159px;
+}
+
+.contact {
+  width: 189px;
 }
 
 .actionRow {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 12px;
   height: 28px;
   margin-top: 18px;
-  flex-shrink: 0;
-  animation: field-in 640ms cubic-bezier(0.16, 1, 0.3, 1) 860ms both;
 }
 
 .submit {
@@ -234,7 +174,7 @@
   box-shadow: 0 0 0 1px rgb(110, 110, 115);
   color: #f5f5f7;
   font-family: var(--font-quantico), sans-serif;
-  font-size: var(--type-quantico-14);
+  font-size: var(--type-quantico-12);
   font-weight: 400;
   line-height: 1;
   white-space: nowrap;
@@ -274,7 +214,7 @@
   font-size: var(--type-quantico-12);
   line-height: 1.2;
   color: var(--color-text-muted);
-  text-align: left;
+  text-align: right;
 }
 
 .successIn {
@@ -288,7 +228,7 @@
   font-size: var(--type-quantico-12);
   line-height: 1.2;
   color: #ff8f8f;
-  text-align: left;
+  text-align: right;
   animation: success-in 320ms ease both;
 }
 
@@ -343,11 +283,8 @@
   .successIn,
   .error,
   .form,
-  .sweep::before,
-  .fieldBox,
-  .actionRow {
+  .sweep::before {
     animation: none;
-    transition: none;
   }
 }
 
@@ -359,7 +296,7 @@
 
   .row {
     flex-direction: column;
-    gap: 12px;
+    gap: 28px;
   }
 
   .name,
@@ -368,18 +305,16 @@
   }
 
   .full {
-    margin-top: 12px;
+    margin-top: 28px;
   }
 
   .message {
-    min-height: calc(96px + 2lh);
-    padding: 26px 14px 10px;
+    min-height: 72px;
   }
 
   .actionRow {
     height: auto;
     min-height: 32px;
-    margin-top: 16px;
     overflow: visible;
   }
 
@@ -399,21 +334,18 @@
 
 @media (min-width: 901px) {
   .form {
-    display: flex;
-    flex-direction: column;
-    padding: 16px 20px 12px;
+    flex: 0 0 auto;
   }
 
-  .fieldBox:not(.full) {
-    min-height: 44px;
+  :global(html[data-footer-enabled]) .form {
+    padding: 20px 24px 16px;
   }
 
-  .message {
-    min-height: calc(80px + 2lh);
-    height: auto;
+  :global(html[data-footer-enabled]) .full {
+    margin-top: 14px;
   }
 
-  .actionRow {
-    margin-top: 10px;
+  :global(html[data-footer-enabled]) .actionRow {
+    margin-top: 14px;
   }
 }

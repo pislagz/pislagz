@@ -338,6 +338,7 @@
 @media (max-width: 900px) {
   .playSheet {
     z-index: 3;
+    flex-shrink: 0;
     touch-action: none;
     cursor: grab;
     transform: translate3d(0, calc(var(--dock, 0) * var(--dock-travel, 0px)), 0);
