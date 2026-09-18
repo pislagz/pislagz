@@ -42,6 +42,7 @@ export function GlassSurface({
       className={[styles.slot, styles[variant], className ?? ""]
         .filter(Boolean)
         .join(" ")}
+      data-glass-surface=""
       data-ready={ready ? "true" : "false"}
       data-active={active ? "true" : "false"}
       data-effects-enabled={effectsEnabled ? "true" : "false"}

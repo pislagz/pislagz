@@ -1,7 +1,6 @@
 .page {
   position: relative;
-  overflow: hidden;
-  contain: paint;
+  overflow: visible;
   width: min(100%, calc(660px + 2 * var(--pad-x-inner)));
   max-width: var(--page-max);
   margin: 0 auto;

@@ -1,8 +1,10 @@
 "use client";
 
 import type { CSSProperties, MouseEvent, ReactNode } from "react";
+import { useLayoutEffect } from "react";
 import { usePathname } from "next/navigation";
 import { playArcadeSound } from "./arcade-audio";
+import { markGlassEngine } from "./ui/glass-engine";
 import { themeForPath } from "./theme";
 import styles from "./App.module.css";
 
@@ -12,6 +14,9 @@ type Props = {
 
 export function ThemeShell({ children }: Props) {
   const theme = themeForPath(usePathname());
+  useLayoutEffect(() => {
+    markGlassEngine();
+  }, []);
   const style = {
     "--color-accent": theme.accent,
     "--color-accent-deep": theme.accentDeep,
