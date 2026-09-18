@@ -9,6 +9,7 @@ type Props = {
   onChange: (value: number) => void;
   min: number;
   max: number;
+  step?: number;
   formatReadout?: (value: number) => string;
   ariaLabel?: string;
   tabIndex?: number;
@@ -23,11 +24,19 @@ function valueToPercent(value: number, min: number, max: number) {
   return ((value - min) / (max - min)) * 100;
 }
 
+function snapToStep(value: number, min: number, max: number, step: number) {
+  const snapped = min + Math.round((value - min) / step) * step;
+  const decimals = String(step).split(".")[1]?.length ?? 0;
+  const rounded = Number(snapped.toFixed(decimals));
+  return clamp(rounded, min, max);
+}
+
 export function ScaleSlider({
   value,
   onChange,
   min,
   max,
+  step = 1,
   formatReadout = formatBackgroundScale,
   ariaLabel = "Adjust scale",
   tabIndex = -1,
@@ -45,10 +54,10 @@ export function ScaleSlider({
       if (rect.width < 1) return;
 
       const ratio = clamp((clientX - rect.left) / rect.width, 0, 1);
-      const next = Math.round(min + ratio * (max - min));
+      const next = snapToStep(min + ratio * (max - min), min, max, step);
       onChange(next);
     },
-    [max, min, onChange],
+    [max, min, onChange, step],
   );
 
   const onPointerDown = useCallback(

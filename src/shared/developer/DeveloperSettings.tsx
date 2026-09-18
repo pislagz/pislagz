@@ -51,6 +51,14 @@ import {
 import {
   DEFAULT_PORTRAIT_GLYPH_SOUNDS_ENABLED,
 } from "./layout-copy";
+import {
+  DEFAULT_GLASS_PRESETS,
+  type GlassMode,
+  type GlassNumericParam,
+  type GlassPreset,
+  type GlassVariant,
+  type UsedGlassVariant,
+} from "./glass-layout";
 
 type DeveloperSettings = {
   footerEnabled: boolean;
@@ -101,6 +109,13 @@ type DeveloperSettings = {
   setHeaderGradientColorB: (value: string) => void;
   headerGradientDirection: PositionOffset;
   setHeaderGradientDirection: (offset: PositionOffset) => void;
+  glassPresets: Record<GlassVariant, GlassPreset>;
+  setGlassPresetParam: (
+    variant: UsedGlassVariant,
+    key: GlassNumericParam,
+    value: number,
+  ) => void;
+  setGlassPresetMode: (variant: UsedGlassVariant, mode: GlassMode) => void;
   resetDeveloperSettings: () => void;
 };
 
@@ -142,6 +157,11 @@ export function DeveloperSettingsProvider({ children }: { children: ReactNode })
   const [headerGradientDirection, setHeaderGradientDirection] = useState(
     DEFAULT_HEADER_GRADIENT_DIRECTION,
   );
+  const [glassPresets, setGlassPresets] = useState<Record<GlassVariant, GlassPreset>>({
+    dock: { ...DEFAULT_GLASS_PRESETS.dock },
+    panel: { ...DEFAULT_GLASS_PRESETS.panel },
+    pill: { ...DEFAULT_GLASS_PRESETS.pill },
+  });
 
   const resetDeveloperSettings = useCallback(() => {
     setFooterEnabled(false);
@@ -168,12 +188,40 @@ export function DeveloperSettingsProvider({ children }: { children: ReactNode })
     setHeaderGradientColorA(DEFAULT_HEADER_GRADIENT_COLOR_A);
     setHeaderGradientColorB(DEFAULT_HEADER_GRADIENT_COLOR_B);
     setHeaderGradientDirection(DEFAULT_HEADER_GRADIENT_DIRECTION);
+    setGlassPresets({
+      dock: { ...DEFAULT_GLASS_PRESETS.dock },
+      panel: { ...DEFAULT_GLASS_PRESETS.panel },
+      pill: { ...DEFAULT_GLASS_PRESETS.pill },
+    });
   }, []);
 
   const setHomeLayoutOffset = useCallback((key: HomeLayoutKey, offset: PositionOffset) => {
     setHomeLayoutOffsets((current) => ({
       ...current,
       [key]: offset,
+    }));
+  }, []);
+
+  const setGlassPresetParam = useCallback(
+    (variant: UsedGlassVariant, key: GlassNumericParam, value: number) => {
+      setGlassPresets((current) => ({
+        ...current,
+        [variant]: {
+          ...current[variant],
+          [key]: value,
+        },
+      }));
+    },
+    [],
+  );
+
+  const setGlassPresetMode = useCallback((variant: UsedGlassVariant, mode: GlassMode) => {
+    setGlassPresets((current) => ({
+      ...current,
+      [variant]: {
+        ...current[variant],
+        mode,
+      },
     }));
   }, []);
 
@@ -322,6 +370,9 @@ export function DeveloperSettingsProvider({ children }: { children: ReactNode })
           setHeaderGradientColorB(normalizeHeaderGradientColor(value)),
         headerGradientDirection,
         setHeaderGradientDirection,
+        glassPresets,
+        setGlassPresetParam,
+        setGlassPresetMode,
         resetDeveloperSettings,
       }}
     >

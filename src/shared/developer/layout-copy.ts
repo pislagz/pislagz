@@ -15,6 +15,12 @@ import {
   hasChangedHeaderGradientSettings,
 } from "./header-gradient-layout";
 import {
+  formatChangedGlassSettings,
+  hasChangedGlassSettings,
+  type GlassPreset,
+  type GlassVariant,
+} from "./glass-layout";
+import {
   DEFAULT_BIG_HEADER_ENABLED,
   formatChangedHomeLayoutOffsets,
   formatPositionAxis,
@@ -34,6 +40,7 @@ export function hasChangedDeveloperLayoutOffsets(
   arsenalGridOffsetY: number,
   playGameScale: number,
   playGameOffsetY: number,
+  glassPresets: Record<GlassVariant, GlassPreset>,
 ): boolean {
   return (
     hasChangedHomeLayoutOffsets(homeOffsets, backgroundScale) ||
@@ -44,7 +51,8 @@ export function hasChangedDeveloperLayoutOffsets(
       arsenalGlowRadiusPx,
       arsenalGridOffsetY,
     ) ||
-    hasChangedPlaySettings(playGameScale, playGameOffsetY)
+    hasChangedPlaySettings(playGameScale, playGameOffsetY) ||
+    hasChangedGlassSettings(glassPresets)
   );
 }
 
@@ -63,6 +71,7 @@ export function formatChangedDeveloperLayoutOffsets(
   headerGradientColorA: string,
   headerGradientColorB: string,
   headerGradientDirection: PositionOffset,
+  glassPresets: Record<GlassVariant, GlassPreset>,
 ): string {
   const lines: string[] = [];
   const homeLines = formatChangedHomeLayoutOffsets(homeOffsets, backgroundScale);
@@ -106,6 +115,11 @@ export function formatChangedDeveloperLayoutOffsets(
     lines.push(playLines);
   }
 
+  const glassLines = formatChangedGlassSettings(glassPresets);
+  if (glassLines) {
+    lines.push(glassLines);
+  }
+
   return lines.join("\n");
 }
 
@@ -136,6 +150,7 @@ export function hasChangedDeveloperSettings(
   headerGradientColorA: string,
   headerGradientColorB: string,
   headerGradientDirection: PositionOffset,
+  glassPresets: Record<GlassVariant, GlassPreset>,
 ): boolean {
   return (
     footerEnabled ||
@@ -163,6 +178,7 @@ export function hasChangedDeveloperSettings(
       arsenalGridOffsetY,
       playGameScale,
       playGameOffsetY,
+      glassPresets,
     )
   );
 }

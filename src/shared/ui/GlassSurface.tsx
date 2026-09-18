@@ -3,58 +3,17 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import LiquidGlass from "liquid-glass-react";
+import { useDeveloperSettings } from "@shared/developer/DeveloperSettings";
+import { DEFAULT_GLASS_PRESETS, type GlassVariant } from "@shared/developer/glass-layout";
 import { useMediaQuery } from "@shared/hooks/use-media-query";
 import styles from "./GlassSurface.module.css";
 
-type Variant = "dock" | "panel" | "pill";
-
 type Props = {
   children: ReactNode;
-  variant?: Variant;
+  variant?: GlassVariant;
   className?: string;
   active?: boolean;
   effectsEnabled?: boolean;
-};
-
-const PRESETS: Record<
-  Variant,
-  {
-    displacementScale: number;
-    blurAmount: number;
-    saturation: number;
-    aberrationIntensity: number;
-    elasticity: number;
-    cornerRadius: number;
-    mode: "standard" | "prominent";
-  }
-> = {
-  dock: {
-    displacementScale: 36,
-    blurAmount: 0.08,
-    saturation: 130,
-    aberrationIntensity: 1.2,
-    elasticity: 0.06,
-    cornerRadius: 24,
-    mode: "standard",
-  },
-  panel: {
-    displacementScale: 52,
-    blurAmount: 0.1,
-    saturation: 125,
-    aberrationIntensity: 1.6,
-    elasticity: 0.01,
-    cornerRadius: 28,
-    mode: "standard",
-  },
-  pill: {
-    displacementScale: 28,
-    blurAmount: 0.22,
-    saturation: 118,
-    aberrationIntensity: 0.55,
-    elasticity: 0.08,
-    cornerRadius: 100,
-    mode: "standard",
-  },
 };
 
 export function GlassSurface({
@@ -66,7 +25,8 @@ export function GlassSurface({
 }: Props) {
   const [ready, setReady] = useState(false);
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
-  const preset = PRESETS[variant];
+  const { glassPresets } = useDeveloperSettings();
+  const preset = glassPresets[variant] ?? DEFAULT_GLASS_PRESETS[variant];
   const displacementScale = active ? preset.displacementScale * 1.28 : preset.displacementScale;
   const blurAmount = active ? preset.blurAmount + 0.04 : preset.blurAmount;
   const saturation = active ? preset.saturation + 28 : preset.saturation;
