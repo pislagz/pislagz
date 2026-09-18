@@ -31,13 +31,11 @@ export function ContactForm() {
     const field = messageRef.current;
     if (!field) return;
 
-    field.style.minHeight = "";
     field.style.height = "0px";
     const contentHeight = field.scrollHeight;
     const formEl = field.closest("form");
     const main = field.closest("main");
     const boundary = document.querySelector("[data-footer-boundary]");
-
     let next = Math.min(contentHeight, MESSAGE_MAX_PX);
     const desktop = window.matchMedia("(min-width: 901px)").matches;
 
@@ -45,16 +43,16 @@ export function ContactForm() {
       const fieldBox = field.getBoundingClientRect();
       const formBox = formEl.getBoundingClientRect();
       const belowField = formBox.bottom - fieldBox.bottom;
-      const limit = boundary
-        ? boundary.getBoundingClientRect().top
-        : main.getBoundingClientRect().bottom;
+      const limit = Math.min(
+        main.getBoundingClientRect().bottom,
+        boundary?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY,
+      );
       const available = Math.floor(limit - FORM_BOTTOM_GAP_PX - fieldBox.top - belowField);
       if (Number.isFinite(available)) {
         next = Math.min(next, Math.max(0, available));
       }
     }
 
-    field.style.minHeight = `${next}px`;
     field.style.height = `${next}px`;
     field.style.overflowY = contentHeight > next + 1 ? "auto" : "hidden";
   }, []);
@@ -73,9 +71,7 @@ export function ContactForm() {
     >
       <div className={styles.sweep} aria-hidden="true" />
       <div className={styles.row}>
-        <label
-          className={`${styles.fieldBox} ${styles.name} ${form.name ? styles.filled : ""}`}
-        >
+        <label className={`${styles.field} ${styles.name}`}>
           <span className={styles.label}>Full name / Company</span>
           <input
             className={styles.input}
@@ -85,9 +81,7 @@ export function ContactForm() {
             disabled={busy || locked}
           />
         </label>
-        <label
-          className={`${styles.fieldBox} ${styles.contact} ${form.contact ? styles.filled : ""}`}
-        >
+        <label className={`${styles.field} ${styles.contact}`}>
           <span className={styles.label}>E-mail / Phone</span>
           <input
             className={styles.input}
@@ -98,22 +92,18 @@ export function ContactForm() {
           />
         </label>
       </div>
-      <label className={`${styles.fieldBox} ${styles.full} ${form.message ? styles.filled : ""}`}>
+      <label className={`${styles.field} ${styles.full}`}>
         <span className={styles.label}>Message</span>
         <textarea
           ref={messageRef}
           className={`${styles.input} ${styles.message}`}
-          rows={1}
+          rows={2}
           value={form.message}
           onChange={(event) => form.setMessage(event.target.value)}
           disabled={busy || locked}
         />
       </label>
       <div className={styles.actionRow}>
-        {form.error ? <p className={styles.error}>{form.error}</p> : null}
-        {buttonGone ? (
-          <p className={`${styles.success} ${styles.successIn}`}>Message sent. Thank you.</p>
-        ) : null}
         {!buttonGone ? (
           <button
             type="submit"
@@ -125,6 +115,10 @@ export function ContactForm() {
             <span>{busy ? "Sending" : "Send message"}</span>
             <img src="/assets/icons/send.svg" alt="" width={12} height={12} />
           </button>
+        ) : null}
+        {form.error ? <p className={styles.error}>{form.error}</p> : null}
+        {buttonGone ? (
+          <p className={`${styles.success} ${styles.successIn}`}>Message sent. Thank you.</p>
         ) : null}
       </div>
     </form>

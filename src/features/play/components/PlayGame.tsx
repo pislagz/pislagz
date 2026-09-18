@@ -1012,13 +1012,14 @@ export function PlayGame({ pong }: { pong: boolean }) {
   const [powerWindowOpen, setPowerWindowOpen] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [skipCountdown, setSkipCountdown] = useState(false);
-  const [footerDocked, setFooterDocked] = useState(false);
+  const showTouchHint = pong && status === "playing";
   const [crtOn, setCrtOn] = useState(true);
   const [intro, setIntro] = useState(true);
   const powerTimingTimeoutRef = useRef<number | null>(null);
   const instructionsRef = useRef<HTMLParagraphElement>(null);
   const touchCursorRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<HTMLDivElement>(null);
+  const screenRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -1123,18 +1124,7 @@ export function PlayGame({ pong }: { pong: boolean }) {
   };
 
   useEffect(() => {
-    if (!pong) return;
-    const onFooterProgress = (event: Event) => {
-      const { dock } = (event as CustomEvent<{ dock: number }>).detail;
-      setFooterDocked(dock > 0.9);
-    };
-    setFooterDocked(document.documentElement.dataset.pongFooterDocked === "true");
-    window.addEventListener("pong-footer-progress", onFooterProgress);
-    return () => window.removeEventListener("pong-footer-progress", onFooterProgress);
-  }, [pong]);
-
-  useEffect(() => {
-    if (!pong || !footerDocked) return;
+    if (!pong || !showTouchHint) return;
     const placeCursor = () => {
       const cursor = touchCursorRef.current;
       const instructions = instructionsRef.current;
@@ -1150,27 +1140,35 @@ export function PlayGame({ pong }: { pong: boolean }) {
       window.clearTimeout(timeout);
       window.removeEventListener("resize", placeCursor);
     };
-  }, [footerDocked, pong]);
+  }, [showTouchHint, pong]);
 
   useLayoutEffect(() => {
     const game = gameRef.current;
-    const frame = frameRef.current;
+    const screen = screenRef.current;
     if (!game) return;
     if (pong) {
       game.style.removeProperty("--crt-width");
       return;
     }
-    if (!frame) return;
+    if (!screen) return;
 
     const sync = () => {
-      const width = frame.offsetWidth;
-      if (width > 0) game.style.setProperty("--crt-width", `${width}px`);
+      const availW = screen.clientWidth;
+      const availH = screen.clientHeight;
+      if (availW <= 0 || availH <= 0) return;
+      const width = Math.min(availW, (availH * 3) / 2);
+      game.style.setProperty("--crt-width", `${width}px`);
     };
 
     sync();
     const observer = new ResizeObserver(sync);
-    observer.observe(frame);
-    return () => observer.disconnect();
+    observer.observe(screen);
+    window.addEventListener("resize", sync);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", sync);
+      game.style.removeProperty("--crt-width");
+    };
   }, [pong, intro, crtOn]);
 
   return (
@@ -1237,7 +1235,7 @@ export function PlayGame({ pong }: { pong: boolean }) {
           ) : null}
         </div>
       )}
-      <div className={styles.screen} data-play-screen="">
+      <div ref={screenRef} className={styles.screen} data-play-screen="">
         <div ref={frameRef} className={styles.frame}>
         {pong ? (
           <VerticalPong
@@ -1300,7 +1298,7 @@ export function PlayGame({ pong }: { pong: boolean }) {
         <p
           ref={instructionsRef}
           className={`${styles.instructions} ${
-            pong && footerDocked ? styles.hintPlaying : ""
+            pong && showTouchHint ? styles.hintPlaying : ""
           }`}
         >
           {pong ? (
@@ -1325,7 +1323,7 @@ export function PlayGame({ pong }: { pong: boolean }) {
           <div
             ref={touchCursorRef}
             className={`${styles.touchCursor} ${
-              footerDocked ? styles.touchCursorVisible : ""
+              showTouchHint ? styles.touchCursorVisible : ""
             }`}
             aria-hidden="true"
           >

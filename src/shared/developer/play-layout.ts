@@ -1,9 +1,9 @@
 import { backgroundScaleMultiplier, formatBackgroundScale } from "./home-layout";
 
-export const DEFAULT_PLAY_GAME_SCALE = 0;
+export const DEFAULT_PLAY_GAME_SCALE = -15;
 export const PLAY_GAME_SCALE_MIN = -50;
 export const PLAY_GAME_SCALE_MAX = 50;
-export const DEFAULT_PLAY_GAME_OFFSET_Y = 0;
+export const DEFAULT_PLAY_GAME_OFFSET_Y = 36;
 export const PLAY_GAME_OFFSET_MIN = -80;
 export const PLAY_GAME_OFFSET_MAX = 120;
 
