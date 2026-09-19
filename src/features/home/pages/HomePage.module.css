@@ -157,7 +157,7 @@
   }
 
   :global(html:not([data-footer-enabled])) .typed {
-    margin-left: 0.18em;
+    margin-left: 0.22em;
   }
 
   :global(html:not([data-footer-enabled])) .role {
