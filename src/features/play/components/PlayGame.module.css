@@ -693,7 +693,8 @@
 
 .game[data-mode="pong"] .hud,
 .game[data-mode="pong"] .energyBars,
-.game[data-mode="pong"] .touchpad {
+.game[data-mode="pong"] .touchpad,
+.game[data-mode="pong"] :global([data-play-resume-cta]) {
   flex-shrink: 0;
 }
 

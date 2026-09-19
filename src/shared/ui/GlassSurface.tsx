@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import LiquidGlass from "liquid-glass-react";
 import { useDeveloperSettings } from "@shared/developer/DeveloperSettings";
 import { DEFAULT_GLASS_PRESETS, type GlassVariant } from "@shared/developer/glass-layout";
@@ -33,7 +33,7 @@ export function GlassSurface({
   const aberrationIntensity = active ? preset.aberrationIntensity + 1.1 : preset.aberrationIntensity;
   const elasticity = active ? Math.min(preset.elasticity, 0.12) : preset.elasticity;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setReady(effectsEnabled);
   }, [effectsEnabled]);
 

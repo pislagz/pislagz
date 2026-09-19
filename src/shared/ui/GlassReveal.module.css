@@ -1,0 +1,36 @@
+.stack {
+  position: relative;
+  display: inline-flex;
+  border-radius: var(--radius-pill, 1000px);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.shown {
+  visibility: visible;
+}
+
+.cover {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  background: var(--color-bg);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 520ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.coverOut {
+  opacity: 0;
+}
+
+.open.shown {
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cover {
+    transition: none;
+  }
+}

@@ -1123,21 +1123,30 @@ export function PlayGame({ pong }: { pong: boolean }) {
     setRestartToken((current) => current + 1);
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!pong || !showTouchHint) return;
     const placeCursor = () => {
       const cursor = touchCursorRef.current;
       const instructions = instructionsRef.current;
       if (!cursor || !instructions) return;
+      document.documentElement.dataset.playMobile = "true";
       const top = instructions.getBoundingClientRect().bottom;
-      const bottom = window.innerHeight - 36;
+      const rights = document.querySelector("[data-rights]");
+      const bottom = rights?.getBoundingClientRect().top ?? window.innerHeight - 36;
       cursor.style.top = `${(top + bottom) / 2}px`;
     };
+
     placeCursor();
-    const timeout = window.setTimeout(placeCursor, 640);
+    const observer = new ResizeObserver(placeCursor);
+    if (instructionsRef.current) observer.observe(instructionsRef.current);
+    if (gameRef.current) observer.observe(gameRef.current);
+    const viewport = window.visualViewport;
+    viewport?.addEventListener("resize", placeCursor);
     window.addEventListener("resize", placeCursor);
+    void document.fonts?.ready.then(placeCursor);
     return () => {
-      window.clearTimeout(timeout);
+      observer.disconnect();
+      viewport?.removeEventListener("resize", placeCursor);
       window.removeEventListener("resize", placeCursor);
     };
   }, [showTouchHint, pong]);
@@ -1297,6 +1306,7 @@ export function PlayGame({ pong }: { pong: boolean }) {
       <div className={styles.touchpad}>
         <p
           ref={instructionsRef}
+          data-play-instructions=""
           className={`${styles.instructions} ${
             pong && showTouchHint ? styles.hintPlaying : ""
           }`}
@@ -1334,6 +1344,7 @@ export function PlayGame({ pong }: { pong: boolean }) {
       <PlayTabletCtas
         pong={pong}
         gameActive={status === "playing" && !intro && !crtOn}
+        gameOver={status === "game-over"}
       />
     </div>
   );

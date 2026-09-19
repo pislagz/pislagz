@@ -43,6 +43,10 @@
   pointer-events: none;
 }
 
+:global(html[data-mobile-scroll-safe="true"]:not([data-footer-enabled])) .shell::after {
+  padding-bottom: 0;
+}
+
 .pageFrame {
   position: relative;
   width: 100%;
@@ -113,6 +117,13 @@
   }
 
   :global(html:not([data-footer-enabled])) .shell:has([data-page="home"]) :global([data-footer-placeholder]) {
+    height: 0;
+    min-height: 0;
+    padding: 0;
+    overflow: visible;
+  }
+
+  :global(html:not([data-footer-enabled])) .shell:has([data-page="home"]) :global([data-footer-placeholder] > :not([data-rights])) {
     display: none;
   }
 }
@@ -121,4 +132,10 @@
    tiles overflow those siblings, so lift main until they land. */
 :global(html[data-arsenal-flying]) .main {
   z-index: 80;
+}
+
+@media (max-width: 900px) {
+  :global(html:not([data-footer-enabled])) .shell:has([data-arsenal-continue]) :global([data-footer-placeholder]) {
+    padding-top: 0;
+  }
 }

@@ -5,6 +5,7 @@ import { useDeveloperSettings } from "@shared/developer/DeveloperSettings";
 import { useMediaQuery } from "@shared/hooks/use-media-query";
 import { schedulePlayFooterActionDelay } from "@shared/play-footer-action";
 import { GlassArrowCta } from "@shared/ui/GlassArrowCta";
+import { GlassReveal } from "@shared/ui/GlassReveal";
 import styles from "./ArsenalContinueCta.module.css";
 
 const COMPACT_NAV_QUERY = "(max-width: 1100px)";
@@ -40,14 +41,16 @@ export function ArsenalContinueCta() {
   if (footerEnabled || !visible) return null;
 
   return (
-    <div className={styles.wrap}>
-      <GlassArrowCta
-        href="/play"
-        className={styles.cta}
-        onClick={schedulePlayFooterActionDelay}
-      >
-        continue
-      </GlassArrowCta>
+    <div className={styles.wrap} data-arsenal-continue="">
+      <GlassReveal show>
+        <GlassArrowCta
+          href="/play"
+          className={styles.cta}
+          onClick={schedulePlayFooterActionDelay}
+        >
+          continue
+        </GlassArrowCta>
+      </GlassReveal>
     </div>
   );
 }

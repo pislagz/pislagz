@@ -10,17 +10,15 @@ export function FooterSlot() {
 
   if (!footerEnabled) {
     return (
-      <>
+      <div
+        className={styles.footerPlaceholder}
+        data-footer-boundary=""
+        data-footer-placeholder=""
+        aria-hidden="true"
+      >
         {rightsEnabled ? <FooterCopyright variant="floating" /> : null}
-        <div
-          className={styles.footerPlaceholder}
-          data-footer-boundary=""
-          data-footer-placeholder=""
-          aria-hidden="true"
-        >
-          <div className={styles.footerPlaceholderInner} />
-        </div>
-      </>
+        <div className={styles.footerPlaceholderInner} />
+      </div>
     );
   }
 

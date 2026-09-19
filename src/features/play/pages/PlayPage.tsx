@@ -29,7 +29,7 @@ export function PlayPage() {
     };
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!pong) return;
 
     document.documentElement.dataset.playMobile = "true";
@@ -38,19 +38,25 @@ export function PlayPage() {
     document.body.style.overflow = "hidden";
     document.body.style.overscrollBehavior = "none";
 
-    const onTouchStart = (event: TouchEvent) => {
-      if (isInteractiveTouchTarget(event.target)) return;
-      event.preventDefault();
-    };
-
-    document.addEventListener("touchstart", onTouchStart, { capture: true, passive: false });
-
     return () => {
       delete document.documentElement.dataset.playMobile;
       document.documentElement.style.removeProperty("overflow");
       document.documentElement.style.removeProperty("overscroll-behavior");
       document.body.style.removeProperty("overflow");
       document.body.style.removeProperty("overscroll-behavior");
+    };
+  }, [pong]);
+
+  useEffect(() => {
+    if (!pong) return;
+
+    const onTouchStart = (event: TouchEvent) => {
+      if (isInteractiveTouchTarget(event.target)) return;
+      event.preventDefault();
+    };
+
+    document.addEventListener("touchstart", onTouchStart, { capture: true, passive: false });
+    return () => {
       document.removeEventListener("touchstart", onTouchStart, { capture: true });
     };
   }, [pong]);
@@ -59,7 +65,11 @@ export function PlayPage() {
     if (!pong) return;
 
     const forward = (phase: "down" | "move" | "up", event: PointerEvent) => {
-      if (event.target instanceof Element && event.target.closest("footer")) return;
+      if (
+        event.target instanceof Element &&
+        event.target.closest("footer, [data-play-resume-cta]")
+      )
+        return;
       const canvas = pageRef.current?.querySelector("canvas");
       if (!canvas || event.clientY < canvas.getBoundingClientRect().bottom) return;
       window.dispatchEvent(
