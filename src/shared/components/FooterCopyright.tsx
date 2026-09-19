@@ -9,7 +9,7 @@ export function FooterCopyright({ variant = "inline" }: Props) {
 
   if (variant === "floating") {
     return (
-      <div className={styles.floatingCopyBar} aria-hidden="true">
+      <div className={styles.floatingCopyBar} data-rights="" aria-hidden="true">
         <div className={styles.floatingCopyInner}>
           <p className={styles.floatingCopy}>
             All rights reserved | Pawel Pisulski | {currentYear}

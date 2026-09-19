@@ -230,6 +230,32 @@
   .floatingCopyInner {
     justify-content: center;
   }
+
+  /* Sit in document flow on phones so play and other routes share one bottom slot. */
+  :global(html:not([data-footer-enabled])) .floatingCopyBar {
+    position: relative;
+    inset: auto;
+    bottom: auto;
+    z-index: 1;
+  }
+
+  :global(html:not([data-footer-enabled])) .floatingCopyInner {
+    justify-content: center;
+    width: 100%;
+    padding-inline: 0;
+  }
+
+  :global(html:not([data-footer-enabled])) .footerPlaceholder {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-end;
+    padding: 8px var(--pad-x) calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+
+  :global(html:not([data-footer-enabled])) .footerPlaceholderInner {
+    display: none;
+  }
 }
 
 @media (max-width: 740px) {

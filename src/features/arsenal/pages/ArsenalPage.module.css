@@ -26,10 +26,18 @@
     padding-top: 44px;
     padding-bottom: 24px;
   }
+
+  .page:has([data-arsenal-continue]) {
+    padding-bottom: 0;
+  }
 }
 
 @media (max-width: 900px) {
   .page {
     padding: var(--page-top-mobile) var(--pad-x) 32px;
+  }
+
+  .page:has([data-arsenal-continue]) {
+    padding-bottom: 0;
   }
 }
